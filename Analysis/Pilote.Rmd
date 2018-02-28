@@ -1,0 +1,427 @@
+---
+title: "Measuring landmark variation distances"
+author: "Thomas Guillerme"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    fig_width: 12
+    fig_height: 6
+---
+
+I've tried to kept the variables and comments as similar as yours.
+The comments starting with `#VW:` are yours.
+
+## Inputs
+
+Make sure you're in the right folder where the `coordinates.difference.R`, `ClassificationWomCr.csv` and `Wombat_Cranium_Lndmrk_Data.csv` files are.
+
+ 1. First load the package:
+
+```{r}
+## Loading the libraries (and installing if necessary)
+if(!require(devtools)) install.packages("devtools")
+if(!require(geomorph)) install.packages("geomorph")
+if(!require(zoo)) install.packages("zoo")
+if(!require(dispRity)) install_github("dispRity")
+## Loading the function
+source("coordinates.difference.R")
+```
+
+ 2. Second, load the data
+
+```{r}
+#VW: Contains information about each specimen for crania or wombats
+ClassifierCr <- read.csv("ClassificationWomCr.csv", header = TRUE)
+## The landmarks list
+landmarks <- read.csv("MovingLMs.csv")
+#VW: Read data
+WomCrData <- read.csv("Wombat_Cranium_Lndmrk_Data.csv", header = TRUE, row.names = 1)
+#VW: Transpose rows and columns because of the format that Viewbox exports in
+WomCrData <- t(WomCrData)
+#VW: Remove any empty rows
+WomCrData <- WomCrData[complete.cases(WomCrData),]
+#VW: Make 3D Array
+WomCrData <- arrayspecs(WomCrData, k = 3, p = ncol(WomCrData)/3)
+```
+
+## Analysis
+
+### Procrustes
+
+```{r}
+#VW: The surface and curve landmarks were already slid in viewbox, hence we do not slide them here
+WomCrGPA <- gpagen(WomCrData, print.progress = FALSE)
+WomCrgdf <- geomorph.data.frame(WomCrGPA, species = ClassifierCr$Species)
+```
+
+### Ordination
+
+```{r}
+WomCrPCA <- plotTangentSpace(WomCrGPA$coords, axis1 = 1, axis2 = 2, warpgrids = FALSE)
+```
+> By the way, small coding comment (ignore me if I sound pedantic) but using `F` instead of `FALSE` is generally a bad practice: you save four letters but at a cost of a lot of potential trouble. `F` is a variable, not a boolean (`TRUE`/`FALSE`) which as `FALSE` attributed as default. But you can easily do `F <- TRUE` and `F` will now be `TRUE`! However, you can never do `FALSE <- TRUE`.
+
+Note that the spread of the variance is pretty even past the third axis (roughly + 2% variance per axis).
+
+After checking, these PC*i* min/max are the transposed mean procrustes coordinates plus the dot product of the min/max for the *i^{th}* PC axis and the transposed eigenvectors.
+
+```{r}
+## This is what ploTangentSpace does individually
+get.pc.min.max <- function(axis, what, PCA, GPA) {
+    if(length(axis) == 1) {
+       output <- geomorph::arrayspecs(as.vector(t(GPA$consensus)) + c(what(PCA$pc.scores[,axis]),
+                                      rep(0, ncol(PCA$pc.scores)-length(axis))) %*% t(PCA$rotation),
+                                      dim(GPA$consensus)[1], dim(GPA$consensus)[2])
+    } else {
+
+        ## To check with Emma for this one
+
+       output <- geomorph::arrayspecs(as.vector(t(GPA$consensus)) + c(apply(PCA$pc.scores, 2, what),
+                                      rep(0, ncol(PCA$pc.scores)-length(axis))) %*% t(PCA$rotation),
+                                      dim(GPA$consensus)[1], dim(GPA$consensus)[2])
+    }
+}
+```
+
+### Using the `coordinates.difference` function
+
+Small digression to explain the function:
+This function is pretty straight forward an simply extracts the coordinates of the axis plotted by `plotRefToTarget`.
+The function intakes the arguments
+
+ * coordinates: the coordinates for one species or more.
+ * reference: the reference coordinates to draw the vectors from.
+ * type: which type of coordinates, `"cartesian"` or `"shperical"` (there's also `"vector"` but it's not tested yet).
+ * angle: the angle unit (`"degree"` or `"radian"`).
+
+For example, if you want the coordinates of each vectors in your first ordination axis, you can go as follow:
+
+```{r}
+first_axis_max_min <- coordinates.difference(WomCrPCA$pc.shapes$PC1min, WomCrPCA$pc.shapes$PC1max,
+                                             type = "cartesian")
+head(first_axis_max_min[[1]])
+```
+
+So these are the simple x,y,z coordinates of the vectors.
+It's possible to visualise them (here just in 2D for the example):
+
+```{r, fig.width = 6, fig.height = 6}
+## Selecting only the two first dimension
+d2_matrix <- first_axis_max_min[[1]][,c(1,2,4,5)]
+## And lets plot the hairs (in 2D)
+par(bty = "n")
+plot(NULL, xlim = range(d2_matrix[,-c(1,2)]), ylim = range(d2_matrix[,-c(3,4)]))
+apply(d2_matrix, 1, function(x) lines(x = x[1:2], y = x[3:4]))
+```
+
+Not really meaningfull! But at least we've extracted them properly.
+
+# Measuring the differences between landmarks
+
+## The "easy" ways
+
+Now we can calculate the length (radius) and the angles (polar and azimuth) of all this on the first PC axis:
+
+```{r}
+first_axis_max_min <- coordinates.difference(WomCrPCA$pc.shapes$PC1min, WomCrPCA$pc.shapes$PC1max,
+                                             type = "spherical", angle = "degree")
+head(first_axis_max_min[[1]])
+```
+
+And draw it as distributions:
+
+```{r, fig.width = 6, fig.height = 12}
+par(mfrow = c(3,1), bty = "n")
+plot(density(first_axis_max_min[[1]][,1]), main = "Distribution of landmark changes",
+     xlab = "radius")
+plot(density(first_axis_max_min[[1]][,2]), main = "", xlab = "azimuth")
+plot(density(first_axis_max_min[[1]][,3]), main = "", xlab = "polar")
+```
+
+Interestingly there's mainly small changes in length and big changes in angle.
+
+### Actually testing the differences
+
+If your hypothesis is "Within each species, the landmarks selected landmarks change more than the other landmarks", you can test it by using an anova, t-test or any variance comparison test (parametric or not).
+For example, let say that my selected landmarks are the ones from 1 to 100 (it's probably not the case), you can go as follow:
+
+```{r, fig.width = 6, fig.height = 6}
+## Selecting the landmarks
+selected_land <- which(as.numeric(landmarks[,2]) == 1)
+
+## Selecting the changes (radii)
+selected_landmark_change <- first_axis_max_min[[1]][selected_land,1]
+non_sele_landmark_change <- first_axis_max_min[[1]][-selected_land,1]
+
+## Comparing both
+par(bty = "n")
+boxplot(selected_landmark_change, non_sele_landmark_change, ylab = "Radius",
+        xlab = "Selected/others")
+
+## Wilcoxon test (distributions are not normal)
+(wilcox_test_PC1 <- wilcox.test(selected_landmark_change, non_sele_landmark_change))
+```
+
+Because of the huge parameter, we can check if this change is actually meaningful or simply because they are many points.
+We can first measure the probability of the two distributions being the same:
+
+```{r}
+## Bhattacharrya Coefficient (probability of overlap)
+(bhat_PC1 <- bhatt.coeff(selected_landmark_change, non_sele_landmark_change))
+```
+
+And then simulate both this probability and the p-values for random selected landmarks
+
+```{r, fig.width = 6, fig.height = 12}
+## Randomly sample
+rand.sample <- function(max_min, selected_lan) {
+    ## Randomly sampling
+    random_select <- sample(1:length(max_min), length(selected_lan))
+
+    ## Wilcox test
+    wilcox <- wilcox.test(max_min[random_select], max_min[-random_select])
+
+    ## Bhattaacharrya
+    bhatt <- bhatt.coeff(max_min[random_select], max_min[-random_select])
+
+    ## Results
+    return(c("BC" = bhatt, wilcox$statistic, wilcox$p.value))
+}
+
+## Doing it on 100 bootstraps
+test <- replicate(100, rand.sample(first_axis_max_min[[1]][,1], selected_land))
+
+## Function for plotting the results
+plot.one.test <- function(test, obs, which, xlab = "") {
+    densi <- hist(test[which,], plot = FALSE)
+    plot(NULL, main = "", xlab = xlab, xlim = range(c(densi$breaks, obs)), ylim = range(c(0, densi$counts)), ylab = "Density")
+    hist(test[which,], add = TRUE)
+    abline(v = obs, lwd = 2, lty = 2)
+}
+
+## Plotting the results
+par(mfrow = c(3,1), bty = "n")
+plot.one.test(test, bhat_PC1, which = 1, xlab = "Bhattacharrya")
+plot.one.test(test, wilcox_test_PC1$statistic, which = 2, xlab = "Wilcox W")
+plot.one.test(test, wilcox_test_PC1$p.value, which = 3, xlab = "p value")
+```
+
+In this case, yes, the landmark on the selected change more than the other landmarks change more (in term of distance).
+
+#### Problem
+However, I would argue that this is probably wrong in a shape sense (not mentioning that the test is not appropriate here) since what we are actually measuring, is not the change in landmark position but the change in landmark variance/co-variance along the first axis of the PCA. The hypothesis tested above was: "Within each species, the first variance/covariance axis of the selected landmark change more than the other landmarks".
+
+We need to either measure it on all the variance/covariance (all the PC axis) or simply the physical landmark position change.
+
+## The "hard" way
+
+### Measuring change in position with *all* the PC axis
+
+In the same way as shown before, we can also extract the max and min on all dimensions all together:
+
+```{r}
+all_max <- get.pc.min.max(axis = 1:70, what = max, PCA = WomCrPCA, GPA = WomCrGPA)
+all_max <- matrix(all_max, dim(all_max)[1], dim(all_max)[2])
+all_min <- get.pc.min.max(axis = 1:70, what = min, PCA = WomCrPCA, GPA = WomCrGPA)
+all_min <- matrix(all_min, dim(all_min)[1], dim(all_min)[2])
+```
+
+And then the same way we can have the polar coordinates (but in all dimensions!):
+
+```{r}
+all_axis_max_min <- coordinates.difference(all_min, all_max,
+                                           type = "spherical", angle = "degree")
+head(all_axis_max_min[[1]])
+```
+
+And draw it as distributions:
+
+```{r, fig.width = 6, fig.height = 12}
+par(mfrow = c(3,1), bty = "n")
+plot(density(all_axis_max_min[[1]][,1]), main = "Distribution of landmark changes", xlab = "radius")
+plot(density(all_axis_max_min[[1]][,2]), main = "", xlab = "azimuth")
+plot(density(all_axis_max_min[[1]][,3]), main = "", xlab = "polar")
+```
+
+These are now the variation of all species along the maximum and minimum variation in all dimensions (not just one).
+We can thus test the same hypothesis as before but by making it more specific: "Within each species, the variance/covariance of the selected landmarks change more than the other landmarks."
+
+#### Testing the differences on all axis
+
+```{r, fig.width = 6, fig.height = 6}
+## Selecting the changes (radii)
+selected_landmark_change <- all_axis_max_min[[1]][selected_land,1]
+non_sele_landmark_change <- all_axis_max_min[[1]][-selected_land,1]
+
+## Comparing both
+par(bty = "n")
+boxplot(selected_landmark_change, non_sele_landmark_change, ylab = "Radius",
+        xlab = "Selected/others")
+
+## Wilcoxon test (distributions are not normal)
+(wilcox_test_all_PC <- wilcox.test(selected_landmark_change, non_sele_landmark_change))
+
+## Bhattacharrya Coefficient (probability of overlap)
+(bhat_all_PC1 <- bhatt.coeff(selected_landmark_change, non_sele_landmark_change))
+```
+
+And then simulate both this probability and the p-values for random selected landmarks
+
+```{r, fig.width = 6, fig.height = 12}
+## Doing it on 100 bootstraps
+test <- replicate(100, rand.sample(all_axis_max_min[[1]][,1], selected_land))
+
+## Plotting the results
+par(mfrow = c(3,1), bty = "n")
+plot.one.test(test, bhat_all_PC1, which = 1, xlab = "Bhattacharrya")
+plot.one.test(test, wilcox_test_all_PC$statistic, which = 2, xlab = "Wilcox W")
+plot.one.test(test, wilcox_test_all_PC$p.value, which = 3, xlab = "p value")
+```
+
+### Measuring change in position with *pre* ordination
+
+Always in the same way as shown before, we can extract the max and min of variation in landmark change in the actual 3D word.
+This has the advantage of directly measuring what we want to test the hypothesis "Within each species, the selected landmarks change more than the other landmarks" without using the variance/covariance of the landmarks as a proxy.
+
+For that, we'll first need to detect which species are the "maximum" and "minimum" variation.
+Because they are a 826x3 variables per specimen, it's not really feasible/meaningful to simply calculate a distance matrix.
+Luckily (!) we are just interested in the change in length and... we have a function that can calculate that!
+
+Now we need to find the maximum and minimum of these landmarks distributions and here's the trick:
+ 
+ 1. we know that the radius measured above are the distances from the consensus (average shape);
+ 2. we can measure the integral (or the area under curves if we don't want to bother defining the functions) that will represent one value for each specimen: the bigger the value, the more difference from the consensus the specimen is (the other way around, the more average).
+ 3. we can find which specimen is the most different from the average and then re-measure the coordinates differences from this one.
+ 4. and then re-measure the areas: the max value there will be the specimen the most different from the less average specimen (the max/min specimen).
+
+```{r}
+## The area function
+area <- function(coordinate_diff, what = "radius") {
+    y <- sort(coordinate_diff[, what])
+    x <- 1:length(y)
+    return(sum(diff(x) * zoo::rollmean(y,2)))
+}
+```
+ 1. The distances from consensus:
+
+```{r}
+## Distances from the consensus
+diff_from_consensus <- coordinates.difference(WomCrGPA$coords, WomCrGPA$consensus,
+                                             type = "spherical", angle = "degree")
+```
+
+ 2. The maximum area under the curve:
+
+```{r}
+## Getting all the areas
+areas_of_radius_mean <- unlist(lapply(diff_from_consensus, area))
+
+## Finding the specimen the most different from the consensus
+max_specimen <- which(areas_of_radius_mean == max(areas_of_radius_mean))
+```
+
+ 3. The distances from the most different specimen:
+
+```{r}
+## Distances from the maximum
+diff_from_max <- coordinates.difference(WomCrGPA$coords, WomCrGPA$coords[,,max_specimen],
+                                        type = "spherical", angle = "degree")
+```
+
+ 4. The maximum area under the curve (the most different from the most different from average specimen)
+
+```{r}
+## Getting all the areas
+areas_of_radius_max <- unlist(lapply(diff_from_max, area))
+
+## Finding the specimen the most different from the consensus
+min_specimen <- which(areas_of_radius_max == max(areas_of_radius_max))
+```
+
+So we now have our max and min specimens (though impossible to say which one is the "bigger" or "smaller" one - but we don't care about that).
+
+Anyway, we can now measure this distance:
+
+
+```{r}
+## Distances between the max/min
+diff_from_max_min <- coordinates.difference(WomCrGPA$coords[,,min_specimen],
+                                            WomCrGPA$coords[,,max_specimen],
+                                            type = "spherical", angle = "degree")
+```
+
+
+```{r, fig.width = 6, fig.height = 12}
+par(mfrow = c(3,1), bty = "n")
+plot(density(diff_from_max_min[[1]][,1]), main = "Distribution of landmark changes",
+    xlab = "radius")
+plot(density(diff_from_max_min[[1]][,2]), main = "", xlab = "azimuth")
+plot(density(diff_from_max_min[[1]][,3]), main = "", xlab = "polar")
+```
+
+And now we can apply the same comparisons as we did for the differences in PC scores.
+The advantages however is that we are now actually measuring this differences in physical units: i.e. if the differences in zygomatic arches landmarks are now measured in units of Procrustes superimposition (which are by definition 3D Euclidean distances) rather than in ordination of variance/co-variance of landmarks position.
+
+
+
+#### Testing the differences in the Euclidean space
+
+```{r, fig.width = 6, fig.height = 6}
+## Selecting the changes (radii)
+selected_landmark_change <- diff_from_max_min[[1]][selected_land,1]
+non_sele_landmark_change <- diff_from_max_min[[1]][-selected_land,1]
+
+## Comparing both
+par(bty = "n")
+boxplot(selected_landmark_change, non_sele_landmark_change, ylab = "Radius",
+        xlab = "Selected/others")
+
+## Wilcoxon test (distributions are not normal)
+(wilcox_test_Euclidean <- wilcox.test(selected_landmark_change, non_sele_landmark_change))
+
+## Bhattacharrya Coefficient (probability of overlap)
+(bhat_Euclidean <- bhatt.coeff(selected_landmark_change, non_sele_landmark_change))
+```
+
+And then simulate both this probability and the p-values for random selected landmarks
+
+```{r, fig.width = 6, fig.height = 12}
+## Doing it on 100 bootstraps
+test <- replicate(100, rand.sample(diff_from_max_min[[1]][,1], selected_land))
+
+## Plotting the results
+par(mfrow = c(3,1), bty = "n")
+plot.one.test(test, bhat_Euclidean, which = 1, xlab = "Bhattacharrya")
+plot.one.test(test, wilcox_test_Euclidean$statistic, which = 2, xlab = "Wilcox W")
+plot.one.test(test, wilcox_test_Euclidean$p.value, which = 3, xlab = "p value")
+```
+
+
+### Visual differences:
+
+Just some plots for showing the differences (in 3D so I won't run it in this markdown file):
+
+```{r, eval = FALSE}
+gridPar = gridPar(pt.bg = "white", pt.size = 0.5)
+open3d()
+plotRefToTarget(WomCrPCA$pc.shapes$PC1min, WomCrPCA$pc.shapes$PC1max, method = "vector",
+                gridPars = gridPar, label = FALSE, main = "Max/Min on the first PC axis")
+```
+
+```{r, eval = FALSE}
+plotRefToTarget(all_min, all_max, method = "vector",
+                gridPars = gridPar, label = FALSE, main = "Max/Min on all the PC axes")
+```
+
+```{r, eval = FALSE}
+plotRefToTarget(WomCrGPA$coords[,,max_specimen], WomCrGPA$coords[,,min_specimen], method = "vector",
+                gridPars = gridPar, label = FALSE, main = "Max/Min in \"real space\"")
+```
+
+Note how the results using only the first PC axis actually distorts the reality from the one using all the axis or the one without ordination.
+I think this is a classical problem in Geometric Morphometric analysis with ordination (or any dimensionality reduction analysis for that sake): the PC axis deform reality (that's what they're supposed to do) and it is then really tempting (and often easy) to propose post-hoc explanation of what is happening along each axis.
+Not saying it's a wrong method but at least they is room from discussion on which method is actually more adapted to test the actual hypothesis.
+
+I'll be curious to see the results of the properly tested hypothesis with the three methods!
+
+
