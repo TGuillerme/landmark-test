@@ -211,3 +211,22 @@ coordinates.difference <- function(coordinates, reference, type = "cartesian", a
 
     return(coordinates)
 }
+
+
+##### TESTS
+test <- FALSE
+if(test){
+    #TESTING bhatt.coeff
+
+    context("coordinates.difference")
+
+    #Test
+    test_that("correct output", {
+
+        ## Make data set
+        data(plethodon)
+        test_output <- geomorph::gpagen(plethodon$land, PrinAxes = FALSE, print.progress = FALSE)
+        test_out <- coordinates.difference()
+
+    })
+}
