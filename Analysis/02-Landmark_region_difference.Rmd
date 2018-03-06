@@ -8,10 +8,97 @@ output:
     fig_height: 6
 ---
 
-# Title
+```{r}
+## Loading the libraries (and installing if necessary)
+if(!require(devtools)) install.packages("devtools")
+if(!require(geomorph)) install.packages("geomorph")
+if(!require(zoo)) install.packages("zoo")
+if(!require(dispRity)) install_github("dispRity")
+## Loading the function
+source("../Functions/coordinates.difference.R")
+source("../Functions/coordinates.area.R")
+source("../Functions/variation.range.R")
+source("../Functions/rand.test.R")
+source("../Functions/plot.rand.test.R")
+source("../Functions/sanitizing.R")
+```
 
-## Subtitle
+# Pipelined analysis
 
 
-```{r, eval = FALSE, message = FALSE, fig.width = 12, fig.height = 12, echo = FALSE}
+```{r}
+## Loading a dataset
+load("../Data/Processed/wombat.Rda")
+
+## Selecting a partition
+cranium <- land_data$cranium
+```
+
+
+## Selecting the two most extreme specimen (max and min)
+
+Getting the ranges of variation for the Procrustes (i.e. real variation), the ordination (variance of the variation) and the first PC axis (the main variance of the variation):
+
+```{r}
+## Procrustes variation ranges
+procrustes_variation <- variation.range(cranium$procrustes)
+## PCA variation range
+ordination_variation <- variation.range(cranium$procrustes, ordination = cranium$ordination)
+## PC1 variation range
+ordinatio1_variation <- variation.range(cranium$procrustes, ordination = cranium$ordination,
+                                       axis = 1)
+```
+
+
+
+
+
+
+
+
+
+
+```{r, fig.width = 6, fig.height = 12}
+par(mfrow = c(3,1), bty = "n")
+plot(density(diff_from_max_min[[1]][,1]), main = "Distribution of landmark changes",
+    xlab = "radius")
+plot(density(diff_from_max_min[[1]][,2]), main = "", xlab = "azimuth")
+plot(density(diff_from_max_min[[1]][,3]), main = "", xlab = "polar")
+```
+
+And now we can apply the same comparisons as we did for the differences in PC scores.
+The advantages however is that we are now actually measuring this differences in physical units: i.e. if the differences in zygomatic arches landmarks are now measured in units of Procrustes superimposition (which are by definition 3D Euclidean distances) rather than in ordination of variance/co-variance of landmarks position.
+
+
+
+#### Testing the differences in the Euclidean space
+
+```{r, fig.width = 6, fig.height = 6}
+## Selecting the changes (radii)
+selected_landmark_change <- diff_from_max_min[[1]][selected_land,1]
+non_sele_landmark_change <- diff_from_max_min[[1]][-selected_land,1]
+
+## Comparing both
+par(bty = "n")
+boxplot(selected_landmark_change, non_sele_landmark_change, ylab = "Radius",
+        xlab = "Selected/others")
+
+## Wilcoxon test (distributions are not normal)
+(wilcox_test_Euclidean <- wilcox.test(selected_landmark_change, non_sele_landmark_change))
+
+## Bhattacharrya Coefficient (probability of overlap)
+(bhat_Euclidean <- bhatt.coeff(selected_landmark_change, non_sele_landmark_change))
+```
+
+And then simulate both this probability and the p-values for random selected landmarks
+
+```{r, fig.width = 6, fig.height = 12}
+## Doing it on 100 bootstraps
+test <- replicate(100, rand.sample(diff_from_max_min[[1]][,1], selected_land))
+
+## Plotting the results
+par(mfrow = c(3,1), bty = "n")
+plot.one.test(test, bhat_Euclidean, which = 1, xlab = "Bhattacharrya")
+plot.one.test(test, wilcox_test_Euclidean$statistic, which = 2, xlab = "Wilcox W")
+plot.one.test(test, wilcox_test_Euclidean$p.value, which = 3, xlab = "p value")
 ```
