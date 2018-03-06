@@ -21,54 +21,51 @@ The data should be stored in `../Data/` in the following format:
 
 Data type | Data set | Species | File format
 ----------|----------|---------|------------
-classification | cranium  | sp1 | .csv
-landmarkgroups | mandible | sp2 |
-landmarkdata   |          | sp3 |
+landmarkdata | cranium  | wombat | .csv
+landmarkgroups | mandible | koala |
 
 
-### Data per species
+
+### Data per genus
 
 ```{r}
 ## The chain names
-chains <- c("sp1", "sp2", "sp3")
+chains <- c("wombat", "koala")
 
-## The chain place holder
-all_chains <- list()
+## The datasets
+datasets <- c("cranium", "mandible")
 
 ## Looping through the chains
 for(chain in chains) {
     
-    ## The datasets
-    datasets <- c("cranium", "mandible")
-
     ## Output list holder
-    output_list <- list()
+    land_data <- list()
 
     ## Looping through the datasets
     for(dataset in datasets) {
 
         ## Read the landmarks groups
-        output_list[[dataset]][[1]] <- read.csv(paste0("../Data/landmarkgroups_", dataset, "_",
+        land_data[[dataset]][[1]] <- read.csv(paste0("../Data/landmarkgroups_", dataset, "_",
                                                 chain, ".csv"))
         
         ## Read the landmarks
-        output_list[[dataset]][[2]] <- t(read.csv(paste0("../Data/landmarkdata_", dataset, "_",
+        land_data[[dataset]][[2]] <- t(read.csv(paste0("../Data/landmarkdata_", dataset, "_",
                                                   chain, ".csv") , header = TRUE, row.names = 1))
         
         ## Remove any NAs rows
-        output_list[[dataset]][[2]] <- output_list[[dataset]][[2]][complete.cases(
-                                                                   output_list[[dataset]][[2]]),]
+        land_data[[dataset]][[2]] <- land_data[[dataset]][[2]][complete.cases(
+                                                                   land_data[[dataset]][[2]]),]
         
         ## Make into a 3D array
-        output_list[[dataset]][[2]] <- geomorph::arrayspecs(output_list[[dataset]][[2]], k = 3,
-                                                            p = ncol(output_list[[dataset]][[2]])/3)
+        land_data[[dataset]][[2]] <- geomorph::arrayspecs(land_data[[dataset]][[2]], k = 3,
+                                                            p = ncol(land_data[[dataset]][[2]])/3)
 
         ## Running the Procrustes superimposition
-        output_list[[dataset]][[3]] <- geomorph::gpagen(output_list[[dataset]][[2]],
+        land_data[[dataset]][[3]] <- geomorph::gpagen(land_data[[dataset]][[2]],
                                                         print.progress = FALSE)
 
         ## Convert the array in 2D
-        array_2d <- geomorph::two.d.array(output_list[[dataset]][[3]]$coords)
+        array_2d <- geomorph::two.d.array(land_data[[dataset]][[3]]$coords)
 
         ## measure the tolerance
         tol <- prcomp(array_2d)$sdev^2
@@ -80,17 +77,85 @@ for(chain in chains) {
         tolerance <- max(c(tol[tolerance]/tol[1],0.005))
 
         ## Ordinating the data
-        output_list[[dataset]][[4]] <- prcomp(array_2d, center = TRUE, scale. = FALSE, retx = TRUE,
+        land_data[[dataset]][[4]] <- prcomp(array_2d, center = TRUE, scale. = FALSE, retx = TRUE,
                                               tol = tolerance)
 
         ## Name the elements
-        names(output_list[[dataset]]) <- c("landmarkgroups", "landmarkdata", "procrustes",
+        names(land_data[[dataset]]) <- c("landmarkgroups", "landmarkdata", "procrustes",
                                            "ordination")
     }
 
     ## Save the file
-    save(output_list, file = paste0("../Data/Processed/", chain, ".Rda"))
-    all_chains[[chain]] <- output_list
+    save(land_data, file = paste0("../Data/Processed/", chain, ".Rda"))
 }
 ```
-### Combined data
+
+### Data per species
+
+```{r}
+## Selecting the wombats
+chain <- chains[1]
+
+## Getting the species names
+species <- c("ursinus", "latifrons", "krefftii")
+sp_holders <- c("Common wombat", "SHN wombat", "NHN wombat")
+
+## Reading the wombat species
+wombat_sp <- read.csv("../Data/wombat_species.csv")
+for(sp in 1:length(species)) {
+    wombat_sp$Species <- gsub(sp_holders[sp], species[sp], as.character(wombat_sp$Species))
+}
+
+land_data <- list()
+
+for(sp in 1:length(species)) {
+
+    for(dataset in datasets) {
+
+        ## Read the landmarks groups
+        land_data[[dataset]][[1]] <- read.csv(paste0("../Data/landmarkgroups_", dataset, "_",
+                                                chain, ".csv"))
+        
+        ## Read the landmarks
+        land_data[[dataset]][[2]] <- t(read.csv(paste0("../Data/landmarkdata_", dataset, "_",
+                                                  chain, ".csv") , header = TRUE, row.names = 1))
+        
+        ## Remove any NAs rows
+        land_data[[dataset]][[2]] <- land_data[[dataset]][[2]][complete.cases(
+                                                                   land_data[[dataset]][[2]]),]
+        
+        ## Make into a 3D array
+        land_data[[dataset]][[2]] <- geomorph::arrayspecs(land_data[[dataset]][[2]], k = 3,
+                                                            p = ncol(land_data[[dataset]][[2]])/3)
+
+        ## Selecting the subset of species
+        land_data[[dataset]][[2]] <- land_data[[dataset]][[2]][, , which(wombat_sp$Species == species[sp])]
+
+        ## Procrustes superimposition
+        land_data[[dataset]][[3]] <- geomorph::gpagen(land_data[[dataset]][[2]],
+                                                        print.progress = FALSE)
+
+        ## Convert the array in 2D
+        array_2d <- geomorph::two.d.array(land_data[[dataset]][[3]]$coords)
+
+        ## measure the tolerance
+        tol <- prcomp(array_2d)$sdev^2
+        tolerance <- cumsum(tol)/sum(tol)
+        tolerance <- length(which(tolerance < 1)) 
+        if(length(tolerance) < length(tol)){
+            tolerance <- tolerance + 1
+        }
+        tolerance <- max(c(tol[tolerance]/tol[1],0.005))
+
+        ## Ordinating the data
+        land_data[[dataset]][[4]] <- prcomp(array_2d, center = TRUE, scale. = FALSE, retx = TRUE,
+                                              tol = tolerance)
+
+        ## Name the elements
+        names(land_data[[dataset]]) <- c("landmarkgroups", "landmarkdata", "procrustes",
+                                           "ordination")
+    }
+
+    save(land_data, file = paste0("../Data/Processed/", chain, "_", species[sp], ".Rda"))
+}
+```
