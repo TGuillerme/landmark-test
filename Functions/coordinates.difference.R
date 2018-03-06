@@ -19,12 +19,6 @@
 coordinates.difference <- function(coordinates, reference, type = "cartesian", angle = "radian") {
 
     ## Sanitizing
-    
-    #####
-    ## TEMPORARY: get sanitizing functions
-    #####
-    script <- RCurl::getURL("https://raw.githubusercontent.com/TGuillerme/dispRity/master/R/sanitizing.R", ssl.verifypeer = FALSE)
-    eval(parse(text = script))
 
     ## Coordinates
     coordinates_class <- check.class(coordinates, c("array", "list", "matrix"))
