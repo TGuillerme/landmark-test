@@ -49,23 +49,20 @@ for(chain in chains) {
                                                 chain, ".csv"))
         
         ## Read the landmarks
-        land_data[[dataset]][[2]] <- t(read.csv(paste0("../Data/landmarkdata_", dataset, "_",
-                                                  chain, ".csv") , header = TRUE, row.names = 1))
+        landmarks  <- t(read.csv(paste0("../Data/landmarkdata_", dataset, "_", chain, ".csv"),
+                                 header = TRUE, row.names = 1))
         
         ## Remove any NAs rows
-        land_data[[dataset]][[2]] <- land_data[[dataset]][[2]][complete.cases(
-                                                                   land_data[[dataset]][[2]]),]
-        
+        landmarks <- landmarks[complete.cases(landmarks),]
+
         ## Make into a 3D array
-        land_data[[dataset]][[2]] <- geomorph::arrayspecs(land_data[[dataset]][[2]], k = 3,
-                                                            p = ncol(land_data[[dataset]][[2]])/3)
+        landmarks <- geomorph::arrayspecs(landmarks, k = 3, p = ncol(landmarks)/3)
 
         ## Running the Procrustes superimposition
-        land_data[[dataset]][[3]] <- geomorph::gpagen(land_data[[dataset]][[2]],
-                                                        print.progress = FALSE)
+        land_data[[dataset]][[2]] <- geomorph::gpagen(landmarks, print.progress = FALSE)
 
         ## Convert the array in 2D
-        array_2d <- geomorph::two.d.array(land_data[[dataset]][[3]]$coords)
+        array_2d <- geomorph::two.d.array(land_data[[dataset]][[2]]$coords)
 
         ## measure the tolerance
         tol <- prcomp(array_2d)$sdev^2
@@ -77,12 +74,11 @@ for(chain in chains) {
         tolerance <- max(c(tol[tolerance]/tol[1],0.005))
 
         ## Ordinating the data
-        land_data[[dataset]][[4]] <- prcomp(array_2d, center = TRUE, scale. = FALSE, retx = TRUE,
+        land_data[[dataset]][[3]] <- prcomp(array_2d, center = TRUE, scale. = FALSE, retx = TRUE,
                                               tol = tolerance)
 
         ## Name the elements
-        names(land_data[[dataset]]) <- c("landmarkgroups", "landmarkdata", "procrustes",
-                                           "ordination")
+        names(land_data[[dataset]]) <- c("landmarkgroups", "procrustes", "ordination")
     }
 
     ## Save the file
@@ -115,28 +111,25 @@ for(sp in 1:length(species)) {
         ## Read the landmarks groups
         land_data[[dataset]][[1]] <- read.csv(paste0("../Data/landmarkgroups_", dataset, "_",
                                                 chain, ".csv"))
-        
+
         ## Read the landmarks
-        land_data[[dataset]][[2]] <- t(read.csv(paste0("../Data/landmarkdata_", dataset, "_",
-                                                  chain, ".csv") , header = TRUE, row.names = 1))
+        landmarks  <- t(read.csv(paste0("../Data/landmarkdata_", dataset, "_", chain, ".csv"),
+                                 header = TRUE, row.names = 1))
         
         ## Remove any NAs rows
-        land_data[[dataset]][[2]] <- land_data[[dataset]][[2]][complete.cases(
-                                                                   land_data[[dataset]][[2]]),]
-        
+        landmarks <- landmarks[complete.cases(landmarks),]
+
         ## Make into a 3D array
-        land_data[[dataset]][[2]] <- geomorph::arrayspecs(land_data[[dataset]][[2]], k = 3,
-                                                            p = ncol(land_data[[dataset]][[2]])/3)
+        landmarks <- geomorph::arrayspecs(landmarks, k = 3, p = ncol(landmarks)/3)
 
         ## Selecting the subset of species
-        land_data[[dataset]][[2]] <- land_data[[dataset]][[2]][, , which(wombat_sp$Species == species[sp])]
+        landmarks <- landmarks[, , which(wombat_sp$Species == species[sp])]
 
-        ## Procrustes superimposition
-        land_data[[dataset]][[3]] <- geomorph::gpagen(land_data[[dataset]][[2]],
-                                                        print.progress = FALSE)
+        ## Running the Procrustes superimposition
+        land_data[[dataset]][[2]] <- geomorph::gpagen(landmarks, print.progress = FALSE)
 
         ## Convert the array in 2D
-        array_2d <- geomorph::two.d.array(land_data[[dataset]][[3]]$coords)
+        array_2d <- geomorph::two.d.array(land_data[[dataset]][[2]]$coords)
 
         ## measure the tolerance
         tol <- prcomp(array_2d)$sdev^2
@@ -148,12 +141,11 @@ for(sp in 1:length(species)) {
         tolerance <- max(c(tol[tolerance]/tol[1],0.005))
 
         ## Ordinating the data
-        land_data[[dataset]][[4]] <- prcomp(array_2d, center = TRUE, scale. = FALSE, retx = TRUE,
+        land_data[[dataset]][[3]] <- prcomp(array_2d, center = TRUE, scale. = FALSE, retx = TRUE,
                                               tol = tolerance)
 
         ## Name the elements
-        names(land_data[[dataset]]) <- c("landmarkgroups", "landmarkdata", "procrustes",
-                                           "ordination")
+        names(land_data[[dataset]]) <- c("landmarkgroups", "procrustes", "ordination")
     }
 
     save(land_data, file = paste0("../Data/Processed/", chain, "_", species[sp], ".Rda"))
