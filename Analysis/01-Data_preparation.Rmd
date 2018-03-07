@@ -96,17 +96,18 @@ chain <- chains[1]
 species <- c("ursinus", "latifrons", "krefftii")
 sp_holders <- c("Common wombat", "SHN wombat", "NHN wombat")
 
-## Reading the wombat species
-wombat_sp <- read.csv("../Data/wombat_species.csv")
-for(sp in 1:length(species)) {
-    wombat_sp$Species <- gsub(sp_holders[sp], species[sp], as.character(wombat_sp$Species))
-}
-
 land_data <- list()
 
 for(sp in 1:length(species)) {
 
     for(dataset in datasets) {
+
+        ## Reading the wombat species
+        wombat_sp <- read.csv(paste0("../Data/wombat_species_", dataset, ".csv"))
+        for(spec in 1:length(species)) {
+            wombat_sp$Species <- gsub(sp_holders[spec], species[spec],
+                                      as.character(wombat_sp$Species))
+        }
 
         ## Read the landmarks groups
         land_data[[dataset]][[1]] <- read.csv(paste0("../Data/landmarkgroups_", dataset, "_",
