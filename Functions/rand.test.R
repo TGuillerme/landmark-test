@@ -6,6 +6,7 @@
 #' @param subset A \code{numeric} vector of the elements of the distribution to test.
 #' @param test The test to apply (a \code{function}).
 #' @param replicates A \code{numeric} value for the number of replicates (\code{default = 100}).
+#' @param resample \code{logical} wether to resample the full distribution (\code{TRUE}) or the distribution without the subset (\code{FALSE}).
 #' @param rarefaction Optional, a \code{numeric} value for rarefying the subset.
 #' @param test.parameter Optional, whether to test the calculated parameter (\code{TRUE}) or not (\code{FALSE} - default).
 #' @param parameter Optional,  if the parameter is tested, which parameter to select (can be left empty if \code{test} outputs a single value or a named object containing a \code{statistic} element).
@@ -29,7 +30,7 @@
 #' @author Thomas Guillerme
 #' @export
 
-rand.test <- function(distribution, subset, test, replicates = 100, rarefaction, test.parameter = FALSE, parameter, alternative = "two-sided", ...) {
+rand.test <- function(distribution, subset, test, replicates = 100, resample = TRUE, rarefaction, test.parameter = FALSE, parameter, alternative = "two-sided", ...) {
 
     match_call <- match.call()
 
@@ -50,6 +51,9 @@ rand.test <- function(distribution, subset, test, replicates = 100, rarefaction,
     if(replicates < 1) {
         stop("At least one replicate must be run.")
     }
+
+    ## Resample
+    check.class(resample, "logical")
 
     ## Rarefaction
     if(missing(rarefaction)) {
@@ -139,8 +143,14 @@ rand.test <- function(distribution, subset, test, replicates = 100, rarefaction,
     }
 
     ## Applying test function
-    lapply.test <- function(draw, test, distribution, ...) {
-        return(test(distribution[draw], distribution, ...))
+    if(resample) {
+        lapply.test <- function(draw, test, distribution, ...) {
+            return(test(distribution[draw], distribution, ...))
+        }
+    } else {
+        lapply.test <- function(draw, test, distribution, ...) {
+            return(test(distribution[draw], distribution[-draw], ...))
+        }
     }
 
 
