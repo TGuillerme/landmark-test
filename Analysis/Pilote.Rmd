@@ -25,17 +25,18 @@ if(!require(zoo)) install.packages("zoo")
 if(!require(dispRity)) install_github("dispRity")
 ## Loading the function
 source("../Functions/coordinates.difference.R")
+source("../Functions/sanitizing.R")
 ```
 
  2. Second, load the data
 
 ```{r}
 #VW: Contains information about each specimen for crania or wombats
-ClassifierCr <- read.csv("../Data/ClassificationWomCr.csv", header = TRUE)
+ClassifierCr <- read.csv("../Data/wombat_species.csv", header = TRUE)
 ## The landmarks list
-landmarks <- read.csv("../Data/MovingLMs.csv")
+landmarks <- read.csv("../Data/landmarkgroups_cranium_wombat.csv")
 #VW: Read data
-WomCrData <- read.csv("../Data/Wombat_Cranium_Lndmrk_Data.csv", header = TRUE, row.names = 1)
+WomCrData <- read.csv("../Data/landmarkdata_cranium_wombat.csv", header = TRUE, row.names = 1)
 #VW: Transpose rows and columns because of the format that Viewbox exports in
 WomCrData <- t(WomCrData)
 #VW: Remove any empty rows
