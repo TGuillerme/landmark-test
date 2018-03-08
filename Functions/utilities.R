@@ -1,3 +1,60 @@
+
+# @param species the species name
+# @param dataset the type of dataset (cranium or mandible)
+# @param path the path where the processed data is
+
+## Test pipeline
+pipeline.test <- function(species, dataset, path, verbose = FALSE){
+    ## Loading a dataset
+    if(verbose) message("Load data...")
+    load(paste0(path, species, ".Rda"))
+    if(verbose) message("Done.\n")
+
+    ## Selecting a dataset
+    if(verbose) message("Select dataset...")
+    data <- land_data[[dataset]]
+    if(verbose) message("Done.\n")
+
+    ## Procrustes variation ranges
+    if(verbose) message("Calculate range...")
+    procrustes_var <- variation.range(data$procrustes)
+    if(verbose) message("Done.\n")
+
+    ## landmarks partitions
+    if(verbose) message("Determine partitions...")
+    partitions <- list()
+    for(part in unique(data$landmarkgroups[,2])) {
+        partitions[[part]] <- which(data$landmarkgroups[,2] == part)
+    }
+    if(verbose) message("Done.\n")
+
+    ## Size differences
+    if(verbose) message("Run size difference test...")
+    differences <- lapply(partitions, lapply.rand.test, data = procrustes_var, test = area.diff)
+    if(verbose) message("Done.\n")
+
+    ## Probabilities of overlap
+    if(verbose) message("Run overlap probability test...")
+    overlaps <- lapply(partitions, lapply.rand.test, data = procrustes_var, test = bhatt.coeff)
+    if(verbose) message("Done.\n")
+
+    return(list("differences" = differences, "overlaps" = overlaps, "species" = species, "dataset" = dataset))
+}
+
+
+## Summary pipeline
+pipeline.plots <- function(results, export = FALSE){
+
+    ## Plot the size differences
+    make.plots(results$differences, type = "area difference", add.p = TRUE, correction = "bonferroni")
+
+    ## Plot the size differences
+    make.plots(results$overlaps, type = "Bhattacharyya Coefficient", add.p = TRUE, correction = "bonferroni")
+
+}
+
+
+
 ## Function for applying the rand tests
 lapply.rand.test <- function(partition, data, test, ...) {
     rand.test(data[, "radius"], partition, test = test, test.parameter = TRUE, ...)
