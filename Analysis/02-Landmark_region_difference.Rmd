@@ -192,19 +192,19 @@ kable(make.table(differences, "bonferroni"), digits = 5)
 
 The probability of overlaps:
 
-```{r}
+```{r, echo = FALSE}
 ## Probability of overlap
 kable(make.table(overlaps, "bonferroni"), digits = 5)
 ```
 
 The result plots:
 
-```{r, fig.width = 10, fig.height = 15}
+```{r, fig.width = 10, fig.height = 15, echo = FALSE}
 ## Plot the size differences
 make.plots(differences, type = "area difference", add.p = TRUE, correction = "bonferroni")
 ```
 
-```{r, fig.width = 10, fig.height = 15}
+```{r, fig.width = 10, fig.height = 15, echo = FALSE}
 ## Plot the size differences
 make.plots(overlaps, type = "Bhattacharyya Coefficient", add.p = TRUE, correction = "bonferroni")
 ```
