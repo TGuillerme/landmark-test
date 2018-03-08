@@ -44,7 +44,7 @@ area.diff <- function(x, y, rarefy, cent.tend = mean) {
 
             ## If rarefying is missing sample 1000 times the sd with a max of 500 and a min of 100
             if(missing(rarefy)) {
-                rarefy <- round(stats::bw.nrd(x) * 1000)
+                rarefy <- round(stats::bw.nrd0(x) * 1000)
                 rarefy <- ifelse(rarefy > 1000, 1000, rarefy)
                 rarefy <- ifelse(rarefy < 100, 100, rarefy)
             }
@@ -58,7 +58,7 @@ area.diff <- function(x, y, rarefy, cent.tend = mean) {
 
             ## If rarefying is missing sample 1000 times the sd with a max of 500 and a min of 100
             if(missing(rarefy)) {
-                rarefy <- round(stats::bw.nrd(y) * 1000)
+                rarefy <- round(stats::bw.nrd0(y) * 1000)
                 rarefy <- ifelse(rarefy > 1000, 1000, rarefy)
                 rarefy <- ifelse(rarefy < 100, 100, rarefy)
             }

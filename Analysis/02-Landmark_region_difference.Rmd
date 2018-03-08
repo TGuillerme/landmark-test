@@ -25,6 +25,7 @@ source("../Functions/rand.test.R")
 source("../Functions/area.diff.R")
 source("../Functions/sanitizing.R")
 source("../Functions/utilities.R")
+source("../Functions/bootstrap.test.R")
 set.seed(1)
 ```
 
@@ -215,4 +216,26 @@ For these results, all the partitions are different from the overall data (i.e. 
 The landmarks in partitions 1 and 3 are comparatively longer than all the other landmarks (i.e. the partitions 1 and 3 of the skull vary more than the others - see area difference figures for partition 1 and 3).
 Partition 3 is the most different than the rest of the skull (i.e. the landmarks in partition 3 are the most different to all the other landmarks - see second table observed Bhattacharyya Coeffient of 0.54).
 
+
+## Additional - Calculating the mean difference
+
+```{r}
+## Mean differences
+means_diff <- lapply(partitions, lapply.bootstrap.test, data = procrustes_var, statistic = mean, repicates = 500, alternative = "greater")
+```
+The mean differences:
+
+```{r, echo = FALSE}
+## Size differences
+kable(make.table(means_diff, "bonferroni"), digits = 5)
+```
+
+```{r, fig.width = 10, fig.height = 15, echo = FALSE}
+## Plot the size differences
+make.plots(means_diff, type = "mean difference", add.p = TRUE, correction = "bonferroni")
+```
+
 ## References
+
+
+
