@@ -59,6 +59,10 @@ pipeline.plots <- function(results, export = FALSE){
 lapply.rand.test <- function(partition, data, test, ...) {
     rand.test(data[, "radius"], partition, test = test, test.parameter = TRUE, ...)
 }
+lapply.bootstrap.test <- function(partition, data, statistic, ...) {
+    bootstrap.test(data[, "radius"], partition, statistic = statistic, ...)
+}
+
 
 ## Function for plotting the test results
 make.table <- function(results, correction) {
@@ -105,7 +109,7 @@ make.plots <- function(results, type, add.p = FALSE, correction) {
         ## p_value
         if(add.p) {
             ## Get the coordinates for the text
-            text_pos <- ifelse(table_res[one_plot, "Observed"] < table_res[one_plot, "Random mean"], "topleft", "topright")
+            text_pos <- ifelse(table_res[one_plot, "Observed"] < table_res[one_plot, 2], "topleft", "topright")
             ## Add the text
             legend(text_pos, paste(colnames(table_res)[6], round(table_res[one_plot, 6], 5), sep = "\n")  , bty = "n")
         }
