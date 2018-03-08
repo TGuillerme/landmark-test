@@ -3,8 +3,16 @@
 #' @description Measure the area difference between two ranked distribution
 #'
 #' @param x,y the two distributions to compare.
-#' @param rarefy Optional, if \code{x} is \neq \code{y}, how many rarefaction samples to use (\code{defaut = 500})
+#' @param rarefy Optional, if \code{x} is \neq \code{y}, how many rarefaction samples to use. If left empty a default number of replicates between 100 and 1000 is used (see details).
 #' @param cent.tend Optional, if \code{x} is \neq \code{y}, which central tendency to use (\code{defaut = mean})
+#' 
+#' @details
+#' The number of replicates is chosen based on the variance of the distribution to rarefy using the Silverman's rule of thumb (Silverman 1986, pp.48, eqn 3.31) for choosing the bandwidth of a Gaussian kernel density estimator multiplied by 1000 with a result comprised between 100 and 1000.
+#' For example, for rarefying \code{x}, \code{rarefy = round(stats::bw.nrd0(x) * 1000)}.
+#' With \code{100 \leq rarefy \leq 1000}.
+#' 
+#' @references
+#' Silverman, B. W. (1986) Density Estimation. London: Chapman and Hall.
 #' 
 #' @examples
 #'
@@ -12,11 +20,13 @@
 #' 
 #' @author Thomas Guillerme
 #' @export
+#' @importFrom zoo rollmean
+#' @importFrom stats bw.nrd0
 
-area.diff <- function(x, y, rarefy = 500, cent.tend = mean) {
+area.diff <- function(x, y, rarefy, cent.tend = mean) {
     ## Sort both distributions (y axis)
-    y_x <- sort(x)
-    y_y <- sort(y)
+    y_x <- sort(x, decreasing = TRUE)
+    y_y <- sort(y, decreasing = TRUE)
 
     ## Getting the vectors lengths
     length_x <- length(x)
@@ -31,12 +41,28 @@ area.diff <- function(x, y, rarefy = 500, cent.tend = mean) {
         ## Samples have different sizes
         if(length_x > length_y) {
             x_rare <- TRUE
+
+            ## If rarefying is missing sample 1000 times the sd with a max of 500 and a min of 100
+            if(missing(rarefy)) {
+                rarefy <- round(stats::bw.nrd(x) * 1000)
+                rarefy <- ifelse(rarefy > 1000, 1000, rarefy)
+                rarefy <- ifelse(rarefy < 100, 100, rarefy)
+            }
+
             ## x > y
             x_rarefied <- lapply(replicate(rarefy, sample(x, length_y), simplify = FALSE), sort)
             y_rarefied <- y_y
             x_axis <- 1:length_y
         } else {
             x_rare <- FALSE
+
+            ## If rarefying is missing sample 1000 times the sd with a max of 500 and a min of 100
+            if(missing(rarefy)) {
+                rarefy <- round(stats::bw.nrd(y) * 1000)
+                rarefy <- ifelse(rarefy > 1000, 1000, rarefy)
+                rarefy <- ifelse(rarefy < 100, 100, rarefy)
+            }
+
             ## x < y
             y_rarefied <- lapply(replicate(rarefy, sample(y, length_x), simplify = FALSE), sort)
             x_rarefied <- y_x

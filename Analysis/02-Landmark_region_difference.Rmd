@@ -1,6 +1,7 @@
 ---
 title: "Landmark region difference"
 author: "Thomas Guillerme"
+bibliography: references.bib
 date: "`r Sys.Date()`"
 output:
   html_document:
@@ -24,6 +25,7 @@ source("../Functions/rand.test.R")
 source("../Functions/area.diff.R")
 source("../Functions/sanitizing.R")
 source("../Functions/utilities.R")
+set.seed(1)
 ```
 
 # Pipelined analysis
@@ -105,11 +107,18 @@ To measure the overall differences in the length of the radii, we can calculate 
 
 $\text{Area difference} = \int_{0}^{n-1} (f_{x} - f_{y}) %d(x,y)$
 
-Where $n$ is the total number of landmarks and $f_{x}$ and $f_{y}$ are ranked functions (i.e. $f_{0} \geq f_{1} \geq f_{2} ...$) with respectively $n-m$ and $m$ total observations (with $m \leq n$).
+Where $n$ is minimum number of comparable landmarks and $f_{x}$ and $f_{y}$ are ranked functions (i.e. $f_{0} \geq f_{1} \geq f_{2} ...$).
+If one of the functions $f_{x}$ or $f_{y}$ have $m$ elements (with $m > n$) $f^{*}_{z}$, a rarefied estimated of the function with $m$ elements is used instead.
+
+$\int_{0}^{n-1}f^*_{z}d(z) = \frac{\sum_1^p\int f^*_{zi}}{p}$
+
+Where $p$ is the number of rarefaction replicates.
+$p$ is chosen based on the Silverman's rule of thumb for choosing the bandwidth of a Gaussian kernel density estimator multiplied by 1000 with a result forced to be 100 $\leq p \leq$ 1000 [@silverman1986density].
+This allows the rarefaction algorithm to be fast but "fair" (i.e. reducing the number of re-sampling the more the distribution is homogeneous).
 
 ### Probability of overlap
 
-The Bhattacharyya Coefficient calculates the probability of overlap of two distributions. <!-- \citep{Bhattacharyya} -->
+The Bhattacharyya Coefficient calculates the probability of overlap of two distributions [@Bhattacharyya; @Guillerme2016146].
 When it is equal to zero, the probability of overlap of the distributions is also zero, and when it is equal to one, the two distributions are entirely overlapping.
 It forms an elegant and easy to compute continuous measurement of the probability of similarity between two distributions.
 The coefficient is calculated as the sum of the square root of the relative counts shared in $n$ bins among two distributions.
@@ -120,15 +129,15 @@ Where ${a_i}$ and ${b_i}$  are the number of counts in bin $i$ for the distribut
 
 The precision of the Bhattacharyya Coefficient is directly related to the number of bins, $n$.
 If $n$ is low, the overlap will be overestimated and if $n$ is too high, the overlap will be underestimated.
-We determined the number of bins using Silverman's rule of thumb which states that $n$ should be $0.9$ times the minimum of the standard deviation and the interquartile range of the distribution, divided by $1.34$ times the sample size of the distribution to the negative one-fifth power (`bw.nrd0()` function in R)  <!-- \citep{silverman1986density}). -->
+We determined the number of bins using Silverman's rule of thumb which states that $n$ should be 0.9 times the minimum of the standard deviation and the interquartile range of the distribution, divided by $1.34$ times the sample size of the distribution to the negative one-fifth power (`bw.nrd0()` function in R) [@silverman1986density].
 
-We consider two distributions to be significantly similar when their Bhattacharyya Coefficient is $<0.95$.
-Conversely, we consider them to be significantly different when their Bhattacharyya Coefficient is $<0.05$.
+We consider two distributions to be significantly similar when their Bhattacharyya Coefficient is < 0.95.
+Conversely, we consider them to be significantly different when their Bhattacharyya Coefficient is < 0.05.
 Values in between these two threshold just show the probability of overlap between the distributions but are not conclusive to assess the similarity or differences between the distributions.
 
 ### Random test
 
-To test whether the landmark radii for one partition is different than the remaining ones, we can use a random test (modification from `ade4::as.randtest`).
+To test whether the landmark radii for one partition is different than the remaining ones, we can use a random test (modification from `ade4::as.randtest` [@thioulouse1997ade]).
 These tests are pretty intuitive yet powerful.
 The idea is to see whether the observed difference between a particular subsample (i.e. the partition) of a statistical population could be obtained by randomly sampling it from the same population.
 Concretely, the test compares an observed measurement from a subsample (either the area difference or the Bhattacharyya Coeffient in our case) to the same measurement calculated from random subsamples of the same size.
@@ -174,12 +183,16 @@ overlaps <- lapply(partitions, lapply.rand.test, data = procrustes_var, test = b
 
 ### Summarising the results
 
-The result tables:
+The landmark size differences:
 
 ```{r, echo = FALSE}
 ## Size differences
 kable(make.table(differences, "bonferroni"), digits = 5)
+```
 
+The probability of overlaps:
+
+```{r}
 ## Probability of overlap
 kable(make.table(overlaps, "bonferroni"), digits = 5)
 ```
@@ -198,3 +211,8 @@ make.plots(overlaps, type = "Bhattacharyya Coefficient", add.p = TRUE, correctio
 
 ### Interpretation
 
+For these results, all the partitions are different from the overall data (i.e. the partitions are not random).
+The landmarks in partitions 1 and 3 are comparatively longer than all the other landmarks (i.e. the partitions 1 and 3 of the skull vary more than the others - see area difference figures for partition 1 and 3).
+Partition 3 is the most different than the rest of the skull (i.e. the landmarks in partition 3 are the most different to all the other landmarks - see second table observed Bhattacharyya Coeffient of 0.54).
+
+## References
