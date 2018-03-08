@@ -1,6 +1,6 @@
 ## Function for applying the rand tests
 lapply.rand.test <- function(partition, data, test, ...) {
-    rand.test(data[, "radius"], partition, test = test, test.parameter = TRUE, ...)    
+    rand.test(data[, "radius"], partition, test = test, test.parameter = TRUE, ...)
 }
 
 ## Function for plotting the test results
