@@ -30,12 +30,12 @@ pipeline.test <- function(species, dataset, path, verbose = FALSE){
 
     ## Size differences
     if(verbose) message("Run size difference test...")
-    differences <- lapply(partitions, lapply.rand.test, data = procrustes_var, test = area.diff)
+    differences <- lapply(partitions, lapply.rand.test, data = procrustes_var, test = area.diff, replicates = 1000)
     if(verbose) message("Done.\n")
 
     ## Probabilities of overlap
     if(verbose) message("Run overlap probability test...")
-    overlaps <- lapply(partitions, lapply.rand.test, data = procrustes_var, test = bhatt.coeff)
+    overlaps <- lapply(partitions, lapply.rand.test, data = procrustes_var, test = bhatt.coeff, replicates = 1000)
     if(verbose) message("Done.\n")
 
     return(list("differences" = differences, "overlaps" = overlaps, "species" = species, "dataset" = dataset))
