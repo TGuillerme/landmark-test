@@ -8,6 +8,7 @@
 #' @param what Which element from the \code{\link{coordinates.differences}} to use (default is \code{"radius"}).
 #' @param ordination Optional, an ordinated PCA matrix (\code{"prcomp"}) to calculate the range from there.
 #' @param axis Optional, if an ordinated matrix is used, which axis (axes) to use. If left empty, all the axes will be used.
+#' @param return.ID \code{logical}, whether to return the ID of the max/min specimens or not.
 #' 
 #' @examples
 #'
@@ -16,7 +17,7 @@
 #' @author Thomas Guillerme
 #' @export
 
-variation.range <- function(procrustes, type = "spherical", angle = "degree", what = "radius", ordination, axis) {
+variation.range <- function(procrustes, type = "spherical", angle = "degree", what = "radius", ordination, axis, return.ID = FALSE) {
 
     ## Sanitizing
     ## procrustes
@@ -45,6 +46,9 @@ variation.range <- function(procrustes, type = "spherical", angle = "degree", wh
             }
         }
     }
+    
+    ## return.ID
+    check.class(return.ID, "logical")
 
     ## Applying the method to the Procrustes
     if(!do_ordinate) {
@@ -92,6 +96,10 @@ variation.range <- function(procrustes, type = "spherical", angle = "degree", wh
         ## Get the variation range
         variation_range <- coordinates.difference(min_coordinates, max_coordinates, type = type, angle = angle)[[1]]
     }
-
-    return(variation_range)
+    
+    if(!do_ordinate && return.ID){   
+        return(list("range" = variation_range, "min.max" = c(min_specimen, max_specimen)))
+    } else {
+        return(variation_range)
+    }
 }
