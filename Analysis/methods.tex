@@ -1,47 +1,30 @@
----
-title: "Landmark region difference"
-author: "Thomas Guillerme"
-bibliography: references.bib
-date: "`r Sys.Date()`"
-output:
-  html_document:
-    fig_width: 12
-    fig_height: 6
----
+\documentclass[a4paper,11pt]{article}
 
-```{r, message = FALSE, warning = FALSE}
-## Loading the libraries (and installing if necessary)
-if(!require(devtools)) install.packages("devtools")
-if(!require(knitr)) install.packages("knitr")
-if(!require(geomorph)) install.packages("geomorph")
-if(!require(RCurl)) install.packages("RCurl")
-if(!require(zoo)) install.packages("zoo")
-if(!require(dispRity)) install_github("dispRity")
-## Loading the function
-source("../Functions/coordinates.difference.R")
-source("../Functions/coordinates.area.R")
-source("../Functions/variation.range.R")
-source("../Functions/rand.test.R")
-source("../Functions/area.diff.R")
-source("../Functions/sanitizing.R")
-source("../Functions/utilities.R")
-source("../Functions/bootstrap.test.R")
-set.seed(1)
-```
+\usepackage{enumerate}
+\usepackage[osf]{mathpazo}
+\usepackage{lastpage}
+\usepackage{url}
+\usepackage{hyperref}
+\pagenumbering{arabic}
+\linespread{1.66}
 
-# Pipelined analysis
+\begin{document}
+
+\begin{flushright}
+Version dated: \today
+\end{flushright}
+\begin{center}
+
+%Title
+\noindent{\Large{\bf{Title}}}\
+\bigskip
+%Author
+Thomas Guillerme\\href{mailto:t.guillerme@imperial.ac.uk}{t.guillerme@imperial.ac.uk}
+
+\end{center}
 
 
-```{r}
-## Loading a dataset
-load("../Data/Processed/wombat_ursinus.Rda")
-
-## Selecting a partition
-cranium <- land_data$cranium
-```
-
-
-## Selecting the two most extreme specimen (max and min)
+\section{Selecting the two most extreme specimen (max and min)}
 
 Getting the ranges of variation for the Procrustes.
 This variation is equivalent to the range of Procrustes differences (i.e. the two skulls with the most different landmark positions in the procrustes superimposition).
@@ -51,11 +34,11 @@ Since we are only interested in the _magnitude_ of difference ($\rho$) regardles
 
 We calculate the to extremes (the two individuals with the most different radii) using the following simple algorithm:
 
- 1. Calculate the radii for all _n_ landmarks between the mean Procrustes superimposition and each individual superimposition.
- 2. Rank each set of _n_ radii and measure the area under the resulting curve.
- 3. Select the specimen with the highest _n_ radii area. This is now the "maximum" Procrustes (i.e. the specimen with the most different shape compared to the mean).
- 4. Calculate the radii for all _n_ landmarks between the "maximum" Procrustes and the remaining individual ones.
- 5. Repeat step 2 and 3. The result specimen with the highest _n_ radii area is now the "minimum" Procrustes (i.e. the specimen with the most different shape compared to the "maximum" Procrustes).
+ 1. Calculate the radii for all $n$ landmarks between the mean Procrustes superimposition and each individual superimposition.
+ 2. Rank each set of $n$ radii and measure the area under the resulting curve.
+ 3. Select the specimen with the highest $n$ radii area. This is now the "maximum" Procrustes (i.e. the specimen with the most different shape compared to the mean).
+ 4. Calculate the radii for all $n$ landmarks between the "maximum" Procrustes and the remaining individual ones.
+ 5. Repeat step 2 and 3. The result specimen with the highest $n$ radii area is now the "minimum" Procrustes (i.e. the specimen with the most different shape compared to the "maximum" Procrustes).
 
 These two "maximum" and "minimum" Procrustes are not the biggest/smallest, widest/narowest, etc. skulls _per se_ but rather the two extremes of the overall distribution of landmark variation ($\rho$).
 Without visualisation, it actually impossible to even determine which one between the "maximum" or the "minimum" has actually the most variation.
@@ -64,36 +47,18 @@ However, since we are not interest in direction, this is totally sufficient to g
 This procedure can be compute with the `variation.range` function:
 
 
-```{r}
-## Procrustes variation ranges
-procrustes_var <- variation.range(cranium$procrustes)
-```
-<!-- ## PCA variation range
-ordination_var <- variation.range(cranium$procrustes, ordination = cranium$ordination)
-## PC1 variation range
-ordinatio1_var <- variation.range(cranium$procrustes, ordination = cranium$ordination, axis = 1)
-```
- -->
-
-## Selecting the different partitions
+\section{Selecting the different partitions}
 
 Here we select five partitions of the landmarks, four partitions correspond to four different zones of the cranium and on corresponds the rest of cranium (minus those four partitions).
 Each one will be test blindly and noted from one to five (without _a priori_ knowledge of which is which).
 
-```{r}
-## Partitions
-partitions <- list()
-for(part in unique(cranium$landmarkgroups[,2])) {
-    partitions[[part]] <- which(cranium$landmarkgroups[,2] == part)
-}
-```
 
 The hypotheses we are testing are "Are the landmarks in partition X different than the ones in the rest of the skull?".
 In mathematical phrasing: $H_{0}: \Theta_{0} = \Theta$ with a two-sided alternative $H_{1}: \Theta_{0} \neq \Theta$.
 In other words, does the partition X varies more or less than the rest of the skull.
 
 
-## How to test the differences per partitions?
+\section{How to test the differences per partitions?}
 
 We can then test the difference per partitions using two aspects: the size difference and the probability of overlap.
 
@@ -106,30 +71,39 @@ We can then test the difference per partitions using two aspects: the size diffe
 
 To measure the overall differences in the length of the radii, we can calculate the area difference:
 
-$\text{Area difference} = \int_{0}^{n-1} (f_{x} - f_{y}) %d(x,y)$
+\begin{equation}
+    \text{Area difference} = \int_{0}^{n-1} (f_{x} - f_{y})
+\end{equation}
 
 Where $n$ is minimum number of comparable landmarks and $f_{x}$ and $f_{y}$ are ranked functions (i.e. $f_{0} \geq f_{1} \geq f_{2} ...$).
 If one of the functions $f_{x}$ or $f_{y}$ have $m$ elements (with $m > n$) $f^{*}_{z}$, a rarefied estimated of the function with $m$ elements is used instead.
 
-$\int_{0}^{n-1}f^*_{z}d(z) = \frac{\sum_1^p\int f^*_{zi}}{p}$
+\begin{equation}
+    \int_{0}^{n-1}f^*_{z}d(z) = \frac{\sum_1^p\int f^*_{zi}}{p}
+\end{equation}
 
 
 Where $p$ is the number of rarefaction replicates.
 $p$ is chosen based on the Silverman's rule of thumb for choosing the bandwidth of a Gaussian kernel density estimator multiplied by 1000 with a result forced to be 100 $\leq p \leq$ 1000 [@silverman1986density].
 
-$p=\left(\frac{0.9\times \sigma_{m} }{1.34n}\right)^{-1/5}$
+\begin{equation}
+    p=\left(\frac{0.9\times \sigma_{m} }{1.34n}\right)^{-1/5}
+\end{equation}
+
 With $\sigma_{m}$ being the minimum of the standard deviation and the interquartile range of the distribution.
 
 This allows the rarefaction algorithm to be fast but "fair" (i.e. reducing the number of re-sampling the more the distribution is homogeneous).
 
-### Probability of overlap
+\section{Probability of overlap}
 
 The Bhattacharyya Coefficient calculates the probability of overlap of two distributions [@Bhattacharyya; @Guillerme2016146].
 When it is equal to zero, the probability of overlap of the distributions is also zero, and when it is equal to one, the two distributions are entirely overlapping.
 It forms an elegant and easy to compute continuous measurement of the probability of similarity between two distributions.
 The coefficient is calculated as the sum of the square root of the relative counts shared in $n$ bins among two distributions.
 
-$\text{Bhattacharyya Coefficient}=\sum_{i=1}^{n} \sqrt{{\sum{a_i}}\times{\sum{b_i}}}$
+\begin{equation}
+\text{Bhattacharyya Coefficient}=\sum_{i=1}^{n} \sqrt{{\sum{a_i}}\times{\sum{b_i}}}
+\end{equation}
 
 Where ${a_i}$ and ${b_i}$  are the number of counts in bin $i$ for the distributions $a$ and $b$ respectively divided by the total number of counts in the distribution $a$ and $b$ respectively.
 
@@ -141,7 +115,7 @@ We consider two distributions to be significantly similar when their Bhattachary
 Conversely, we consider them to be significantly different when their Bhattacharyya Coefficient is < 0.05.
 Values in between these two threshold just show the probability of overlap between the distributions but are not conclusive to assess the similarity or differences between the distributions.
 
-### Random test
+\section{Random test}
 
 To test whether the landmark radii for one partition is different than the remaining ones, we can use a random test (modification from `ade4::as.randtest` [@thioulouse1997ade]).
 These tests are pretty intuitive yet powerful.
@@ -155,92 +129,4 @@ In this study we used a simple Bonferonni-Holm correction (multiplying the _p_ v
 Here is an example of what a random test would measure when creating a random partition.
 In this case we the observed measurement to fall well within the randomly sampled distribution results.
 
-```{r, fig.width = 10, fig.height = 5}
-set.seed(1)
-## Creating a random partition
-random_part <- sample(1:nrow(procrustes_var), 300)
-
-## Measuring the difference for a random partition
-random_area <- rand.test(procrustes_var[, "radius"], random_part, test = area.diff,
-                         test.parameter = TRUE)
-
-## Measuring the difference for a random overlap
-random_overlap <- rand.test(procrustes_var[, "radius"], random_part, test = bhatt.coeff,
-                            test.parameter = TRUE)
-
-## Plotting the results
-par(mfrow = c(1,2), bty = "n")
-plot(random_area, xlab = "Area difference", main = paste("Random partition"))
-legend("topleft", paste("p value", round(random_area$pvalue, 3), sep = "\n")  , bty = "n")
-plot(random_overlap, xlab = "Bhattacharyya coefficient", main = paste("Random partition"))
-legend("topleft", paste("p value", round(random_overlap$pvalue, 3), sep = "\n")  , bty = "n")
-```
-
-## Calculating the differences
-
-```{r}
-## Size differences
-differences <- lapply(partitions, lapply.rand.test, data = procrustes_var, test = area.diff)
-
-## Probabilities of overlap
-overlaps <- lapply(partitions, lapply.rand.test, data = procrustes_var, test = bhatt.coeff)
-
-```
-
-### Summarising the results
-
-The landmark size differences:
-
-```{r, echo = FALSE}
-## Size differences
-kable(make.table(differences, "bonferroni"), digits = 5)
-```
-
-The probability of overlaps:
-
-```{r, echo = FALSE}
-## Probability of overlap
-kable(make.table(overlaps, "bonferroni"), digits = 5)
-```
-
-The result plots:
-
-```{r, fig.width = 10, fig.height = 15, echo = FALSE}
-## Plot the size differences
-make.plots(differences, type = "area difference", add.p = TRUE, correction = "bonferroni")
-```
-
-```{r, fig.width = 10, fig.height = 15, echo = FALSE}
-## Plot the size differences
-make.plots(overlaps, type = "Bhattacharyya Coefficient", add.p = TRUE, correction = "bonferroni")
-```
-
-### Interpretation
-
-For these results, all the partitions are different from the overall data (i.e. the partitions are not random).
-The landmarks in partitions 1 and 3 are comparatively longer than all the other landmarks (i.e. the partitions 1 and 3 of the skull vary more than the others - see area difference figures for partition 1 and 3).
-Partition 3 is the most different than the rest of the skull (i.e. the landmarks in partition 3 are the most different to all the other landmarks - see second table observed Bhattacharyya Coeffient of 0.54).
-
-
-## Additional - Calculating the mean difference
-
-```{r}
-## Mean differences
-means_diff <- lapply(partitions, lapply.bootstrap.test, data = procrustes_var, statistic = mean, repicates = 500, alternative = "greater")
-```
-The mean differences:
-
-```{r, echo = FALSE}
-## Size differences
-kable(make.table(means_diff, "bonferroni"), digits = 5)
-```
-
-```{r, fig.width = 10, fig.height = 15, echo = FALSE}
-## Plot the size differences
-make.plots(means_diff, type = "mean difference", add.p = TRUE, correction = "bonferroni")
-```
-
-## References
-
-
-
+\end{document}
