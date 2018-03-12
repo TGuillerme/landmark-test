@@ -1,0 +1,274 @@
+---
+title: "Landmark region difference"
+author: "Thomas Guillerme"
+bibliography: references.bib
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    fig_width: 12
+    fig_height: 6
+---
+
+```{r, message = FALSE, warning = FALSE}
+## Loading the libraries (and installing if necessary)
+if(!require(devtools)) install.packages("devtools")
+if(!require(knitr)) install.packages("knitr")
+if(!require(geomorph)) install.packages("geomorph")
+if(!require(RCurl)) install.packages("RCurl")
+if(!require(zoo)) install.packages("zoo")
+if(!require(dispRity)) install_github("dispRity")
+## Loading the function
+source("../Functions/coordinates.difference.R")
+source("../Functions/coordinates.area.R")
+source("../Functions/variation.range.R")
+source("../Functions/rand.test.R")
+source("../Functions/area.diff.R")
+source("../Functions/sanitizing.R")
+source("../Functions/utilities.R")
+source("../Functions/add.rare.plot.R")
+set.seed(1)
+```
+
+# Rarefied analysis
+
+# Within species
+
+## Wombat ursinus
+
+### Cranium
+
+```{r, echo = FALSE, message = FALSE}
+results <- pipeline.test("Wombat_ursinus", "cranium", "../Data/Processed/", verbose = TRUE, rarefaction = TRUE)
+save(results, file = paste0("../Data/Results/Wombat_ursinus_cranium_rar", results$rarefaction, ".Rda"))
+
+caption_diff <- paste0("Results of the area difference random test (rarefied - ", results$rarefaction, ") for the ", results$dataset, " of ", results$species)
+caption_over <- paste0("Results of the overlap probability random test (rarefied - ", results$rarefaction, ") for the ", results$ataset, " of ", results$species)
+
+## Size differences
+kable(make.table(results$differences, "bonferroni"), digits = 5, caption = caption_diff)
+
+## Probability of overlap
+kable(make.table(results$overlaps, "bonferroni"), digits = 5, caption = caption_over)
+```
+
+#### Area difference
+```{r, fig.width = 10, fig.height = 15, echo = FALSE, message = FALSE}
+## Plot the size differences
+make.plots(results$differences, type = "area difference", add.p = TRUE, correction = "bonferroni", rarefaction = TRUE, rare.level = results$rarefaction)
+```
+
+
+#### Bhattacharyya Coefficient
+```{r, fig.width = 10, fig.height = 15, echo = FALSE, message = FALSE}
+## Plot the size differences
+make.plots(results$overlaps, type = "Bhattacharyya Coefficient", add.p = TRUE, correction = "bonferroni", rarefaction = TRUE, rare.level = results$rarefaction)
+```
+
+### Mandible
+
+```{r, echo = FALSE, message = FALSE}
+results <- pipeline.test("Wombat_ursinus", "mandible", "../Data/Processed/", verbose = TRUE, rarefaction = TRUE)
+save(results, file = paste0("../Data/Results/Wombat_ursinus_mandible_rar", results$rarefaction, ".Rda"))
+
+caption_diff <- paste0("Results of the area difference random test (rarefied - ", results$rarefaction, ") for the ", results$dataset, " of ", results$species)
+caption_over <- paste0("Results of the overlap probability random test (rarefied - ", results$rarefaction, ") for the ", results$ataset, " of ", results$species)
+
+## Size differences
+kable(make.table(results$differences, "bonferroni"), digits = 5, caption = caption_diff)
+
+## Probability of overlap
+kable(make.table(results$overlaps, "bonferroni"), digits = 5, caption = caption_over)
+```
+
+#### Area difference
+```{r, fig.width = 10, fig.height = 15, echo = FALSE, message = FALSE}
+## Plot the size differences
+make.plots(results$differences, type = "area difference", add.p = TRUE, correction = "bonferroni", rarefaction = TRUE, rare.level = results$rarefaction)
+```
+
+#### Bhattacharyya Coefficient
+```{r, fig.width = 10, fig.height = 15, echo = FALSE, message = FALSE}
+## Plot the size differences
+make.plots(results$overlaps, type = "Bhattacharyya Coefficient", add.p = TRUE, correction = "bonferroni", rarefaction = TRUE, rare.level = results$rarefaction)
+```
+
+
+## Wombat krefftii
+
+### Cranium
+
+```{r, echo = FALSE, message = FALSE}
+results <- pipeline.test("Wombat_krefftii", "cranium", "../Data/Processed/", verbose = TRUE, rarefaction = TRUE)
+save(results, file = paste0("../Data/Results/Wombat_krefftii_cranium_rar", results$rarefaction, ".Rda"))
+
+caption_diff <- paste0("Results of the area difference random test (rarefied - ", results$rarefaction, ") for the ", results$dataset, " of ", results$species)
+caption_over <- paste0("Results of the overlap probability random test (rarefied - ", results$rarefaction, ") for the ", results$ataset, " of ", results$species)
+
+## Size differences
+kable(make.table(results$differences, "bonferroni"), digits = 5, caption = caption_diff)
+
+## Probability of overlap
+kable(make.table(results$overlaps, "bonferroni"), digits = 5, caption = caption_over)
+```
+
+#### Area difference
+```{r, fig.width = 10, fig.height = 15, echo = FALSE, message = FALSE}
+## Plot the size differences
+make.plots(results$differences, type = "area difference", add.p = TRUE, correction = "bonferroni", rarefaction = TRUE, rare.level = results$rarefaction)
+```
+
+#### Bhattacharyya Coefficient
+```{r, fig.width = 10, fig.height = 15, echo = FALSE, message = FALSE}
+## Plot the size differences
+make.plots(results$overlaps, type = "Bhattacharyya Coefficient", add.p = TRUE, correction = "bonferroni", rarefaction = TRUE, rare.level = results$rarefaction)
+```
+
+
+### Mandible
+
+```{r, echo = FALSE, message = FALSE}
+results <- pipeline.test("Wombat_krefftii", "mandible", "../Data/Processed/", verbose = TRUE, rarefaction = TRUE)
+save(results, file = paste0("../Data/Results/Wombat_krefftii_mandible_rar", results$rarefaction, ".Rda"))
+
+caption_diff <- paste0("Results of the area difference random test (rarefied - ", results$rarefaction, ") for the ", results$dataset, " of ", results$species)
+caption_over <- paste0("Results of the overlap probability random test (rarefied - ", results$rarefaction, ") for the ", results$ataset, " of ", results$species)
+
+## Size differences
+kable(make.table(results$differences, "bonferroni"), digits = 5, caption = caption_diff)
+
+## Probability of overlap
+kable(make.table(results$overlaps, "bonferroni"), digits = 5, caption = caption_over)
+```
+
+#### Area difference
+```{r, fig.width = 10, fig.height = 15, echo = FALSE, message = FALSE}
+## Plot the size differences
+make.plots(results$differences, type = "area difference", add.p = TRUE, correction = "bonferroni", rarefaction = TRUE, rare.level = results$rarefaction)
+```
+
+#### Bhattacharyya Coefficient
+```{r, fig.width = 10, fig.height = 15, echo = FALSE, message = FALSE}
+## Plot the size differences
+make.plots(results$overlaps, type = "Bhattacharyya Coefficient", add.p = TRUE, correction = "bonferroni", rarefaction = TRUE, rare.level = results$rarefaction)
+```
+
+
+
+## Wombat latifrons
+
+### Cranium
+
+```{r, echo = FALSE, message = FALSE}
+results <- pipeline.test("Wombat_latifrons", "cranium", "../Data/Processed/", verbose = TRUE, rarefaction = TRUE)
+save(results, file = paste0("../Data/Results/Wombat_latifrons_cranium_rar", results$rarefaction, ".Rda"))
+
+caption_diff <- paste0("Results of the area difference random test (rarefied - ", results$rarefaction, ") for the ", results$dataset, " of ", results$species)
+caption_over <- paste0("Results of the overlap probability random test (rarefied - ", results$rarefaction, ") for the ", results$ataset, " of ", results$species)
+
+## Size differences
+kable(make.table(results$differences, "bonferroni"), digits = 5, caption = caption_diff)
+
+## Probability of overlap
+kable(make.table(results$overlaps, "bonferroni"), digits = 5, caption = caption_over)
+```
+
+#### Area difference
+```{r, fig.width = 10, fig.height = 15, echo = FALSE, message = FALSE}
+## Plot the size differences
+make.plots(results$differences, type = "area difference", add.p = TRUE, correction = "bonferroni", rarefaction = TRUE, rare.level = results$rarefaction)
+```
+
+#### Bhattacharyya Coefficient
+```{r, fig.width = 10, fig.height = 15, echo = FALSE, message = FALSE}
+## Plot the size differences
+make.plots(results$overlaps, type = "Bhattacharyya Coefficient", add.p = TRUE, correction = "bonferroni", rarefaction = TRUE, rare.level = results$rarefaction)
+```
+
+
+### Mandible
+
+```{r, echo = FALSE, message = FALSE}
+results <- pipeline.test("Wombat_latifrons", "mandible", "../Data/Processed/", verbose = TRUE, rarefaction = TRUE)
+save(results, file = paste0("../Data/Results/Wombat_latifrons_mandible_rar", results$rarefaction, ".Rda"))
+
+caption_diff <- paste0("Results of the area difference random test (rarefied - ", results$rarefaction, ") for the ", results$dataset, " of ", results$species)
+caption_over <- paste0("Results of the overlap probability random test (rarefied - ", results$rarefaction, ") for the ", results$ataset, " of ", results$species)
+
+## Size differences
+kable(make.table(results$differences, "bonferroni"), digits = 5, caption = caption_diff)
+
+## Probability of overlap
+kable(make.table(results$overlaps, "bonferroni"), digits = 5, caption = caption_over)
+```
+
+#### Area difference
+```{r, fig.width = 10, fig.height = 15, echo = FALSE, message = FALSE}
+## Plot the size differences
+make.plots(results$differences, type = "area difference", add.p = TRUE, correction = "bonferroni", rarefaction = TRUE, rare.level = results$rarefaction)
+```
+
+#### Bhattacharyya Coefficient
+```{r, fig.width = 10, fig.height = 15, echo = FALSE, message = FALSE}
+## Plot the size differences
+make.plots(results$overlaps, type = "Bhattacharyya Coefficient", add.p = TRUE, correction = "bonferroni", rarefaction = TRUE, rare.level = results$rarefaction)
+```
+
+
+# Between species
+
+### Cranium
+
+```{r, echo = FALSE, message = FALSE}
+results <- pipeline.test("Wombat", "cranium", "../Data/Processed/", verbose = TRUE, rarefaction = TRUE)
+save(results, file = paste0("../Data/Results/Wombat_cranium_rar", results$rarefaction, ".Rda"))
+
+caption_diff <- paste0("Results of the area difference random test (rarefied - ", results$rarefaction, ") for the ", results$dataset, " of ", results$species)
+caption_over <- paste0("Results of the overlap probability random test (rarefied - ", results$rarefaction, ") for the ", results$ataset, " of ", results$species)
+
+## Size differences
+kable(make.table(results$differences, "bonferroni"), digits = 5, caption = caption_diff)
+
+## Probability of overlap
+kable(make.table(results$overlaps, "bonferroni"), digits = 5, caption = caption_over)
+```
+
+#### Area difference
+```{r, fig.width = 10, fig.height = 15, echo = FALSE, message = FALSE}
+## Plot the size differences
+make.plots(results$differences, type = "area difference", add.p = TRUE, correction = "bonferroni", rarefaction = TRUE, rare.level = results$rarefaction)
+```
+
+#### Bhattacharyya Coefficient
+```{r, fig.width = 10, fig.height = 15, echo = FALSE, message = FALSE}
+## Plot the size differences
+make.plots(results$overlaps, type = "Bhattacharyya Coefficient", add.p = TRUE, correction = "bonferroni", rarefaction = TRUE, rare.level = results$rarefaction)
+```
+
+
+### Mandible
+
+```{r, echo = FALSE, message = FALSE}
+results <- pipeline.test("Wombat", "mandible", "../Data/Processed/", verbose = TRUE, rarefaction = TRUE)
+save(results, file = paste0("../Data/Results/Wombat_mandible_rar", results$rarefaction, ".Rda"))
+
+caption_diff <- paste0("Results of the area difference random test (rarefied - ", results$rarefaction, ") for the ", results$dataset, " of ", results$species)
+caption_over <- paste0("Results of the overlap probability random test (rarefied - ", results$rarefaction, ") for the ", results$ataset, " of ", results$species)
+
+## Size differences
+kable(make.table(results$differences, "bonferroni"), digits = 5, caption = caption_diff)
+
+## Probability of overlap
+kable(make.table(results$overlaps, "bonferroni"), digits = 5, caption = caption_over)
+```
+
+#### Area difference
+```{r, fig.width = 10, fig.height = 15, echo = FALSE, message = FALSE}
+## Plot the size differences
+make.plots(results$differences, type = "area difference", add.p = TRUE, correction = "bonferroni", rarefaction = TRUE, rare.level = results$rarefaction)
+```
+
+#### Bhattacharyya Coefficient
+```{r, fig.width = 10, fig.height = 15, echo = FALSE, message = FALSE}
+## Plot the size differences
+make.plots(results$overlaps, type = "Bhattacharyya Coefficient", add.p = TRUE, correction = "bonferroni", rarefaction = TRUE, rare.level = results$rarefaction)
+```
