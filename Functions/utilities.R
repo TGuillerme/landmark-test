@@ -4,7 +4,7 @@
 # @param path the path where the processed data is
 
 ## Test pipeline
-pipeline.test <- function(species, dataset, path, verbose = FALSE){
+pipeline.test <- function(species, dataset, path, verbose = FALSE, rarefaction){
     ## Loading a dataset
     if(verbose) message("Load data...")
     load(paste0(path, species, ".Rda"))
@@ -26,19 +26,40 @@ pipeline.test <- function(species, dataset, path, verbose = FALSE){
     for(part in unique(data$landmarkgroups[,2])) {
         partitions[[part]] <- which(data$landmarkgroups[,2] == part)
     }
+
+    if(missing(rarefaction)) {
+        rarefaction <- FALSE
+    }
+
+    if(rarefaction) {
+        part_min <- min(unlist(lapply(partitions, length)))
+    }
+
     if(verbose) message("Done.\n")
 
     ## Size differences
     if(verbose) message("Run size difference test...")
-    differences <- lapply(partitions, lapply.rand.test, data = procrustes_var, test = area.diff, replicates = 1000)
+    if(rarefaction) {
+        differences <- lapply(partitions, lapply.rand.test, data = procrustes_var, test = area.diff, replicates = 1000, rarefaction = part_min)
+    } else {
+        differences <- lapply(partitions, lapply.rand.test, data = procrustes_var, test = area.diff, replicates = 1000)
+    }
     if(verbose) message("Done.\n")
 
     ## Probabilities of overlap
     if(verbose) message("Run overlap probability test...")
-    overlaps <- lapply(partitions, lapply.rand.test, data = procrustes_var, test = bhatt.coeff, replicates = 1000)
+    if(rarefaction) {
+        overlaps <- lapply(partitions, lapply.rand.test, data = procrustes_var, test = bhatt.coeff, replicates = 1000, rarefaction = part_min)
+    } else {
+        overlaps <- lapply(partitions, lapply.rand.test, data = procrustes_var, test = bhatt.coeff, replicates = 1000)
+    }
     if(verbose) message("Done.\n")
 
-    return(list("differences" = differences, "overlaps" = overlaps, "species" = species, "dataset" = dataset))
+    if(!rarefaction) {
+        return(list("differences" = differences, "overlaps" = overlaps, "species" = species, "dataset" = dataset))
+    } else {
+        return(list("differences" = differences, "overlaps" = overlaps, "species" = species, "dataset" = dataset, "rarefaction" = part_min))
+    }
 }
 
 
@@ -90,7 +111,7 @@ make.table <- function(results, correction) {
 
 
 ## Function for plotting the test results
-make.plots <- function(results, type, add.p = FALSE, correction) {
+make.plots <- function(results, type, add.p = FALSE, correction, rarefaction = FALSE, rare.level) {
 
     ## Number of plots
     n_plots <- length(results)
@@ -105,7 +126,20 @@ make.plots <- function(results, type, add.p = FALSE, correction) {
 
     for(one_plot in 1:n_plots) {
         ## Plot
-        plot(results[[one_plot]], xlab = type, main = paste("Partition", one_plot))
+
+        if(!rarefaction) {
+            main_lab <- paste("Partition", one_plot)
+        } else {
+            main_lab <- paste0("Partition ", one_plot, " (rarefied - ", rare.level, ")")
+        }
+
+        plot(results[[one_plot]], xlab = type, main = main_lab)
+
+        ## Rarefaction
+        if(rarefaction) {
+            add.rare.plot(results[[one_plot]])
+        }
+
         ## p_value
         if(add.p) {
             ## Get the coordinates for the text
