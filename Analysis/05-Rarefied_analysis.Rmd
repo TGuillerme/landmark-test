@@ -39,7 +39,7 @@ set.seed(1)
 
 ```{r, echo = FALSE, message = FALSE}
 results <- pipeline.test("Wombat_ursinus", "cranium", "../Data/Processed/", verbose = TRUE, rarefaction = TRUE)
-save(results, file = paste0("../Data/Results/Wombat_ursinus_cranium_rar", results$rarefaction, ".Rda"))
+save(results, file = paste0("../Data/Results/Wombat_ursinus_cranium_rarefied.Rda"))
 
 caption_diff <- paste0("Results of the area difference random test (rarefied - ", results$rarefaction, ") for the ", results$dataset, " of ", results$species)
 caption_over <- paste0("Results of the overlap probability random test (rarefied - ", results$rarefaction, ") for the ", results$ataset, " of ", results$species)
@@ -68,7 +68,7 @@ make.plots(results$overlaps, type = "Bhattacharyya Coefficient", add.p = TRUE, c
 
 ```{r, echo = FALSE, message = FALSE}
 results <- pipeline.test("Wombat_ursinus", "mandible", "../Data/Processed/", verbose = TRUE, rarefaction = TRUE)
-save(results, file = paste0("../Data/Results/Wombat_ursinus_mandible_rar", results$rarefaction, ".Rda"))
+save(results, file = paste0("../Data/Results/Wombat_ursinus_mandible_rarefied.Rda"))
 
 caption_diff <- paste0("Results of the area difference random test (rarefied - ", results$rarefaction, ") for the ", results$dataset, " of ", results$species)
 caption_over <- paste0("Results of the overlap probability random test (rarefied - ", results$rarefaction, ") for the ", results$ataset, " of ", results$species)
@@ -99,7 +99,7 @@ make.plots(results$overlaps, type = "Bhattacharyya Coefficient", add.p = TRUE, c
 
 ```{r, echo = FALSE, message = FALSE}
 results <- pipeline.test("Wombat_krefftii", "cranium", "../Data/Processed/", verbose = TRUE, rarefaction = TRUE)
-save(results, file = paste0("../Data/Results/Wombat_krefftii_cranium_rar", results$rarefaction, ".Rda"))
+save(results, file = paste0("../Data/Results/Wombat_krefftii_cranium_rarefied.Rda"))
 
 caption_diff <- paste0("Results of the area difference random test (rarefied - ", results$rarefaction, ") for the ", results$dataset, " of ", results$species)
 caption_over <- paste0("Results of the overlap probability random test (rarefied - ", results$rarefaction, ") for the ", results$ataset, " of ", results$species)
@@ -128,7 +128,7 @@ make.plots(results$overlaps, type = "Bhattacharyya Coefficient", add.p = TRUE, c
 
 ```{r, echo = FALSE, message = FALSE}
 results <- pipeline.test("Wombat_krefftii", "mandible", "../Data/Processed/", verbose = TRUE, rarefaction = TRUE)
-save(results, file = paste0("../Data/Results/Wombat_krefftii_mandible_rar", results$rarefaction, ".Rda"))
+save(results, file = paste0("../Data/Results/Wombat_krefftii_mandible_rarefied.Rda"))
 
 caption_diff <- paste0("Results of the area difference random test (rarefied - ", results$rarefaction, ") for the ", results$dataset, " of ", results$species)
 caption_over <- paste0("Results of the overlap probability random test (rarefied - ", results$rarefaction, ") for the ", results$ataset, " of ", results$species)
@@ -160,7 +160,7 @@ make.plots(results$overlaps, type = "Bhattacharyya Coefficient", add.p = TRUE, c
 
 ```{r, echo = FALSE, message = FALSE}
 results <- pipeline.test("Wombat_latifrons", "cranium", "../Data/Processed/", verbose = TRUE, rarefaction = TRUE)
-save(results, file = paste0("../Data/Results/Wombat_latifrons_cranium_rar", results$rarefaction, ".Rda"))
+save(results, file = paste0("../Data/Results/Wombat_latifrons_cranium_rarefied.Rda"))
 
 caption_diff <- paste0("Results of the area difference random test (rarefied - ", results$rarefaction, ") for the ", results$dataset, " of ", results$species)
 caption_over <- paste0("Results of the overlap probability random test (rarefied - ", results$rarefaction, ") for the ", results$ataset, " of ", results$species)
@@ -189,7 +189,7 @@ make.plots(results$overlaps, type = "Bhattacharyya Coefficient", add.p = TRUE, c
 
 ```{r, echo = FALSE, message = FALSE}
 results <- pipeline.test("Wombat_latifrons", "mandible", "../Data/Processed/", verbose = TRUE, rarefaction = TRUE)
-save(results, file = paste0("../Data/Results/Wombat_latifrons_mandible_rar", results$rarefaction, ".Rda"))
+save(results, file = paste0("../Data/Results/Wombat_latifrons_mandible_rarefied.Rda"))
 
 caption_diff <- paste0("Results of the area difference random test (rarefied - ", results$rarefaction, ") for the ", results$dataset, " of ", results$species)
 caption_over <- paste0("Results of the overlap probability random test (rarefied - ", results$rarefaction, ") for the ", results$ataset, " of ", results$species)
@@ -220,7 +220,7 @@ make.plots(results$overlaps, type = "Bhattacharyya Coefficient", add.p = TRUE, c
 
 ```{r, echo = FALSE, message = FALSE}
 results <- pipeline.test("Wombat", "cranium", "../Data/Processed/", verbose = TRUE, rarefaction = TRUE)
-save(results, file = paste0("../Data/Results/Wombat_cranium_rar", results$rarefaction, ".Rda"))
+save(results, file = paste0("../Data/Results/Wombat_cranium_rarefied.Rda"))
 
 caption_diff <- paste0("Results of the area difference random test (rarefied - ", results$rarefaction, ") for the ", results$dataset, " of ", results$species)
 caption_over <- paste0("Results of the overlap probability random test (rarefied - ", results$rarefaction, ") for the ", results$ataset, " of ", results$species)
@@ -249,7 +249,7 @@ make.plots(results$overlaps, type = "Bhattacharyya Coefficient", add.p = TRUE, c
 
 ```{r, echo = FALSE, message = FALSE}
 results <- pipeline.test("Wombat", "mandible", "../Data/Processed/", verbose = TRUE, rarefaction = TRUE)
-save(results, file = paste0("../Data/Results/Wombat_mandible_rar", results$rarefaction, ".Rda"))
+save(results, file = paste0("../Data/Results/Wombat_mandible_rarefied.Rda"))
 
 caption_diff <- paste0("Results of the area difference random test (rarefied - ", results$rarefaction, ") for the ", results$dataset, " of ", results$species)
 caption_over <- paste0("Results of the overlap probability random test (rarefied - ", results$rarefaction, ") for the ", results$ataset, " of ", results$species)
