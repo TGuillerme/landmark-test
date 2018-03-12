@@ -60,7 +60,7 @@ rand.test <- function(distribution, subset, test, replicates = 100, resample = T
         is_rarefied <- FALSE
     } else {
         is_rarefied <- TRUE
-        check.class(rarefaction, "numeric")
+        check.class(rarefaction, c("numeric", "integer"))
         check.length(rarefaction, 1, msg = " must be a single numeric value.")
         if(length(rarefaction) > length(subset)) {
             stop("The rarefaction values is bigger than the subset size.")
@@ -132,14 +132,13 @@ rand.test <- function(distribution, subset, test, replicates = 100, resample = T
     ## Select the sub-population size
     pop_size <- ifelse(is_rarefied, rarefaction, length(subset))
 
-    ## Randomly select a population within the distribution
-    random_draws <- replicate(replicates, sample(1:length(distribution), length(subset)), simplify = FALSE)
-
     ## Observed draw
     if(!is_rarefied) {
         observed_draws <- subset
+        random_draws <- replicate(replicates, sample(1:length(distribution), length(subset)), simplify = FALSE)
     } else {
         observed_draws <- replicate(replicates, sample(subset, rarefaction), simplify = FALSE)
+        random_draws <- replicate(replicates, sample(1:length(distribution), rarefaction), simplify = FALSE)
     }
 
     ## Applying test function
@@ -182,7 +181,6 @@ rand.test <- function(distribution, subset, test, replicates = 100, resample = T
 
         ## Calculating the p-value
         p_value <- get.p.value(random_parameters, observed_parameters, replicates)
-
     } 
 
     ## Making the results into a randtest object
@@ -199,8 +197,8 @@ rand.test <- function(distribution, subset, test, replicates = 100, resample = T
     res$obs <- mean(observed_parameters)
 
     ## Adding the plot options (modified from ade4::as.randtest)
-    r0 <- c(random_parameters, mean(observed_parameters))
-    l0 <- max(random_parameters) - min(random_parameters)
+    r0 <- c(random_parameters, observed_parameters)
+    l0 <- max(random_parameters, observed_parameters) - min(random_parameters, observed_parameters)
     w0 <- l0/(log(length(random_parameters), base = 2) + 1)
     xlim0 <- range(r0) + c(-w0, w0)
     h0 <- hist(random_parameters, plot = FALSE, nclass = 10)
