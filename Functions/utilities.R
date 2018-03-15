@@ -1,9 +1,10 @@
 # @param species the species name
 # @param dataset the type of dataset (cranium or mandible)
 # @param path the path where the processed data is
+# @param combine.land whether to combine the landmarks (only two partitions)
 
 ## Test pipeline
-pipeline.test <- function(species, dataset, path, verbose = FALSE, rarefaction){
+pipeline.test <- function(species, dataset, path, verbose = FALSE, rarefaction, combine.land = FALSE){
     ## Loading a dataset
     if(verbose) message("Load data...")
     load(paste0(path, species, ".Rda"))
@@ -22,6 +23,15 @@ pipeline.test <- function(species, dataset, path, verbose = FALSE, rarefaction){
     ## landmarks partitions
     if(verbose) message("Determine partitions...")
     partitions <- list()
+
+    ## Combine the landmarks
+    if(combine.land) {
+        ## Select the biggest partitions
+        biggest_partition <- which(table(data$landmarkgroups[,2]) == max(table(data$landmarkgroups[,2])))
+        ## Combine landmarks not in that partition
+        data$landmarkgroups[,2] <- ifelse(data$landmarkgroups[,2] != biggest_partition, 1, biggest_partition)
+    }
+
     for(part in unique(data$landmarkgroups[,2])) {
         partitions[[part]] <- which(data$landmarkgroups[,2] == part)
     }
