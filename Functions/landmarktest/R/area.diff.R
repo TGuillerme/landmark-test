@@ -3,20 +3,26 @@
 #' @description Measure the area difference between two ranked distribution
 #'
 #' @param x,y the two distributions to compare.
-#' @param rarefy Optional, if \code{x} is \neq \code{y}, how many rarefaction samples to use. If left empty a default number of replicates between 100 and 1000 is used (see details).
-#' @param cent.tend Optional, if \code{x} is \neq \code{y}, which central tendency to use (\code{defaut = mean})
+#' @param rarefy Optional, if \code{x != y}, how many rarefaction samples to use. If left empty a default number of replicates between 100 and 1000 is used (see details).
+#' @param cent.tend Optional, if \code{x != y}, which central tendency to use (\code{defaut = mean})
 #' 
 #' @details
 #' The number of replicates is chosen based on the variance of the distribution to rarefy using the Silverman's rule of thumb (Silverman 1986, pp.48, eqn 3.31) for choosing the bandwidth of a Gaussian kernel density estimator multiplied by 1000 with a result comprised between 100 and 1000.
 #' For example, for rarefying \code{x}, \code{rarefy = round(stats::bw.nrd0(x) * 1000)}.
-#' With \code{100 \leq rarefy \leq 1000}.
+#' With \code{100 <= rarefy <= 1000}.
 #' 
 #' @references
 #' Silverman, B. W. (1986) Density Estimation. London: Chapman and Hall.
 #' 
 #' @examples
+#' ## Two distributions
+#' x <- rnorm(10)
+#' y <- runif(10)
+#' 
+#' ## The area difference
+#' area.diff(x, y)
 #'
-#' @seealso
+#' @seealso \code{\link{variation.range}}
 #' 
 #' @author Thomas Guillerme
 #' @export

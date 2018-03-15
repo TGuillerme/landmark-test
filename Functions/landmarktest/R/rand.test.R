@@ -19,16 +19,49 @@
 #' 
 #' If \code{test.parameter} is set to \code{TRUE}, the code tests whether the resulting test parameters between the observed subset and the random ones are significantly different (base on the same procedure as in \code{link[ade4]{rantest}}).
 #' 
-#' @returns
+#' @return
 #' This function returns a \code{"randtest"} object that can be passed to the generic S3 functions \code{\link[randtest]{print.randtest}} or \code{\link[randtest]{plot.randtest}}.
 #' The output also contains to extra elements \code{output$observed} and \code{output$random} containing the raw results of respectively the observed and random tests.
 #' 
 #' @examples
+#' ## Loading the geomorph dataset
+#' data(plethodon)
+#' 
+#' ## Performing the Procrustes superimposition
+#' proc_super <- gpagen(plethodon$land, print.progress = FALSE)
+#' 
+#' ## Getting the two most different specimen based on their landmark change radii
+#' var_range <- variation.range(proc_super)
+#' 
+#' set.seed(1)
+#' 
+#' ## Selecting 6 random landmarks
+#' random_part <- sample(1:nrow(var_range), 6)
+#' 
+#' ## Testing the difference between the two sets of landmarks
+#' stats::t.test(var_range[random_part, "radius"], var_range[-random_part, "radius"])
+#' 
+#' ## Testing whether this difference is expected by chance
+#' random_test <- rand.test(var_range[, "radius"], random_part, test = stats::t.test,
+#'                         test.parameter = TRUE)
 #'
-#' @seealso
+#' ## Summarising the results
+#' random_test
+#' 
+#' ## Plotting the results
+#' plot(random_test)
+#' 
+#' ## Rarefying the area difference to 4 elements without testing the parameter
+#' rarefy_test <- rand.test(var_range[, "radius"], random_part, rarefaction = 5,
+#'                          test = t.test)
+#' plot(rarefy_test)
+#'
+#' @seealso \code{link[ade4]{randtest}}, \code{\link{bootstrap.test}}
 #' 
 #' @author Thomas Guillerme
 #' @export
+#' @importFrom stats sd var
+#' @importFrom graphics hist
 
 rand.test <- function(distribution, subset, test, replicates = 100, resample = TRUE, rarefaction, test.parameter = FALSE, parameter, alternative = "two-sided", ...) {
 
@@ -174,9 +207,9 @@ rand.test <- function(distribution, subset, test, replicates = 100, resample = T
     if(test.parameter) {
         ## Getting the test results
         if(!is_rarefied) {
-            test_results <- c("Normal residuals" = (observed_parameters - mean(random_parameters)) / sd(random_parameters), "Random mean" = mean(random_parameters), "Random variance" = var(random_parameters))
+            test_results <- c("Normal residuals" = (observed_parameters - mean(random_parameters)) / stats::sd(random_parameters), "Random mean" = mean(random_parameters), "Random variance" = stats::var(random_parameters))
         } else {
-            test_results <- c("Mean Normal residuals" = mean((observed_parameters - mean(random_parameters)) / sd(random_parameters)), "Random mean" = mean(random_parameters), "Random variance" = var(random_parameters))
+            test_results <- c("Mean Normal residuals" = mean((observed_parameters - mean(random_parameters)) / stats::sd(random_parameters)), "Random mean" = mean(random_parameters), "Random variance" = stats::var(random_parameters))
         }
 
         ## Calculating the p-value
@@ -201,7 +234,7 @@ rand.test <- function(distribution, subset, test, replicates = 100, resample = T
     l0 <- max(random_parameters, observed_parameters) - min(random_parameters, observed_parameters)
     w0 <- l0/(log(length(random_parameters), base = 2) + 1)
     xlim0 <- range(r0) + c(-w0, w0)
-    h0 <- hist(random_parameters, plot = FALSE, nclass = 10)
+    h0 <- graphics::hist(random_parameters, plot = FALSE, nclass = 10)
     res$plot <- list(hist = h0, xlim = xlim0)
 
     ## Adding the test.parameter arguments
