@@ -3,7 +3,7 @@ Title: Wrapping Package For Performing The Landmark Test From Papername
 Version: 0.0.0.9000
 Authors@R: person("Thomas", "Guillerme", email = "guillert@tcd.ie", role = c("aut", "cre"))
 Description: What the package does (one paragraph).
-Depends: R (>= 3.4.3)
+Depends: R (>= 3.3.2)
 License: GPL-3
 Encoding: UTF-8
 LazyData: true
