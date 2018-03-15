@@ -14,18 +14,9 @@ output:
 if(!require(devtools)) install.packages("devtools")
 if(!require(knitr)) install.packages("knitr")
 if(!require(geomorph)) install.packages("geomorph")
-if(!require(RCurl)) install.packages("RCurl")
-if(!require(zoo)) install.packages("zoo")
-if(!require(dispRity)) install_github("dispRity")
-## Loading the function
-source("../Functions/coordinates.difference.R")
-source("../Functions/coordinates.area.R")
-source("../Functions/variation.range.R")
-source("../Functions/rand.test.R")
-source("../Functions/area.diff.R")
-source("../Functions/sanitizing.R")
+if(!require(dispRity)) install_github("TGuillerme/dispRity")
+if(!require(landmarktest)) install_github("TGuillerme/landmark-test")
 source("../Functions/utilities.R")
-source("../Functions/add.rare.plot.R")
 set.seed(1)
 ```
 
