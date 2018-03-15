@@ -34,6 +34,49 @@ Modification of PlotRefToTarget to allow to add heat maps (only works for \code{
    \item if col is a list of two values, vectors or functions, it will apply the first element to the points and the second to the vectors the same way as described above;
 }
 }
+\examples{
+## Loading the geomorph dataset
+data(plethodon)
+
+## Performing the Procrustes superimposition
+proc_super <- gpagen(plethodon$land, print.progress = FALSE)
+
+## Getting the range of variation
+variation <- variation.range(proc_super, return.ID = TRUE)
+
+## Selecting the coordinates and the variation vector
+M1 <- proc_super$coords[, , variation$min.max[1]]
+M2 <- proc_super$coords[, , variation$min.max[2]]
+var_val <- variation$range[, 1]
+ 
+## Plot the variation
+plotRefToTarget.heat(M1, M2, method = "vector")
+
+## A weird looking plethodon
+plotRefToTarget.heat(M1, M2, method = "points", col = list(rainbow, "pink"), col.val = var_val,
+                pt.size = 2.5, plotRefToTarget.args = list(mag = 3, outline = plethodon$outline))
+
+\dontrun{
+## Loading the scallops 3D data from geomorph
+data(scallops)
+
+## Procrustes superimposition
+procrustes <- gpagen(scallops$coorddata)
+
+## Getting the range of variation
+variation <- variation.range(procrustes, return.ID = TRUE)
+
+## Selecting the coordinates and the variation vector
+M1 <- procrustes[, , variation$min.max[1]]
+M2 <- procrustes[, , variation$min.max[2]]
+var_val <- variation$range[, 1]
+ 
+## Plot the variation in 3D
+plotRefToTarget.heat(M1, M2, method = "vector",  col.val = var_val,
+                     col = list(grDevices::heat.colors, "grey"))
+}
+
+}
 \seealso{
 \code{\link{variation.range}}
 }

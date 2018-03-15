@@ -1,4 +1,3 @@
-
 # @param species the species name
 # @param dataset the type of dataset (cranium or mandible)
 # @param path the path where the processed data is

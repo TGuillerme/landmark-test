@@ -20,7 +20,7 @@
 #' }
 #' 
 #' 
-#' @example
+#' @examples
 #' ## Loading the geomorph dataset
 #' data(plethodon)
 #' 

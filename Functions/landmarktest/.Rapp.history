@@ -1,7 +1,3 @@
-viridis(4)
-col_palette <- viridis::viridis(4)
-points(group1[c(1, 2)], col = col_palette[1])
-group1[c(1, 2)]
 points(group1[, c(1, 2)], col = col_palette[1])
 points(group1[, c(1, 2)], col = col_palette[1], pch = 21)
 points(group1[, c(1, 2)], col = col_palette[1], pch = 19)
@@ -413,8 +409,21 @@ data(lifespan)
 lapply(trees_aves, is.ultrametric)
 lapply(trees_mammalia, is.ultrametric)
 plot(trees_aves)
-cd("~/Projects/landmark-test/Functions/landmarktest/")
+setwd("/Users/TGuillerme/Projects/landmark-test/Analysis")
+## Loading the libraries (and installing if necessary)#
+if(!require(devtools)) install.packages("devtools")#
+if(!require(geomorph)) install.packages("geomorph")#
+if(!require(dispRity)) install_github("dispRity")#
+## Loading the function#
+source("../Functions/utilities.R")
+## Loading a dataset#
+load("../Data/Processed/wombat_ursinus.Rda")#
+#
+## Selecting a partition#
+cranium <- land_data$cranium
+library(landmarktest)
+?plotRefToTarget.heat
+devtools::install("../Functions/landmarktest")
+de("../Functions/landmarktest/")
+cd("../Functions/landmarktest/")
 document()
-?segments3d
-install(".")
-??segments3d
