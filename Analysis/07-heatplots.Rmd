@@ -47,7 +47,7 @@ The "maximum" and "minimum" specimen:
 ## Procrustes variation ranges
 variation <- variation.range(cranium$procruste, return.ID = TRUE)
 specimens_min_max <- variation$min.max
-procrustes_var <- variation$variation
+procrustes_var <- variation$range[,1]
 ```
 
 ```{r, eval = FALSE}
@@ -55,7 +55,7 @@ gridPar = gridPar(pt.bg = "white", pt.size = 0.5)
 open3d()
 plotRefToTarget.heat(cranium$procruste$coords[, , specimens_min_max[2]],
                      cranium$procruste$coords[, , specimens_min_max[1]],
-                     method = "vector",
+                     method = "vector", mag = 2,
                      col.vector = heat.colors, col.points = heat.colors,
                      val.vector = procrustes_var, val.points = procrustes_var)
 ```
