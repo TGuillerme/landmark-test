@@ -4,17 +4,31 @@
 #'
 #' @param coordinates An \code{array}, \code{list} or \code{matrix} of coordinates to be compared to the reference.
 #' @param reference A \code{matrix} of reference coordinates. If missing and \code{coordinates} is an \code{array} or \code{list}, the first element of \code{coordinates} is used.
-#' @param type the type of coordinates to output: can be \code{"cartesian"} (x0,y0,x1,y1,... format), \code{"vector"} (length, angle(s)), or  \code{"spherical"} (radius, polar, azimuth).
+#' @param type the type of coordinates to output: can be \code{"cartesian"} (x0,y0,x1,y1,... format), or  \code{"spherical"} (radius, polar, azimuth).
+# \code{"vector"} (length, angle(s))
 #' @param angle optional, whether display angles in radian (\code{"radian"} - default) or in degrees (\code{"degree"}).
 #' 
 #' @examples
-#'
-#' @seealso
+#' ## Loading the geomorph dataset
+#' data(plethodon)
+#' 
+#' ## Performing the Procrustes superimposition
+#' proc_super <- geomorph::gpagen(plethodon$land, print.progress = FALSE)
+#' 
+#' ## Getting the coordinates differences from the consensus
+#' cartesian_diff <- coordinates.difference(proc_super$coords, proc_super$consensus)
+#' 
+#' ## The coordinates of the differences between the first specimen and the consensus
+#' head(cartesian_diff[[1]])
+#' 
+#' ## Getting the spherical coordinates difference between the two first specimen
+#' coordinates.difference(proc_super$coords[, , 1], proc_super$coords[, , 2],
+#'                        type = "spherical", angle = "degree")
+#' 
+#' @seealso \code{\link{variation.range}}
 #' 
 #' @author Thomas Guillerme
 #' @export
-
-#TODO: check direction for vector!
 
 coordinates.difference <- function(coordinates, reference, type = "cartesian", angle = "radian") {
 
@@ -53,7 +67,7 @@ coordinates.difference <- function(coordinates, reference, type = "cartesian", a
 
     ## Method
     type <- tolower(type)
-    check.method(type, c("cartesian", "vector", "spherical"), msg = "type")
+    check.method(type, c("cartesian", "spherical"), msg = "type") #"vector"
 
     ## Angle
     angle <- tolower(angle)
@@ -95,38 +109,36 @@ coordinates.difference <- function(coordinates, reference, type = "cartesian", a
         }
 
 
+        # fun.angle <- function(one_row, axis, dimension) {
+        #     return(
+        #         acos( ( sqrt((one_row[-c(1:dimension)][axis] - one_row[1:dimension][axis])^2) ) / sqrt(sum((one_row[-c(1:dimension)]-one_row[1:dimension])^2)) )
+        #         )
+        # }
+
+        # library(testthat)
 
 
-#         fun.angle <- function(one_row, axis, dimension) {
-#             return(
-#                 acos( ( sqrt((one_row[-c(1:dimension)][axis] - one_row[1:dimension][axis])^2) ) / sqrt(sum((one_row[-c(1:dimension)]-one_row[1:dimension])^2)) )
-#                 )
-#         }
-
-# library(testthat)
+        # expect_values <- c()
 
 
-#     expect_values <- c()
-
-    
-#     expect_equal(
-#         fun.angle(c(1,1,2,2), 1, 2)*180/pi
-#         , 45)
-#     expect_equal(
-#         fun.angle(c(1,1,-2,-2), 1, 2)*180/pi
-#         , 45)
-#     expect_equal(
-#         fun.angle(c(1,1,2,1), 1, 2)*180/pi
-#         , 0)
-#     expect_equal(
-#         fun.angle(c(1,1,2,1), 2, 2)*180/pi
-#         , 90)    
-#     expect_equal(
-#         fun.angle(c(1,1,1,2), 1, 2)*180/pi
-#         , 90)
-#     expect_equal(
-#         fun.angle(c(1,1,1,2), 2, 2)*180/pi
-#         , 0)
+        # expect_equal(
+        # fun.angle(c(1,1,2,2), 1, 2)*180/pi
+        # , 45)
+        # expect_equal(
+        # fun.angle(c(1,1,-2,-2), 1, 2)*180/pi
+        # , 45)
+        # expect_equal(
+        # fun.angle(c(1,1,2,1), 1, 2)*180/pi
+        # , 0)
+        # expect_equal(
+        # fun.angle(c(1,1,2,1), 2, 2)*180/pi
+        # , 90)    
+        # expect_equal(
+        # fun.angle(c(1,1,1,2), 1, 2)*180/pi
+        # , 90)
+        # expect_equal(
+        # fun.angle(c(1,1,1,2), 2, 2)*180/pi
+        # , 0)
 
         ## Calculate the angles
         output <- apply(one_coordinate, 1, fun.angle, axis = axis, dimension = dimension)
@@ -142,41 +154,41 @@ coordinates.difference <- function(coordinates, reference, type = "cartesian", a
 
 
     ## Vector coordinates
-    if(type == "vector") {
-        ## length
-        length <- lapply(coordinates, euclidean.distance, dimensions[2])
+    # if(type == "vector") {
+    #     ## length
+    #     length <- lapply(coordinates, euclidean.distance, dimensions[2])
 
-        ## angle
-        if(dimensions[2] == 2) {
-            ## Get the x angle
-            angle <- lapply(coordinates, get.angle, axis = 1, dimensions[2], degree = degree)
+    #     ## angle
+    #     if(dimensions[2] == 2) {
+    #         ## Get the x angle
+    #         angle <- lapply(coordinates, get.angle, axis = 1, dimensions[2], degree = degree)
 
-            ## Direction
-            direction <- lapply(angle, function(x) return(cos(x)/sin(x)))
+    #         ## Direction
+    #         direction <- lapply(angle, function(x) return(cos(x)/sin(x)))
 
-        } else {
-            ## Get the x and y angles
-            angle_x <- lapply(coordinates, get.angle, axis = 1, dimensions[2], degree = degree)
-            angle_y <- lapply(coordinates, get.angle, axis = 2, dimensions[2], degree = degree)
-            ## Combine both
-            angle <- mapply(cbind, angle_x, angle_y, SIMPLIFY = FALSE)
+    #     } else {
+    #         ## Get the x and y angles
+    #         angle_x <- lapply(coordinates, get.angle, axis = 1, dimensions[2], degree = degree)
+    #         angle_y <- lapply(coordinates, get.angle, axis = 2, dimensions[2], degree = degree)
+    #         ## Combine both
+    #         angle <- mapply(cbind, angle_x, angle_y, SIMPLIFY = FALSE)
 
-            ## Direction
-            direction <- lapply(angle_x, function(x) return(cos(x)/sin(x)))
+    #         ## Direction
+    #         direction <- lapply(angle_x, function(x) return(cos(x)/sin(x)))
 
-        }
+    #     }
 
-        ## Combine the coordinates
-        coordinates <- mapply(cbind, length, angle, SIMPLIFY = FALSE)
-        coordinates <- mapply(cbind, coordinates, direction, SIMPLIFY = FALSE)
+    #     ## Combine the coordinates
+    #     coordinates <- mapply(cbind, length, angle, SIMPLIFY = FALSE)
+    #     coordinates <- mapply(cbind, coordinates, direction, SIMPLIFY = FALSE)
 
-        if(dimensions[2] == 2) {
-            coordinates <- lapply(coordinates, function(x) {colnames(x) <- c("length", "angle", "direction") ; return(x)})
-        } else {
-            coordinates <- lapply(coordinates, function(x) {colnames(x) <- c("length", "angle_x", "angle_y", "direction") ; return(x)})
-        }
+    #     if(dimensions[2] == 2) {
+    #         coordinates <- lapply(coordinates, function(x) {colnames(x) <- c("length", "angle", "direction") ; return(x)})
+    #     } else {
+    #         coordinates <- lapply(coordinates, function(x) {colnames(x) <- c("length", "angle_x", "angle_y", "direction") ; return(x)})
+    #     }
 
-    }
+    # }
 
     ## Spherical coordinates
     if(type == "spherical") {
@@ -207,20 +219,20 @@ coordinates.difference <- function(coordinates, reference, type = "cartesian", a
 }
 
 
-##### TESTS
-test <- FALSE
-if(test){
-    #TESTING bhatt.coeff
+# ##### TESTS
+# test <- FALSE
+# if(test){
+#     #TESTING bhatt.coeff
 
-    context("coordinates.difference")
+#     context("coordinates.difference")
 
-    #Test
-    test_that("correct output", {
+#     #Test
+#     test_that("correct output", {
 
-        ## Make data set
-        data(plethodon)
-        test_output <- geomorph::gpagen(plethodon$land, PrinAxes = FALSE, print.progress = FALSE)
-        test_out <- coordinates.difference()
+#         ## Make data set
+#         data(plethodon)
+#         test_output <- geomorph::gpagen(plethodon$land, PrinAxes = FALSE, print.progress = FALSE)
+#         test_out <- coordinates.difference()
 
-    })
-}
+#     })
+# }

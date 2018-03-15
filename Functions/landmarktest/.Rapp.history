@@ -1,0 +1,420 @@
+viridis(4)
+col_palette <- viridis::viridis(4)
+points(group1[c(1, 2)], col = col_palette[1])
+group1[c(1, 2)]
+points(group1[, c(1, 2)], col = col_palette[1])
+points(group1[, c(1, 2)], col = col_palette[1], pch = 21)
+points(group1[, c(1, 2)], col = col_palette[1], pch = 19)
+empty.plot(ylab = "Dimension 2")#
+## Adding the points#
+points(group1[, c(1, 2)], col = col_palette[1], pch = 19)
+points(group1[, c(1, 2)], col = col_palette[1], pch = 19, cex = 0.7)
+empty.plot(ylab = "Dimension 2")#
+## Adding the points#
+points(group1[, c(1, 2)], col = col_palette[1], pch = 19, cex = 0.7)
+col_palette <- as.list(viridis::viridis(4))
+col_palette
+mapply(function(x, col) points(x, col = col), points, col_palette)
+points
+mapply(function(x, col) points(x, col = col, pch = 19, cex = 0.7), groups, col_palette)
+silent <- mapply(function(x, col) points(x, col = col, pch = 19, cex = 0.7), groups, col_palette)
+chull_coords_xy[[1]]
+polygon(chull_coords_xy[[1]][,1], chull_coords_xy[[1]][,2])
+polygon(chull_coords_xy[[1]][,1], chull_coords_xy[[1]][,2], col = col_palette)
+polygon(chull_coords_xy[[1]][,1], chull_coords_xy[[1]][,2], col = col_palette, density = 0.5)
+?polygon
+polygon(chull_coords_xy[[1]][,1], chull_coords_xy[[1]][,2], col = col_palette[[1]], density = 0.5, border = col_palette[[1]])
+polygon(chull_coords_xy[[1]][,1], chull_coords_xy[[1]][,2], col = col_palette[[1]], density = 1, border = col_palette[[1]])
+polygon(chull_coords_xy[[1]][,1], chull_coords_xy[[1]][,2], col = col_palette[[1]], density = 50, border = col_palette[[1]])
+## Plotting the first coordinates sets#
+empty.plot(ylab = "Dimension 2")#
+## Adding the points#
+silent <- mapply(function(x, col) points(x, col = col, pch = 19, cex = 0.7), groups, col_palette)#
+## Adding the polygons#
+polygon(chull_coords_xy[[1]][,1], chull_coords_xy[[1]][,2], col = col_palette[[1]], density = 30, border = col_palette[[1]])
+empty.plot(ylab = "Dimension 2")#
+## Adding the points#
+silent <- mapply(function(x, col) points(x, col = col, pch = 19, cex = 0.7), groups, col_palette)#
+## Adding the polygons#
+silent <- mapply(function(x, col) polygon(x[,1], x[,2], col = col, density = 10, border = col), groups, palette)
+size <- 10            # x                      #y                       #z#
+group1 <- cbind(rnorm(size, -0.5, 0.25), rnorm(size,  0.5, 0.25), rnorm(size,  0.5, 0.25))#
+group2 <- cbind(rnorm(size, -0.5, 0.25), rnorm(size,  0.5, 0.25), rnorm(size, -0.5, 0.25))#
+group3 <- cbind(rnorm(size,  0.5, 0.25), rnorm(size,  0.5, 0.25), rnorm(size,  0.5, 0.25))#
+group4 <- cbind(rnorm(size,  0.5, 0.25), rnorm(size, -0.5, 0.25), rnorm(size,  0.5, 0.25))#
+groups <- list(group1, group2, group3, group4)#
+#
+## Chull coordinates function#
+get.chull.coords <- function(x, axis) {#
+    chull_points <- chull(x[, c(axis)])#
+    chull_coords <- rbind(x[chull_points, axis], x[chull_points[1], axis])#
+}#
+#
+## Getting the coordinates#
+chull_coords_xy <- lapply(groups, get.chull.coords, axis = c(1, 2))#
+chull_coords_xz <- lapply(groups, get.chull.coords, axis = c(1, 3))#
+#
+## Empty plot function#
+empty.plot <- function(xlab = "Dimension 1", ylab) {#
+    par(bty = "n")#
+    plot(NULL, xlim = c(-1, 1), ylim = c(-1, 1), xlab = xlab, ylab = ylab, xaxt='n', yaxt='n')#
+    abline(v = 0)#
+    abline(h = 0)#
+}#
+#
+## Setting the colour palette#
+col_palette <- as.list(viridis::viridis(4))
+silent <- mapply(function(x, col) polygon(x[,1], x[,2], col = col, density = 10, border = col), groups, col_palette)
+## Sampling the four different groups#
+size <- 10            # x                      #y                       #z#
+group1 <- cbind(rnorm(size, -0.5, 0.25), rnorm(size,  0.5, 0.25), rnorm(size,  0.5, 0.25))#
+group2 <- cbind(rnorm(size, -0.5, 0.25), rnorm(size,  0.5, 0.25), rnorm(size, -0.5, 0.25))#
+group3 <- cbind(rnorm(size,  0.5, 0.25), rnorm(size,  0.5, 0.25), rnorm(size,  0.5, 0.25))#
+group4 <- cbind(rnorm(size,  0.5, 0.25), rnorm(size, -0.5, 0.25), rnorm(size,  0.5, 0.25))#
+groups <- list(group1, group2, group3, group4)#
+#
+## Chull coordinates function#
+get.chull.coords <- function(x, axis) {#
+    chull_points <- chull(x[, c(axis)])#
+    chull_coords <- rbind(x[chull_points, axis], x[chull_points[1], axis])#
+}#
+#
+## Getting the coordinates#
+chull_coords_xy <- lapply(groups, get.chull.coords, axis = c(1, 2))#
+chull_coords_xz <- lapply(groups, get.chull.coords, axis = c(1, 3))#
+#
+## Empty plot function#
+empty.plot <- function(xlab = "Dimension 1", ylab) {#
+    par(bty = "n")#
+    plot(NULL, xlim = c(-1, 1), ylim = c(-1, 1), xlab = xlab, ylab = ylab, xaxt='n', yaxt='n')#
+    abline(v = 0)#
+    abline(h = 0)#
+}#
+#
+## Setting the colour palette#
+col_palette <- as.list(viridis::viridis(4))
+poly.plot <- function(x, col) {#
+    polygon(x[,1], x[,2], col = col, density = 30, border = col)#
+}
+poly.plot(groups[[1]], col_palette[[1]])
+groups[[1]]
+empty.plot(ylab = "Dimension 2")#
+## Adding the points#
+silent <- mapply(function(x, col) points(x, col = col, pch = 19, cex = 0.7), groups, col_palette)
+polygon(chull_coords_xy[[1]][,1], chull_coords_xy[[1]][,2], col = col_palette[[1]], density = 30, border = col_palette[[1]])
+empty.plot(ylab = "Dimension 2")#
+## Adding the points#
+plot.point <- function(x, col) points(x, col = col, pch = 19, cex = 0.7)#
+silent <- mapply(groups, col_palette)
+plot.points <- function(x, col) points(x, col = col, pch = 19, cex = 0.7)
+silent <- mapply(plot.points, groups, col_palette)
+plot.polygons <- function(x, col, axis) polygon(x[,axis[1]], x[,axis[2]], col = col, density = 10, border = col)
+plot.polygons <- function(x, col, axis) polygon(x[,axis[1]], x[,axis[2]], col = col, density = 10, border = col)#
+silent <- mapply(plot.polygons, chull_coords_xy, MoreArgs = list(axis = c(1, 2)))
+silent <- mapply(plot.polygons, chull_coords_xy, col_palette, MoreArgs = list(axis = c(1, 2)))
+## Sampling the four different groups#
+size <- 10            # x                      #y                       #z#
+group1 <- cbind(rnorm(size, -0.5, 0.25), rnorm(size,  0.5, 0.25), rnorm(size,  0.5, 0.25))#
+group2 <- cbind(rnorm(size, -0.5, 0.25), rnorm(size,  0.5, 0.25), rnorm(size, -0.5, 0.25))#
+group3 <- cbind(rnorm(size,  0.5, 0.25), rnorm(size,  0.5, 0.25), rnorm(size,  0.5, 0.25))#
+group4 <- cbind(rnorm(size,  0.5, 0.25), rnorm(size, -0.5, 0.25), rnorm(size,  0.5, 0.25))#
+groups <- list(group1, group2, group3, group4)#
+#
+## Chull coordinates function#
+get.chull.coords <- function(x, axis) {#
+    chull_points <- chull(x[, c(axis)])#
+    chull_coords <- rbind(x[chull_points, axis], x[chull_points[1], axis])#
+}#
+#
+## Getting the coordinates#
+chull_coords_xy <- lapply(groups, get.chull.coords, axis = c(1, 2))#
+chull_coords_xz <- lapply(groups, get.chull.coords, axis = c(1, 3))#
+#
+## Empty plot function#
+empty.plot <- function(xlab = "Dimension 1", ylab) {#
+    par(bty = "n")#
+    plot(NULL, xlim = c(-1.1, 1.1), ylim = c(-1.1, 1.1), xlab = xlab, ylab = ylab, xaxt='n', yaxt='n')#
+    abline(v = 0)#
+    abline(h = 0)#
+}#
+#
+## Setting the colour palette#
+col_palette <- as.list(viridis::viridis(4))#
+#
+## Plotting the first coordinates sets#
+empty.plot(ylab = "Dimension 2")#
+## Adding the points#
+plot.points <- function(x, col) points(x, col = col, pch = 19, cex = 0.7)#
+silent <- mapply(plot.points, groups, col_palette)#
+## Adding the polygons#
+plot.polygons <- function(x, col, axis) polygon(x[,axis[1]], x[,axis[2]], col = col, density = 10, border = col)#
+silent <- mapply(plot.polygons, chull_coords_xy, col_palette, MoreArgs = list(axis = c(1, 2)))
+set.seed(1)#
+## Sampling the four different groups#
+size <- 10            # x                      #y                       #z#
+group1 <- cbind(rnorm(size, -0.5, 0.25), rnorm(size,  0.5, 0.25), rnorm(size,  0.5, 0.25))#
+group2 <- cbind(rnorm(size, -0.5, 0.25), rnorm(size,  0.5, 0.25), rnorm(size, -0.5, 0.25))#
+group3 <- cbind(rnorm(size,  0.5, 0.25), rnorm(size,  0.5, 0.25), rnorm(size,  0.5, 0.25))#
+group4 <- cbind(rnorm(size,  0.5, 0.25), rnorm(size, -0.5, 0.25), rnorm(size,  0.5, 0.25))#
+groups <- list(group1, group2, group3, group4)#
+#
+## Chull coordinates function#
+get.chull.coords <- function(x, axis) {#
+    chull_points <- chull(x[, c(axis)])#
+    chull_coords <- rbind(x[chull_points, axis], x[chull_points[1], axis])#
+}#
+#
+## Getting the coordinates#
+chull_coords_xy <- lapply(groups, get.chull.coords, axis = c(1, 2))#
+chull_coords_xz <- lapply(groups, get.chull.coords, axis = c(1, 3))#
+#
+## Empty plot function#
+empty.plot <- function(xlab = "Dimension 1", ylab) {#
+    par(bty = "n")#
+    plot(NULL, xlim = c(-1.1, 1.1), ylim = c(-1.1, 1.1), xlab = xlab, ylab = ylab, xaxt='n', yaxt='n')#
+    abline(v = 0)#
+    abline(h = 0)#
+}#
+#
+## Setting the colour palette#
+col_palette <- as.list(viridis::viridis(4))#
+#
+## Plotting the first coordinates sets#
+empty.plot(ylab = "Dimension 2")#
+## Adding the points#
+plot.points <- function(x, col) points(x, col = col, pch = 19, cex = 0.7)#
+silent <- mapply(plot.points, groups, col_palette)#
+## Adding the polygons#
+plot.polygons <- function(x, col, axis) polygon(x[,axis[1]], x[,axis[2]], col = col, density = 10, border = col)#
+silent <- mapply(plot.polygons, chull_coords_xy, col_palette, MoreArgs = list(axis = c(1, 2)))
+groups
+## Plotting the first coordinates sets#
+empty.plot(ylab = "Dimension 2")#
+## Adding the points#
+plot.points <- function(x, col, axis) points(x[, axis], col = col, pch = 19, cex = 0.7)#
+silent <- mapply(plot.points, groups, col_palette, MoreArgs = list(axis = c(1, 2)))#
+## Adding the polygons#
+plot.polygons <- function(x, col, axis) polygon(x[,axis[1]], x[,axis[2]], col = col, density = 10, border = col)#
+silent <- mapply(plot.polygons, chull_coords_xy, col_palette, MoreArgs = list(axis = c(1, 2)))
+## Plotting the second coordinates sets#
+empty.plot(ylab = "Dimension 3")#
+## Adding the points#
+silent <- mapply(plot.points, groups, col_palette, MoreArgs = list(axis = c(1, 3)))#
+## Adding the polygons#
+silent <- mapply(plot.polygons, chull_coords_xy, col_palette, MoreArgs = list(axis = c(1, 3)))
+plot.polygons <- function(x, col) polygon(x[, 1], x[, 2], col = col, density = 10, border = col)#
+silent <- mapply(plot.polygons, chull_coords_xy, col_palette)
+## Plotting the first coordinates sets#
+empty.plot(ylab = "Dimension 2")#
+## Adding the points#
+plot.points <- function(x, col, axis) points(x[, axis], col = col, pch = 19, cex = 0.7)#
+silent <- mapply(plot.points, groups, col_palette, MoreArgs = list(axis = c(1, 2)))#
+## Adding the polygons#
+plot.polygons <- function(x, col) polygon(x[, 1], x[, 2], col = col, density = 10, border = col)#
+silent <- mapply(plot.polygons, chull_coords_xy, col_palette)
+empty.plot(ylab = "Dimension 3")#
+## Adding the points#
+silent <- mapply(plot.points, groups, col_palette, MoreArgs = list(axis = c(1, 3)))#
+## Adding the polygons#
+silent <- mapply(plot.polygons, chull_coords_xy, col_palette, MoreArgs = list(axis = c(1, 3)))
+silent <- mapply(plot.polygons, chull_coords_xy, col_palette)
+empty.plot(ylab = "Dimension 3")#
+## Adding the points#
+silent <- mapply(plot.points, groups, col_palette, MoreArgs = list(axis = c(1, 3)))#
+## Adding the polygons#
+silent <- mapply(plot.polygons, chull_coords_xz, col_palette)
+par(mfrow = c(1, 2))#
+## Plotting the first coordinates sets#
+empty.plot(ylab = "Dimension 2")#
+## Adding the points#
+plot.points <- function(x, col, axis) points(x[, axis], col = col, pch = 19, cex = 0.7)#
+silent <- mapply(plot.points, groups, col_palette, MoreArgs = list(axis = c(1, 2)))#
+## Adding the polygons#
+plot.polygons <- function(x, col) polygon(x[, 1], x[, 2], col = col, density = 10, border = col)#
+silent <- mapply(plot.polygons, chull_coords_xy, col_palette)#
+## Plotting the second coordinates sets#
+empty.plot(ylab = "Dimension 3")#
+## Adding the points#
+silent <- mapply(plot.points, groups, col_palette, MoreArgs = list(axis = c(1, 3)))#
+## Adding the polygons#
+silent <- mapply(plot.polygons, chull_coords_xz, col_palette)
+par(mfrow = c(2, 1))#
+## Plotting the first coordinates sets#
+empty.plot(ylab = "Dimension 2")#
+## Adding the points#
+plot.points <- function(x, col, axis) points(x[, axis], col = col, pch = 19, cex = 0.7)#
+silent <- mapply(plot.points, groups, col_palette, MoreArgs = list(axis = c(1, 2)))#
+## Adding the polygons#
+plot.polygons <- function(x, col) polygon(x[, 1], x[, 2], col = col, density = 10, border = col)#
+silent <- mapply(plot.polygons, chull_coords_xy, col_palette)#
+## Plotting the second coordinates sets#
+empty.plot(ylab = "Dimension 3")#
+## Adding the points#
+silent <- mapply(plot.points, groups, col_palette, MoreArgs = list(axis = c(1, 3)))#
+## Adding the polygons#
+silent <- mapply(plot.polygons, chull_coords_xz, col_palette)
+par(mfrow = c(2, 1))#
+## Plotting the first coordinates sets#
+empty.plot(ylab = "Dimension 2")#
+## Adding the points#
+plot.points <- function(x, col, axis) points(x[, axis], col = col, pch = 19, cex = 0.7)#
+silent <- mapply(plot.points, groups, col_palette, MoreArgs = list(axis = c(1, 2)))#
+## Adding the polygons#
+plot.polygons <- function(x, col) polygon(x[, 1], x[, 2], col = col, density = 10, border = col)#
+silent <- mapply(plot.polygons, chull_coords_xy, col_palette)#
+## Plotting the second coordinates sets#
+empty.plot(xlab = "", ylab = "Dimension 3")#
+## Adding the points#
+silent <- mapply(plot.points, groups, col_palette, MoreArgs = list(axis = c(1, 3)))#
+## Adding the polygons#
+silent <- mapply(plot.polygons, chull_coords_xz, col_palette)
+par(mfrow = c(2, 1))#
+## Plotting the first coordinates sets#
+empty.plot(xlab = "", ylab = "Dimension 2")#
+## Adding the points#
+plot.points <- function(x, col, axis) points(x[, axis], col = col, pch = 19, cex = 0.7)#
+silent <- mapply(plot.points, groups, col_palette, MoreArgs = list(axis = c(1, 2)))#
+## Adding the polygons#
+plot.polygons <- function(x, col) polygon(x[, 1], x[, 2], col = col, density = 10, border = col)#
+silent <- mapply(plot.polygons, chull_coords_xy, col_palette)#
+## Plotting the second coordinates sets#
+empty.plot(ylab = "Dimension 3")#
+## Adding the points#
+silent <- mapply(plot.points, groups, col_palette, MoreArgs = list(axis = c(1, 3)))#
+## Adding the polygons#
+silent <- mapply(plot.polygons, chull_coords_xz, col_palette)
+?par
+library(caper)
+?pgls
+data(shorebird)#
+shorebird <- comparative.data(shorebird.tree, shorebird.data, Species, vcv=TRUE, vcv.dim=3)#
+mod1 <- pgls(log(Egg.Mass) ~ log(M.Mass) * log(F.Mass), shorebird, lambda='ML')
+plot(mod1)
+summary(mod1)
+pgls.confint(mod, 'lambda')
+pgls.confint(mod1, 'lambda')
+shorebird <- comparative.data(shorebird.tree, shorebird.data, Species, vcv=TRUE, vcv.dim=3)#
+mod <- pgls(log(Egg.Mass) ~ log(M.Mass), shorebird, lambda='ML')#
+mod.l <- pgls.profile(mod, 'lambda')#
+plot(mod.l)
+shorebird <- comparative.data(shorebird.tree, shorebird.data, Species, vcv=TRUE, vcv.dim=3)#
+mod <- pgls(log(Egg.Mass) ~ log(M.Mass), shorebird, kappa='ML')#
+mod.l <- pgls.profile(mod, 'lambda')#
+plot(mod.l)
+shorebird <- comparative.data(shorebird.tree, shorebird.data, Species, vcv=TRUE, vcv.dim=3)#
+mod <- pgls(log(Egg.Mass) ~ log(M.Mass), shorebird, kappa='ML')#
+mod.l <- pgls.profile(mod, 'kappa')#
+plot(mod.l)
+?stree
+your_tree <- rtree(19)
+plot(your_tree)
+my_tree <- stree(Ntip(your_tree))
+plot(my_tree)
+my_tree$tip.label <- your_tree$tip.label
+par(mar = c(1, 3, 1, 3))#
+## Plotting the first coordinates sets#
+empty.plot(xlab = "", ylab = "Dimension 2")#
+## Adding the points#
+plot.points <- function(x, col, axis) points(x[, axis], col = col, pch = 19, cex = 0.7)#
+silent <- mapply(plot.points, groups, col_palette, MoreArgs = list(axis = c(1, 2)))#
+## Adding the polygons#
+plot.polygons <- function(x, col) polygon(x[, 1], x[, 2], col = col, density = 10, border = col)#
+silent <- mapply(plot.polygons, chull_coords_xy, col_palette)
+par(mar = c(1, 4, 1, 3))#
+## Plotting the first coordinates sets#
+empty.plot(xlab = "", ylab = "Dimension 2")#
+## Adding the points#
+plot.points <- function(x, col, axis) points(x[, axis], col = col, pch = 19, cex = 0.7)#
+silent <- mapply(plot.points, groups, col_palette, MoreArgs = list(axis = c(1, 2)))#
+## Adding the polygons#
+plot.polygons <- function(x, col) polygon(x[, 1], x[, 2], col = col, density = 10, border = col)#
+silent <- mapply(plot.polygons, chull_coords_xy, col_palette)#
+#
+par(mar = c(3, 4, 1, 3))#
+## Plotting the second coordinates sets#
+empty.plot(ylab = "Dimension 3")#
+## Adding the points#
+silent <- mapply(plot.points, groups, col_palette, MoreArgs = list(axis = c(1, 3)))#
+## Adding the polygons#
+silent <- mapply(plot.polygons, chull_coords_xz, col_palette)
+par(mar = c(1, 4, 1, 3))#
+## Plotting the first coordinates sets#
+empty.plot(xlab = "", ylab = "Dimension 2")#
+## Adding the points#
+plot.points <- function(x, col, axis) points(x[, axis], col = col, pch = 19, cex = 0.7)#
+silent <- mapply(plot.points, groups, col_palette, MoreArgs = list(axis = c(1, 2)))#
+## Adding the polygons#
+plot.polygons <- function(x, col) polygon(x[, 1], x[, 2], col = col, density = 10, border = col)#
+silent <- mapply(plot.polygons, chull_coords_xy, col_palette)#
+#
+par(mar = c(4, 4, 1, 3))#
+## Plotting the second coordinates sets#
+empty.plot(ylab = "Dimension 3")#
+## Adding the points#
+silent <- mapply(plot.points, groups, col_palette, MoreArgs = list(axis = c(1, 3)))#
+## Adding the polygons#
+silent <- mapply(plot.polygons, chull_coords_xz, col_palette)
+legend("bottomlef", legend = LETTERS[1:4], col = unlist(col_palette), bg = "n")
+par(mfrow = c(2, 1))#
+par(mar = c(1, 4, 1, 3))#
+## Plotting the first coordinates sets#
+empty.plot(xlab = "", ylab = "Dimension 2")#
+## Adding the points#
+plot.points <- function(x, col, axis) points(x[, axis], col = col, pch = 19, cex = 0.7)#
+silent <- mapply(plot.points, groups, col_palette, MoreArgs = list(axis = c(1, 2)))#
+## Adding the polygons#
+plot.polygons <- function(x, col) polygon(x[, 1], x[, 2], col = col, density = 10, border = col)#
+silent <- mapply(plot.polygons, chull_coords_xy, col_palette)#
+legend("bottomlef", legend = LETTERS[1:4], col = unlist(col_palette), bty = "n", pch = 19, lty = 1)#
+#
+par(mar = c(4, 4, 1, 3))#
+## Plotting the second coordinates sets#
+empty.plot(ylab = "Dimension 3")#
+## Adding the points#
+silent <- mapply(plot.points, groups, col_palette, MoreArgs = list(axis = c(1, 3)))#
+## Adding the polygons#
+silent <- mapply(plot.polygons, chull_coords_xz, col_palette)
+text("topleft", text = "T")
+text(-1,1, "T")
+text(-1.1,1.1, "T", cex = 3)
+text(-1.1,1.1, "T", cex = 2)
+text(-1,1, "T", cex = 2)
+text(-1,1, "1", cex = 2)
+par(mfrow = c(2, 1))#
+par(mar = c(1, 4, 1, 3))#
+## Plotting the first coordinates sets#
+empty.plot(xlab = "", ylab = "Dimension 2")#
+text(-1,1, "1", cex = 2)#
+## Adding the points#
+plot.points <- function(x, col, axis) points(x[, axis], col = col, pch = 19, cex = 0.7)#
+silent <- mapply(plot.points, groups, col_palette, MoreArgs = list(axis = c(1, 2)))#
+## Adding the polygons#
+plot.polygons <- function(x, col) polygon(x[, 1], x[, 2], col = col, density = 10, border = col)#
+silent <- mapply(plot.polygons, chull_coords_xy, col_palette)#
+legend("bottomlef", legend = LETTERS[1:4], col = unlist(col_palette), bty = "n", pch = 19, lty = 1)#
+#
+par(mar = c(4, 4, 1, 3))#
+## Plotting the second coordinates sets#
+empty.plot(ylab = "Dimension 3")#
+text(-1,1, "2", cex = 2)#
+## Adding the points#
+silent <- mapply(plot.points, groups, col_palette, MoreArgs = list(axis = c(1, 3)))#
+## Adding the polygons#
+silent <- mapply(plot.polygons, chull_coords_xz, col_palette)
+library(dispRity)
+?.onAttach
+library(devtools)
+library(tools)
+?resaveRdaFiles
+?data
+install_github("TGuillerme/mulTree", ref = "release")
+library(mulTree)
+data(lifespan)
+lapply(trees_aves, is.ultrametric)
+lapply(trees_mammalia, is.ultrametric)
+plot(trees_aves)
+cd("~/Projects/landmark-test/Functions/landmarktest/")
+document()
+?segments3d
+install(".")
+??segments3d

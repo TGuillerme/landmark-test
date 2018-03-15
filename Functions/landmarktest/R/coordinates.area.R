@@ -6,11 +6,24 @@
 #' @param what Which element of the coordinate differences to use (can be the \code{numeric} value of the column or the name as \code{character}).
 #' 
 #' @examples
-#'
-#' @seealso
+#' ## Loading the geomorph dataset
+#' data(plethodon)
+#' 
+#' ## Performing the Procrustes superimposition
+#' proc_super <- gpagen(plethodon$land, print.progress = FALSE)
+#' 
+#' ## Getting the spherical coordinates difference between the two first specimen
+#' difference <- coordinates.difference(proc_super$coords[, , 1], proc_super$coords[, , 2],
+#'                                      type = "spherical", angle = "degree")
+#' 
+#' ## Calculate the area of the coordinates differences
+#' coordinates.area(difference[[1]])
+#' 
+#' @seealso \code{\link{coordinates.difference}}
 #' 
 #' @author Thomas Guillerme
 #' @export
+
 #' @importFrom zoo rollmean
 
 

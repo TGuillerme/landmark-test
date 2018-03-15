@@ -15,15 +15,41 @@
 #' 
 #' If \code{test.parameter} is set to \code{TRUE}, the code tests whether the resulting test parameters between the observed subset and the random ones are significantly different (base on the same procedure as in \code{link[ade4]{rantest}}).
 #' 
-#' @returns
+#' @return
 #' This function returns a \code{"randtest"} object that can be passed to the generic S3 functions \code{\link[randtest]{print.randtest}} or \code{\link[randtest]{plot.randtest}}.
 #' The output also contains to extra elements \code{output$observed} and \code{output$random} containing the raw results of respectively the observed and random tests.
 #' 
 #' @examples
-#'
-#' @seealso
+#' ## Loading the geomorph dataset
+#' data(plethodon)
 #' 
-#' @author
+#' ## Performing the Procrustes superimposition
+#' proc_super <- gpagen(plethodon$land, print.progress = FALSE)
+#' 
+#' ## Getting the two most different specimen based on their landmark change radii
+#' var_range <- variation.range(proc_super)
+#' 
+#' set.seed(1)
+#' 
+#' ## Selecting 6 random landmarks
+#' random_part <- sample(1:nrow(var_range), 6)
+#' 
+#' ## Testing whether this partition has a different median than expected by change
+#' boot_test <- bootstrap.test(var_range[, "radius"], random_part, statistic = median)
+#'
+#' ## Summarising the results
+#' boot_test
+#' 
+#' ## Plotting the results
+#' plot(boot_test)
+#' 
+#' @seealso \code{link{rand.test}}, \code{\link[ade4]{randtest}}
+#' 
+#' @author Thomas Guillerme
+#' 
+#' @importFrom stats sd var
+#' @importFrom graphics hist
+
 bootstrap.test <- function(distribution, subset, statistic = mean, replicates = 100, alternative = "two-sided", ...) {
 
     match_call <- match.call()
@@ -91,7 +117,7 @@ bootstrap.test <- function(distribution, subset, statistic = mean, replicates = 
     p_value <- get.p.value(bs_t_statistic, t_statistic, replicates)
 
     ## Get the test results
-    test_results <- c("Residuals" = (t_statistic - mean(bs_t_statistic)) / sd(bs_t_statistic), "Bootstrap mean" = mean(bs_t_statistic), "Bootstrap variance" = var(bs_t_statistic))
+    test_results <- c("Residuals" = (t_statistic - mean(bs_t_statistic)) / stats::sd(bs_t_statistic), "Bootstrap mean" = mean(bs_t_statistic), "Bootstrap variance" = stats::var(bs_t_statistic))
 
     ## Making the results into a randtest object
     res <- list()
@@ -109,7 +135,7 @@ bootstrap.test <- function(distribution, subset, statistic = mean, replicates = 
     l0 <- max(bs_t_statistic) - min(bs_t_statistic)
     w0 <- l0/(log(length(bs_t_statistic), base = 2) + 1)
     xlim0 <- range(r0) + c(-w0, w0)
-    h0 <- hist(bs_t_statistic, plot = FALSE, nclass = 10)
+    h0 <- graphics::hist(bs_t_statistic, plot = FALSE, nclass = 10)
     res$plot <- list(hist = h0, xlim = xlim0)
 
     ## Adding the test.parameter arguments
