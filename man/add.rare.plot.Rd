@@ -16,6 +16,7 @@ Add the rarefaction plot to a called \code{\link[ade4]{plot.randtest}} plot
 }
 \examples{
 ## Loading the geomorph dataset
+require(geomorph)
 data(plethodon)
 
 ## Performing the Procrustes superimposition

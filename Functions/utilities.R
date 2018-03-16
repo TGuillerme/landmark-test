@@ -32,8 +32,8 @@ pipeline.test <- function(species, dataset, path, verbose = FALSE, rarefaction, 
         data$landmarkgroups[,2] <- ifelse(data$landmarkgroups[,2] != biggest_partition, 1, biggest_partition)
     }
 
-    for(part in unique(data$landmarkgroups[,2])) {
-        partitions[[part]] <- which(data$landmarkgroups[,2] == part)
+    for(part in 1:length(unique(data$landmarkgroups[,2]))) {
+        partitions[[part]] <- which(data$landmarkgroups[,2] == unique(data$landmarkgroups[,2])[part])
     }
 
     if(missing(rarefaction)) {

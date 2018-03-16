@@ -4,7 +4,7 @@
 \alias{plotRefToTarget.heat}
 \title{Plot shape differences as PlotRefToTarget with heat}
 \usage{
-plotRefToTarget.heat(M1, M2, method = c("vector", "points"),
+plotRefToTarget.heat(M1, M2, method = "vector",
   plotRefToTarget.args = list(...), ..., col = list("grey", "black"),
   col.val, pt.size)
 }
@@ -13,7 +13,7 @@ plotRefToTarget.heat(M1, M2, method = c("vector", "points"),
 
 \item{M2}{Matrix of landmark coordinates for the second (target) specimen}
 
-\item{method}{Method used to visualize shape difference; see below for details}
+\item{method}{Method used to visualize shape difference: either \code{"vector"} (default) or \code{"points"}. For \code{"surface"} or \code{"TPS"}, use \code{\link[geomorph]{plotRefToTarget}}.}
 
 \item{...}{Additional parameters to \code{\link[graphics]{plot}} or \code{\link[rgl]{plot3d}}.}
 
@@ -36,6 +36,7 @@ Modification of PlotRefToTarget to allow to add heat maps (only works for \code{
 }
 \examples{
 ## Loading the geomorph dataset
+require(geomorph)
 data(plethodon)
 
 ## Performing the Procrustes superimposition
@@ -58,6 +59,7 @@ plotRefToTarget.heat(M1, M2, method = "points", col = list(rainbow, "pink"), col
 
 \dontrun{
 ## Loading the scallops 3D data from geomorph
+require(geomorph)
 data(scallops)
 
 ## Procrustes superimposition
@@ -67,8 +69,8 @@ procrustes <- gpagen(scallops$coorddata)
 variation <- variation.range(procrustes, return.ID = TRUE)
 
 ## Selecting the coordinates and the variation vector
-M1 <- procrustes[, , variation$min.max[1]]
-M2 <- procrustes[, , variation$min.max[2]]
+M1 <- procrustes$coords[, , variation$min.max[1]]
+M2 <- procrustes$coords[, , variation$min.max[2]]
 var_val <- variation$range[, 1]
  
 ## Plot the variation in 3D

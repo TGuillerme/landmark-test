@@ -21,6 +21,7 @@
 #' 
 #' @examples
 #' ## Loading the geomorph dataset
+#' require(geomorph)
 #' data(plethodon)
 #' 
 #' ## Performing the Procrustes superimposition
@@ -47,6 +48,7 @@
 #' 
 #' @author Thomas Guillerme
 #' 
+#' @export
 #' @importFrom stats sd var
 #' @importFrom graphics hist
 

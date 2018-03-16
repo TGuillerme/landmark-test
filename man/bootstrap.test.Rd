@@ -36,6 +36,7 @@ If \code{test.parameter} is set to \code{TRUE}, the code tests whether the resul
 }
 \examples{
 ## Loading the geomorph dataset
+require(geomorph)
 data(plethodon)
 
 ## Performing the Procrustes superimposition

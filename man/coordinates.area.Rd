@@ -16,6 +16,7 @@ Calculates the area of the coordinates differences
 }
 \examples{
 ## Loading the geomorph dataset
+require(geomorph)
 data(plethodon)
 
 ## Performing the Procrustes superimposition

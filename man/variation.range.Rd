@@ -27,6 +27,7 @@ Selecting the range of differences between the maximum and minimum variation spe
 }
 \examples{
 ## Loading the geomorph dataset
+require(geomorph)
 data(plethodon)
 
 ## Performing the Procrustes superimposition
