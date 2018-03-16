@@ -27,7 +27,7 @@ set.seed(1)
 ### Cranium
 
 ```{r, echo = FALSE, message = FALSE}
-results <- pipeline.test("Wombat_ursinus", "cranium", "../Data/Processed/", verbose = TRUE)
+results <- pipeline.test("Wombat_ursinus", "cranium", "../Data/Processed/", verbose = TRUE, combine.land = TRUE)
 save(results, file = "../Data/Results/Wombat_ursinus_cranium.Rda")
 
 caption_diff <- paste0("Results of the area difference random test for the ", results$dataset, " of ", results$species)
@@ -55,7 +55,7 @@ make.plots(results$overlaps, type = "Bhattacharyya Coefficient", add.p = TRUE, c
 ### Mandible
 
 ```{r, echo = FALSE, message = FALSE}
-results <- pipeline.test("Wombat_ursinus", "mandible", "../Data/Processed/", verbose = TRUE)
+results <- pipeline.test("Wombat_ursinus", "mandible", "../Data/Processed/", verbose = TRUE, combine.land = TRUE)
 save(results, file = "../Data/Results/Wombat_ursinus_mandible.Rda")
 
 caption_diff <- paste0("Results of the area difference random test for the ", results$dataset, " of ", results$species)
@@ -86,7 +86,7 @@ make.plots(results$overlaps, type = "Bhattacharyya Coefficient", add.p = TRUE, c
 ### Cranium
 
 ```{r, echo = FALSE, message = FALSE}
-results <- pipeline.test("Wombat_krefftii", "cranium", "../Data/Processed/", verbose = TRUE)
+results <- pipeline.test("Wombat_krefftii", "cranium", "../Data/Processed/", verbose = TRUE, combine.land = TRUE)
 save(results, file = "../Data/Results/Wombat_krefftii_cranium.Rda")
 
 caption_diff <- paste0("Results of the area difference random test for the ", results$dataset, " of ", results$species)
@@ -115,7 +115,7 @@ make.plots(results$overlaps, type = "Bhattacharyya Coefficient", add.p = TRUE, c
 ### Mandible
 
 ```{r, echo = FALSE, message = FALSE}
-results <- pipeline.test("Wombat_krefftii", "mandible", "../Data/Processed/", verbose = TRUE)
+results <- pipeline.test("Wombat_krefftii", "mandible", "../Data/Processed/", verbose = TRUE, combine.land = TRUE)
 save(results, file = "../Data/Results/Wombat_krefftii_mandible.Rda")
 
 caption_diff <- paste0("Results of the area difference random test for the ", results$dataset, " of ", results$species)
@@ -147,7 +147,7 @@ make.plots(results$overlaps, type = "Bhattacharyya Coefficient", add.p = TRUE, c
 ### Cranium
 
 ```{r, echo = FALSE, message = FALSE}
-results <- pipeline.test("Wombat_latifrons", "cranium", "../Data/Processed/", verbose = TRUE)
+results <- pipeline.test("Wombat_latifrons", "cranium", "../Data/Processed/", verbose = TRUE, combine.land = TRUE)
 save(results, file = "../Data/Results/Wombat_latifrons_cranium.Rda")
 
 caption_diff <- paste0("Results of the area difference random test for the ", results$dataset, " of ", results$species)
@@ -176,7 +176,7 @@ make.plots(results$overlaps, type = "Bhattacharyya Coefficient", add.p = TRUE, c
 ### Mandible
 
 ```{r, echo = FALSE, message = FALSE}
-results <- pipeline.test("Wombat_latifrons", "mandible", "../Data/Processed/", verbose = TRUE)
+results <- pipeline.test("Wombat_latifrons", "mandible", "../Data/Processed/", verbose = TRUE, combine.land = TRUE)
 save(results, file = "../Data/Results/Wombat_latifrons_mandible.Rda")
 
 caption_diff <- paste0("Results of the area difference random test for the ", results$dataset, " of ", results$species)
@@ -207,7 +207,7 @@ make.plots(results$overlaps, type = "Bhattacharyya Coefficient", add.p = TRUE, c
 ### Cranium
 
 ```{r, echo = FALSE, message = FALSE}
-results <- pipeline.test("Wombat", "cranium", "../Data/Processed/", verbose = TRUE)
+results <- pipeline.test("Wombat", "cranium", "../Data/Processed/", verbose = TRUE, combine.land = TRUE)
 save(results, file = "../Data/Results/Wombat_cranium.Rda")
 
 caption_diff <- paste0("Results of the area difference random test for the ", results$dataset, " of ", results$species)
@@ -236,7 +236,7 @@ make.plots(results$overlaps, type = "Bhattacharyya Coefficient", add.p = TRUE, c
 ### Mandible
 
 ```{r, echo = FALSE, message = FALSE}
-results <- pipeline.test("Wombat", "mandible", "../Data/Processed/", verbose = TRUE)
+results <- pipeline.test("Wombat", "mandible", "../Data/Processed/", verbose = TRUE, combine.land = TRUE)
 save(results, file = "../Data/Results/Wombat_mandible.Rda")
 
 caption_diff <- paste0("Results of the area difference random test for the ", results$dataset, " of ", results$species)
