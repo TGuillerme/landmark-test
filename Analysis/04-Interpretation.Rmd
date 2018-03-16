@@ -49,7 +49,7 @@ get.token <- function(p) {
 species <- c("Wombat", "Wombat_krefftii", "Wombat_latifrons", "Wombat_ursinus")
 datasets <- c("cranium", "mandible")
 
-results_table <- data.frame(matrix(NA, ncol = length(species)*3, nrow = 11))
+results_table <- data.frame(matrix(NA, ncol = length(species)*3, nrow = 4))
 
 for(sp in 1:length(species)) {
 
@@ -65,15 +65,15 @@ for(sp in 1:length(species)) {
         ## Fill the table
         if(ds == 1) {
             ## Cranium
-            results_table[1:5, 1+(3*(sp-1))] <- difference[,2]
-            results_table[1:5, 2+(3*(sp-1))] <- sapply(difference[,6], get.token)
-            results_table[1:5, 3+(3*(sp-1))] <- sapply(overlap[,6], get.token)
+            results_table[1:2, 1+(3*(sp-1))] <- difference[,2]
+            results_table[1:2, 2+(3*(sp-1))] <- sapply(difference[,6], get.token)
+            results_table[1:2, 3+(3*(sp-1))] <- sapply(overlap[,6], get.token)
             ## Make the differences to be 0 if non-signif
         } else {
             ## Mandible
-            results_table[6:11, 1+(3*(sp-1))] <- difference[,2]
-            results_table[6:11, 2+(3*(sp-1))] <- sapply(difference[,6], get.token)
-            results_table[6:11, 3+(3*(sp-1))] <- sapply(overlap[,6], get.token)
+            results_table[3:4, 1+(3*(sp-1))] <- difference[,2]
+            results_table[3:4, 2+(3*(sp-1))] <- sapply(difference[,6], get.token)
+            results_table[3:4, 3+(3*(sp-1))] <- sapply(overlap[,6], get.token)
         }
     }
 }
@@ -87,7 +87,7 @@ colnames(results_table)[sequence+1] <- "diff"
 colnames(results_table)[sequence+2] <- "over"
 
 ## Renaming the rows
-rownames(results_table) <- c(paste0(datasets[1], 1:5), paste0(datasets[2], 1:6))
+rownames(results_table) <- c(paste0(datasets[1], 1:2), paste0(datasets[2], 1:2))
 
 
 ##
