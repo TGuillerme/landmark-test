@@ -25,6 +25,7 @@
 #' 
 #' @examples
 #' ## Loading the geomorph dataset
+#' require(geomorph)
 #' data(plethodon)
 #' 
 #' ## Performing the Procrustes superimposition

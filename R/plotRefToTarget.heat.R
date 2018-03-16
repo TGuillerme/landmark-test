@@ -4,7 +4,7 @@
 #'
 #' @param M1 Matrix of landmark coordinates for the first (reference) specimen
 #' @param M2 Matrix of landmark coordinates for the second (target) specimen
-#' @param method Method used to visualize shape difference; see below for details
+#' @param method Method used to visualize shape difference: either \code{"vector"} (default) or \code{"points"}. For \code{"surface"} or \code{"TPS"}, use \code{\link[geomorph]{plotRefToTarget}}.
 #' @param plotRefToTarget.args additional arguments to be passed to \code{\link[geomorph]{plotRefTarget}.
 #' @param ... Additional parameters to \code{\link[graphics]{plot}} or \code{\link[rgl]{plot3d}}.
 #' @param col Either a single color value (\code{"character"}), vector of values or function for colouring both points and vectors; or a list of two of any of these three elements. The first argument is passed to the points and the second to the vectors (\code{default = list("grey", "black")} for grey points and black vectors - see details).
@@ -22,6 +22,7 @@
 #' 
 #' @examples
 #' ## Loading the geomorph dataset
+#' require(geomorph)
 #' data(plethodon)
 #' 
 #' ## Performing the Procrustes superimposition
@@ -44,6 +45,7 @@
 #' 
 #' \dontrun{
 #' ## Loading the scallops 3D data from geomorph
+#' require(geomorph)
 #' data(scallops)
 #' 
 #' ## Procrustes superimposition
@@ -53,8 +55,8 @@
 #' variation <- variation.range(procrustes, return.ID = TRUE)
 #' 
 #' ## Selecting the coordinates and the variation vector
-#' M1 <- procrustes[, , variation$min.max[1]]
-#' M2 <- procrustes[, , variation$min.max[2]]
+#' M1 <- procrustes$coords[, , variation$min.max[1]]
+#' M2 <- procrustes$coords[, , variation$min.max[2]]
 #' var_val <- variation$range[, 1]
 #'  
 #' ## Plot the variation in 3D
@@ -70,10 +72,16 @@
 #' @importFrom graphics plot segments points text arrows
 #' @importFrom rgl plot3d text3d
 
-plotRefToTarget.heat <- function(M1, M2, method = c("vector", "points"), plotRefToTarget.args = list(...), ..., col = list("grey", "black"), col.val, pt.size) {
+plotRefToTarget.heat <- function(M1, M2, method = "vector", plotRefToTarget.args = list(...), ..., col = list("grey", "black"), col.val, pt.size) {
+
+
 
   ## Get the methods (defaults)
-  method <- match.arg(method)
+  all_methods <- c("vector", "points")
+  check.method(method, all_methods, "method")
+
+
+  # method <- match.arg(method)
 
   ## Manage default arguments from plotRefToTarget
   dots <- plotRefToTarget.args
