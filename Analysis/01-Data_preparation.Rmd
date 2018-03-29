@@ -21,12 +21,15 @@ The data should be stored in `../Data/` in the following format:
 
 Data type | Data set | Species | File format
 ----------|----------|---------|------------
+classifier|  cranium|wombat|.csv
 landmarkdata | cranium  | wombat | .csv
 landmarkgroups | mandible | koala |
 
 
 
 ### Data per genus
+
+Includes gpa coordinates (procrustes), landmark partitions (landmarkgroups), and principal component output (ordination)
 
 ```{r}
 ## The chain names
@@ -45,15 +48,12 @@ for(chain in chains) {
     for(dataset in datasets) {
 
         ## Read the landmarks groups
-        land_data[[dataset]][[1]] <- read.csv(paste0("../Data/landmarkgroups_", dataset, "_",
+        land_data[[dataset]][[1]] <- read.csv(paste0("../Data/Raw/landmarkgroups_", dataset, "_",
                                                 chain, ".csv"))
         
         ## Read the landmarks
-        landmarks  <- t(read.csv(paste0("../Data/landmarkdata_", dataset, "_", chain, ".csv"),
+        landmarks  <- t(read.csv(paste0("../Data/Raw/landmarkdata_", dataset, "_", chain, ".csv"),
                                  header = TRUE, row.names = 1))
-        
-        ## Remove any NAs rows
-        landmarks <- landmarks[complete.cases(landmarks),]
 
         ## Make into a 3D array
         landmarks <- geomorph::arrayspecs(landmarks, k = 3, p = ncol(landmarks)/3)
@@ -64,7 +64,7 @@ for(chain in chains) {
         ## Convert the array in 2D
         array_2d <- geomorph::two.d.array(land_data[[dataset]][[2]]$coords)
 
-        ## measure the tolerance
+        ## measure the tolerance; the below is part of the geomorph "PlotTangentSpace" code
         tol <- prcomp(array_2d)$sdev^2
         tolerance <- cumsum(tol)/sum(tol)
         tolerance <- length(which(tolerance < 1)) 
@@ -103,22 +103,19 @@ for(sp in 1:length(species)) {
     for(dataset in datasets) {
 
         ## Reading the wombat species
-        wombat_sp <- read.csv(paste0("../Data/wombat_species_", dataset, ".csv"))
+        wombat_sp <- read.csv(paste0("../Data/Raw/classifier_", dataset, "_wombat.csv"))
         for(spec in 1:length(species)) {
             wombat_sp$Species <- gsub(sp_holders[spec], species[spec],
                                       as.character(wombat_sp$Species))
         }
 
         ## Read the landmarks groups
-        land_data[[dataset]][[1]] <- read.csv(paste0("../Data/landmarkgroups_", dataset, "_",
+        land_data[[dataset]][[1]] <- read.csv(paste0("../Data/Raw/landmarkgroups_", dataset, "_",
                                                 chain, ".csv"))
 
         ## Read the landmarks
-        landmarks  <- t(read.csv(paste0("../Data/landmarkdata_", dataset, "_", chain, ".csv"),
+        landmarks  <- t(read.csv(paste0("../Data/Raw/landmarkdata_", dataset, "_", chain, ".csv"),
                                  header = TRUE, row.names = 1))
-        
-        ## Remove any NAs rows
-        landmarks <- landmarks[complete.cases(landmarks),]
 
         ## Make into a 3D array
         landmarks <- geomorph::arrayspecs(landmarks, k = 3, p = ncol(landmarks)/3)
