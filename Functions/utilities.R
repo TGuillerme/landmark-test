@@ -162,7 +162,9 @@ make.plots <- function(results, type, add.p = FALSE, correction, rarefaction = F
 
 # Utilities based on existing functions
 
-
+#colouring partition spheres
+#@param land_data_partition the landmark data e.g. land_data$cranium
+#@param partnames is an optional vector with names for each partition number
 
 plot.partitions<-function(land_data_partition, PartNames){
   ##the object with the landmarks subset according to partitions
@@ -196,5 +198,19 @@ plot.partitions<-function(land_data_partition, PartNames){
   
 }
 
+#Visualizing differences between PC min and max
+#@param x is the coordinates after gpa e.g. land_data$cranium
+#@param minfirst is whether min vs max or other way round (for PlotRefToTarget )
 
-
+PCA.vectors<-function(x, minfirst=TRUE){
+  gridPar=gridPar(pt.bg = "white", pt.size = 0.5)#These are needed to give it the right parameters for the point size, colour and size - the default is too large points
+  open3d()
+  
+  PCA=plotTangentSpace(x$procrustes$coords)
+  open3d()
+  if (minfirst==TRUE){
+    plotRefToTarget(PCA$pc.shapes$PC1min,PCA$pc.shapes$PC1max, method="vector", gridPars=gridPar, label = F)
+  } else {
+    plotRefToTarget(PCA$pc.shapes$PC1max,PCA$pc.shapes$PC1min, method="vector", gridPars=gridPar, label = F)
+  }
+}
