@@ -39,7 +39,7 @@ allom.shape(land_data$mandible$procrustes)
 
 
 ```{r}
-#I want to later make this a function for "Full_Classifier_Table"
+#I want to later make this a function for "Full_Classifier_Table" but this was to help me figure out if the code works in principle
 Full_Classifier_Table=read.csv("../Data/Raw/classifier_cranium_wombat.csv")
 
 #I want these names to go into the output
