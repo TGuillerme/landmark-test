@@ -4,9 +4,15 @@
 #'
 #' @param coordinates An \code{array}, \code{list} or \code{matrix} of coordinates to be compared to the reference.
 #' @param reference A \code{matrix} of reference coordinates. If missing and \code{coordinates} is an \code{array} or \code{list}, the first element of \code{coordinates} is used.
-#' @param type the type of coordinates to output: can be \code{"cartesian"} (x0,y0,x1,y1,... format), or  \code{"spherical"} (radius, polar, azimuth).
-# \code{"vector"} (length, angle(s))
+#' @param type the type of coordinates to output: can be \code{"cartesian"} (x0,y0,x1,y1,... format), \code{"spherical"} (radius, polar, azimuth) or \code{"vector"} (length, angle(s)).
 #' @param angle optional, whether display angles in radian (\code{"radian"} - default) or in degrees (\code{"degree"}).
+#' @param absolute.distance \code{logical}, when using \code{"vector"}, whether to use the absolute distance (from the centroid) or the relative one (from the reference landmark). See details.
+#' 
+#' @details
+#' When using \code{type = "vector"} with \code{absolute.distance = TRUE}, the distance between two landmarks A and A' is calculated as d(0,A') - d(0,A) where 0 is the centroid of the shape to analysis.
+#' A positive absolute distance means that A' is further away from the centroid than A.
+#' A negative absolute distance means that A' closer to the centroid than A.
+#' When using \code{absolute.distance = FALSE}, the distance is calculated as d(A,A') and is always positive.
 #' 
 #' @examples
 #' ## Loading the geomorph dataset
@@ -26,12 +32,20 @@
 #' coordinates.difference(proc_super$coords[, , 1], proc_super$coords[, , 2],
 #'                        type = "spherical", angle = "degree")
 #' 
+#' ## Getting the vector coordinates for the same specimen in relative distance
+#' coordinates.difference(proc_super$coords[, , 1], proc_super$coords[, , 2],
+#'                        type = "vector", angle = "degree", absolute.distance = FALSE)
+#' 
+#' ## Getting the vector same coordinates in absolute distances
+#' coordinates.difference(proc_super$coords[, , 1], proc_super$coords[, , 2],
+#'                        type = "vector", angle = "degree")
 #' @seealso \code{\link{variation.range}}
 #' 
 #' @author Thomas Guillerme
 #' @export
+#' @importFrom geometry dot
 
-coordinates.difference <- function(coordinates, reference, type = "cartesian", angle = "radian") {
+coordinates.difference <- function(coordinates, reference, type = "cartesian", angle = "radian", absolute.distance = TRUE) {
 
     ## Sanitizing
 
@@ -68,7 +82,7 @@ coordinates.difference <- function(coordinates, reference, type = "cartesian", a
 
     ## Method
     type <- tolower(type)
-    check.method(type, c("cartesian", "spherical"), msg = "type") #"vector"
+    check.method(type, c("cartesian", "spherical", "vector"), msg = "type")
 
     ## Angle
     angle <- tolower(angle)
@@ -109,87 +123,58 @@ coordinates.difference <- function(coordinates, reference, type = "cartesian", a
                 )
         }
 
-
-        # fun.angle <- function(one_row, axis, dimension) {
-        #     return(
-        #         acos( ( sqrt((one_row[-c(1:dimension)][axis] - one_row[1:dimension][axis])^2) ) / sqrt(sum((one_row[-c(1:dimension)]-one_row[1:dimension])^2)) )
-        #         )
-        # }
-
-        # library(testthat)
-
-
-        # expect_values <- c()
-
-
-        # expect_equal(
-        # fun.angle(c(1,1,2,2), 1, 2)*180/pi
-        # , 45)
-        # expect_equal(
-        # fun.angle(c(1,1,-2,-2), 1, 2)*180/pi
-        # , 45)
-        # expect_equal(
-        # fun.angle(c(1,1,2,1), 1, 2)*180/pi
-        # , 0)
-        # expect_equal(
-        # fun.angle(c(1,1,2,1), 2, 2)*180/pi
-        # , 90)    
-        # expect_equal(
-        # fun.angle(c(1,1,1,2), 1, 2)*180/pi
-        # , 90)
-        # expect_equal(
-        # fun.angle(c(1,1,1,2), 2, 2)*180/pi
-        # , 0)
-
         ## Calculate the angles
         output <- apply(one_coordinate, 1, fun.angle, axis = axis, dimension = dimension)
         
         ## Convert degrees
         if(degree) { output <- output*180/pi}
 
-
-
-
         return(output)
     }
 
+    get.vector.diffs <- function(one_coordinate, dimension, angle, absolute.distance = TRUE) {
 
-    ## Vector coordinates
-    # if(type == "vector") {
-    #     ## length
-    #     length <- lapply(coordinates, euclidean.distance, dimensions[2])
+        ## Transform coordinates into a vector
+        coord.to.vector <- function(coords, dimension) {
+            mapply(function(a, b) return(a - b), coords[1:dimension], coords[-c(1:dimension)])
+        }
 
-    #     ## angle
-    #     if(dimensions[2] == 2) {
-    #         ## Get the x angle
-    #         angle <- lapply(coordinates, get.angle, axis = 1, dimensions[2], degree = degree)
+        ## Get centroid
+        centroid <- apply(one_coordinate[,1:dimension], 2, mean)
 
-    #         ## Direction
-    #         direction <- lapply(angle, function(x) return(cos(x)/sin(x)))
+        ## Get the vectors for the reference
+        reference <- cbind(matrix(rep(centroid, nrow(one_coordinate)), ncol = dimension, byrow = TRUE), one_coordinate[,1:dimension])
+        reference <- apply(reference, 1, coord.to.vector, dimension)
+        #rownames(reference) <- paste0("u", 1:dimension)
 
-    #     } else {
-    #         ## Get the x and y angles
-    #         angle_x <- lapply(coordinates, get.angle, axis = 1, dimensions[2], degree = degree)
-    #         angle_y <- lapply(coordinates, get.angle, axis = 2, dimensions[2], degree = degree)
-    #         ## Combine both
-    #         angle <- mapply(cbind, angle_x, angle_y, SIMPLIFY = FALSE)
+        ## Get the vector for the observed
+        observed <- cbind(matrix(rep(centroid, nrow(one_coordinate)), ncol = dimension, byrow = TRUE), one_coordinate[,-c(1:dimension)])
+        observed <- apply(observed, 1, coord.to.vector, dimension)
+        #rownames(observed) <- paste0("v", 1:dimension)
 
-    #         ## Direction
-    #         direction <- lapply(angle_x, function(x) return(cos(x)/sin(x)))
+        ## Get the vector lengths
+        ref_length <- apply(reference, 2, function(X) return(sqrt(sum(X^2))))
+        obs_length <- apply(observed, 2, function(X) return(sqrt(sum(X^2))))
 
-    #     }
+        ## Dot product of the vectors
+        dot_prod <- geometry::dot(reference, observed)
 
-    #     ## Combine the coordinates
-    #     coordinates <- mapply(cbind, length, angle, SIMPLIFY = FALSE)
-    #     coordinates <- mapply(cbind, coordinates, direction, SIMPLIFY = FALSE)
+        ## Get the angle
+        angles <- acos(dot_prod / (ref_length * obs_length))
 
-    #     if(dimensions[2] == 2) {
-    #         coordinates <- lapply(coordinates, function(x) {colnames(x) <- c("length", "angle", "direction") ; return(x)})
-    #     } else {
-    #         coordinates <- lapply(coordinates, function(x) {colnames(x) <- c("length", "angle_x", "angle_y", "direction") ; return(x)})
-    #     }
+        if(angle == "degree") {
+            angles <- angles * 180 / pi
+        }
 
-    # }
+        ## Get the length difference
+        if(absolute.distance == TRUE) {
+            length <- obs_length - ref_length
+        } else {
+            length <- euclidean.distance(one_coordinate, dimension)
+        }
+
+        return(matrix(c(length, angles), ncol = 2, byrow = FALSE, dimnames = list(c(),c("length", "angle"))))
+    }
 
     ## Spherical coordinates
     if(type == "spherical") {
@@ -214,6 +199,13 @@ coordinates.difference <- function(coordinates, reference, type = "cartesian", a
             coordinates <- mapply(cbind, coordinates, polar, SIMPLIFY = FALSE)
             coordinates <- lapply(coordinates, function(x) {colnames(x) <- c("radius", "azimuth", "polar") ; return(x)})
         }
+    }
+
+    ## Vector coordinates
+    if(type == "vector") {
+
+        ## Get the vector coordinates for each coordinates
+        coordinates <- lapply(coordinates, get.vector.diffs, dimension = dimensions[2], angle = angle, absolute.distance = absolute.distance)
     }
 
     return(coordinates)
