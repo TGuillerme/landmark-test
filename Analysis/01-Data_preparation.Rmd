@@ -23,7 +23,7 @@ Data type | Data set | Species | File format
 ----------|----------|---------|------------
 classifier|  cranium|wombat|.csv
 landmarkdata | cranium  | wombat | .csv
-landmarkgroups | mandible | koala |
+landmarkgroups | mandible | wombat |
 
 
 
@@ -33,7 +33,7 @@ Includes gpa coordinates (procrustes), landmark partitions (landmarkgroups), and
 
 ```{r}
 ## The chain names
-chains <- c("wombat", "koala")
+chains <- c("wombat")
 
 ## The datasets
 datasets <- c("cranium", "mandible")
