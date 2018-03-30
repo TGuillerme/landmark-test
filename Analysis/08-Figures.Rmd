@@ -9,7 +9,7 @@ output:
 ---
 
 
-# Visualizing the landmark partitions
+# Loading the data
 
 ```{r, message = FALSE, warning = FALSE}
 ## Loading the libraries (and installing if necessary)
@@ -23,7 +23,10 @@ set.seed(1)
 
 ##the below loads the Wombat.Rda from the processed data (i.e. partitions, procrustes data, and ordination results); but the object is NOT called the file name called under "load", it is "land_data"
 load("../Data/Processed/wombat.Rda")
+```
 
+#Visualize landmark partitions
+```{r, message = FALSE, warning = FALSE}
 #separate land_data into the relevant components
 
 PartNames<-c("Zyg", "Sn", "Oc", "Po", "Rest")# This is not necessary for colouring the cranium AND needs to be separately accessed, but helps in identifying the partitionss
@@ -32,4 +35,25 @@ plot.partitions(land_data$cranium)
 plot.partitions(land_data$mandible)
 
 
+```
+
+# Visualizing shape changes between Principal component extremes
+```{r, message = FALSE, warning = FALSE}
+
+
+
+PCA.vectors<-function(x, minfirst=TRUE){
+  gridPar=gridPar(pt.bg = "white", pt.size = 0.5)#These are needed to give it the right parameters for the point size, colour and size - the default is too large points
+  open3d()
+  
+  PCA=plotTangentSpace(x$procrustes$coords)
+  open3d()
+  if (minfirst==TRUE){
+    plotRefToTarget(PCA$pc.shapes$PC1min,PCA$pc.shapes$PC1max, method="vector", gridPars=gridPar, label = F)
+  } else {
+    plotRefToTarget(PCA$pc.shapes$PC1max,PCA$pc.shapes$PC1min, method="vector", gridPars=gridPar, label = F)
+    }
+}
+
+PCA.vectors(land_data$cranium)
 ```
