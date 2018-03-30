@@ -158,3 +158,43 @@ make.plots <- function(results, type, add.p = FALSE, correction, rarefaction = F
         }
     }
 }
+
+
+# Utilities based on existing functions
+
+
+
+plot.partitions<-function(land_data_partition, PartNames){
+  ##the object with the landmarks subset according to partitions
+  Part=list()
+  WomCrGPA<-land_data_partition$procrustes
+  WomCrPart<-land_data_partition$landmarkgroups
+  WomCrRef <- mshape(WomCrGPA$coords) 
+  
+  
+  #provides the numbers of the parts
+  PartLevels= unique(WomCrPart[,2])
+  Colours<-rainbow(length(PartLevels))
+  
+  ##subset the landmarks according to the partitions
+  for(i in 1:length(PartLevels)){
+    Part[[i]]<-which (WomCrPart[,2] == PartLevels[[i]])
+  }
+  
+  ##provides names for each of the partitions (optional and requires a name vector to be given)
+  if (!missing(PartNames)){
+    for (i in 1:length(PartLevels)){
+      names(Part)[i]<-PartNames[i]
+    }
+  }
+  ##colours the spheres for each partition
+  open3d()
+  for (i in 1:length(PartLevels)){
+    spheres3d(WomCrRef[Part[[i]],1], WomCrRef[Part[[i]],2], WomCrRef[Part[[i]],3], col=Colours[i], lit=TRUE,radius = 0.001, asp=F)
+    
+  }
+  
+}
+
+
+
