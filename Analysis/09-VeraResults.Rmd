@@ -17,26 +17,24 @@ source("../Functions/utilities.R")
 set.seed(42)
 
 #loading the below loads an object called land_data, NOT "wombat"
-load("../Data/Processed/wombat_krefftii.Rda")
+load("../Data/Processed/wombat.Rda")
 ```
 
 #Allometry analyses
 
 ```{r, message = FALSE, warning = FALSE}
-#@param x= coordinates after gpa incl centroid size, e.g. land_data$cranium. "procrustes" of land_data contains all the objects of gpagen
-allom.shape<-function (procrustes_coordinate_file_with_centroid_size){
-
-  Allometry <- procD.allometry((procrustes_coordinate_file_with_centroid_size$coords)~ procrustes_coordinate_file_with_centroid_size$Csize, f2=NULL, f3=NULL, logsz = FALSE, iter=999)
+#@param procrustes_coordinate_file_with_centroid_size: "land_data_procrustes" of land_data contains all the objects of gpagen, including coords and Csize
+x=land_data$cranium$procrustes
+allom.shape<-function (x){
+coords=x$coords
+Csize=x$Csize
+  
+  Allometry <- procD.allometry((coords)~ Csize, f2=NULL, f3=NULL, logsz = FALSE, iter=999)
   return(Allometry)
-  }
+}
+
 allom.shape(land_data$cranium$procrustes)
-summary(Allometry)
 
-coords=land_data$cranium$procrustes$coords
-Csize=land_data$cranium$procrustes$Csize
-
-Allometry <- procD.allometry(coords~ Csize)
-summary(Allometry)
 
 
 ```
