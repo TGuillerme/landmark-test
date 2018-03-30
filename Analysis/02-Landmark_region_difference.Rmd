@@ -14,8 +14,8 @@ output:
 if(!require(devtools)) install.packages("devtools")
 if(!require(knitr)) install.packages("knitr")
 if(!require(geomorph)) install.packages("geomorph")
-if(!require(dispRity)) install_github("TGuillerme/dispRity")
-if(!require(landmarktest)) install_github("TGuillerme/landmark-test")
+if(!require(dispRity)) install.packages("dispRity");library(dispRity)
+if(!require(landmarktest)) install_github("TGuillerme/landmark-test");library(landmarktest)
 source("../Functions/utilities.R")
 set.seed(1)
 ```
@@ -148,7 +148,7 @@ In this case we the observed measurement to fall well within the randomly sample
 
 ```{r, fig.width = 10, fig.height = 5}
 set.seed(1)
-## Creating a random partition
+## Creating a random partition
 random_part <- sample(1:nrow(procrustes_var), 300)
 
 ## Measuring the difference for a random partition
@@ -184,6 +184,7 @@ The landmark size differences:
 
 ```{r, echo = FALSE}
 ## Size differences
+library(knitr)
 kable(make.table(differences, "bonferroni"), digits = 5)
 ```
 
@@ -212,24 +213,6 @@ For these results, all the partitions are different from the overall data (i.e. 
 The landmarks in partitions 1 and 3 are comparatively longer than all the other landmarks (i.e. the partitions 1 and 3 of the skull vary more than the others - see area difference figures for partition 1 and 3).
 Partition 3 is the most different than the rest of the skull (i.e. the landmarks in partition 3 are the most different to all the other landmarks - see second table observed Bhattacharyya Coeffient of 0.54).
 
-
-## Additional - Calculating the mean difference
-
-```{r}
-## Mean differences
-means_diff <- lapply(partitions, lapply.bootstrap.test, data = procrustes_var, statistic = mean, repicates = 500, alternative = "greater")
-```
-The mean differences:
-
-```{r, echo = FALSE}
-## Size differences
-kable(make.table(means_diff, "bonferroni"), digits = 5)
-```
-
-```{r, fig.width = 10, fig.height = 15, echo = FALSE}
-## Plot the size differences
-make.plots(means_diff, type = "mean difference", add.p = TRUE, correction = "bonferroni")
-```
 
 ## References
 
