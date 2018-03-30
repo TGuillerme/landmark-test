@@ -42,18 +42,6 @@ plot.partitions(land_data$mandible)
 
 
 
-PCA.vectors<-function(x, minfirst=TRUE){
-  gridPar=gridPar(pt.bg = "white", pt.size = 0.5)#These are needed to give it the right parameters for the point size, colour and size - the default is too large points
-  open3d()
-  
-  PCA=plotTangentSpace(x$procrustes$coords)
-  open3d()
-  if (minfirst==TRUE){
-    plotRefToTarget(PCA$pc.shapes$PC1min,PCA$pc.shapes$PC1max, method="vector", gridPars=gridPar, label = F)
-  } else {
-    plotRefToTarget(PCA$pc.shapes$PC1max,PCA$pc.shapes$PC1min, method="vector", gridPars=gridPar, label = F)
-    }
-}
 
-PCA.vectors(land_data$cranium)
+PCA.vectors(land_data$cranium, minfirst=TRUE)
 ```
