@@ -40,7 +40,7 @@ allom.shape(land_data$mandible$procrustes)
 
 ```{r}
 #I want to later make this a function for "Full_Classifier_Table" but this was to help me figure out if the code works in principle
-Full_Classifier_Table=read.csv("../Data/Raw/classifier_cranium_wombat.csv")
+Full_Classifier_Table_Cranial=read.csv("../Data/Raw/classifier_cranium_wombat.csv")
 
 #I want these names to go into the output
 species <- c("CW", "SHNW", "NHNW")
@@ -50,7 +50,7 @@ sp_holders <- c("Common wombat", "SHN wombat", "NHN wombat")
     for (i in length(sp_holders)){
       
     Class=Full_Classifier_Table[Full_Classifier_Table$Species==sp_holders[i],]
-    NAME (SUBSET)<-SPECIES[i]#HOW DO I NAME THE OUTPUT APPROPRIATELY SO i END UP WITH 3 SUBSETTED DATASETS?
+    NAME (SUBSET)<-classifier_SPECIES[i]#HOW DO I NAME THE OUTPUT APPROPRIATELY SO I END UP WITH 3 SUBSETTED DATASETS?
     }
 
 ```
