@@ -218,10 +218,10 @@ PCA.vectors<-function(x, minfirst=TRUE){
 #allometry analysis
 
 #@param procrustes_coordinate_file_with_centroid_size: "land_data_procrustes" of land_data contains all the objects of gpagen, including coords and Csize
-x=land_data$cranium$procrustes
-allom.shape<-function (x){
-  coords=x$coords
-  Csize=x$Csize
+
+allom.shape<-function (procrustes_coordinate_file_with_centroid_size){
+  coords=procrustes_coordinate_file_with_centroid_size$coords
+  Csize=procrustes_coordinate_file_with_centroid_size$Csize
   
   Allometry <- procD.allometry((coords)~ Csize, f2=NULL, f3=NULL, logsz = FALSE, iter=999)
   return(Allometry)
