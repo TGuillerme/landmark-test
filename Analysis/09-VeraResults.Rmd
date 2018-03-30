@@ -17,24 +17,40 @@ source("../Functions/utilities.R")
 set.seed(42)
 
 #loading the below loads an object called land_data, NOT "wombat"
-load("../Data/Processed/wombat.Rda")
+load("../Data/Processed/wombat_krefftii.Rda")
+ClassifierCr=read.csv("../Data/Raw/classifier_cranium_wombat.csv")
 ```
 
 #Allometry analyses
 
 ```{r, message = FALSE, warning = FALSE}
-#@param procrustes_coordinate_file_with_centroid_size: "land_data_procrustes" of land_data contains all the objects of gpagen, including coords and Csize
-x=land_data$cranium$procrustes
-allom.shape<-function (x){
-coords=x$coords
-Csize=x$Csize
-  
-  Allometry <- procD.allometry((coords)~ Csize, f2=NULL, f3=NULL, logsz = FALSE, iter=999)
-  return(Allometry)
-}
 
-allom.shape(land_data$cranium$procrustes)
+allom.shape(land_data$mandible$procrustes)
+
+```
+#2-Block Partial Least Squares analysis
+```{r, message = FALSE, warning = FALSE}
 
 
+#reduce datasets down to those that have mandibles and crania
+#@params GPA_coords is a file containing coords, e.g. land_data_cranium
+
+#Classifiers
+
+
+```{r}
+#I want to later make this a function for "Full_Classifier_Table"
+Full_Classifier_Table=read.csv("../Data/Raw/classifier_cranium_wombat.csv")
+
+#I want these names to go into the output
+species <- c("CW", "SHNW", "NHNW")
+#these are required to pull out the subsets
+sp_holders <- c("Common wombat", "SHN wombat", "NHN wombat")
+
+    for (i in length(sp_holders)){
+      
+    Class=Full_Classifier_Table[Full_Classifier_Table$Species==sp_holders[i],]
+    NAME (SUBSET)<-SPECIES[i]#HOW DO I NAME THE OUTPUT APPROPRIATELY SO i END UP WITH 3 SUBSETTED DATASETS?
+    }
 
 ```
