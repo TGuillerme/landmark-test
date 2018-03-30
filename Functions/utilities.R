@@ -17,7 +17,7 @@ pipeline.test <- function(species, dataset, path, verbose = FALSE, rarefaction, 
 
     ## Procrustes variation ranges
     if(verbose) message("Calculate range...")
-    procrustes_var <- variation.range(data$procrustes)
+    procrustes_var <- variation.range(data$procrustes, type = "vector", what = "length")
     if(verbose) message("Done.\n")
 
     ## landmarks partitions
@@ -87,10 +87,10 @@ pipeline.plots <- function(results, export = FALSE){
 
 ## Function for applying the rand tests
 lapply.rand.test <- function(partition, data, test, ...) {
-    rand.test(data[, "radius"], partition, test = test, test.parameter = TRUE, ...)
+    rand.test(data[, "length"], partition, test = test, test.parameter = TRUE, ...)
 }
 lapply.bootstrap.test <- function(partition, data, statistic, ...) {
-    bootstrap.test(data[, "radius"], partition, statistic = statistic, ...)
+    bootstrap.test(data[, "length"], partition, statistic = statistic, ...)
 }
 
 
