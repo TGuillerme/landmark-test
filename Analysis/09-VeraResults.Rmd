@@ -25,7 +25,7 @@ ClassifierCr=read.csv("../Data/Raw/classifier_cranium_wombat.csv")
 
 ```{r, message = FALSE, warning = FALSE}
 
-allom.shape(land_data$mandible$procrustes)
+allom.shape(land_data$cranium$procrustes)
 
 ```
 #2-Block Partial Least Squares analysis
@@ -49,8 +49,11 @@ sp_holders <- c("Common wombat", "SHN wombat", "NHN wombat")
 
     for (i in length(sp_holders)){
       
-    Class=Full_Classifier_Table[Full_Classifier_Table$Species==sp_holders[i],]
-    NAME (SUBSET)<-classifier_SPECIES[i]#HOW DO I NAME THE OUTPUT APPROPRIATELY SO I END UP WITH 3 SUBSETTED DATASETS?
+    Class=Full_Classifier_Table_Cranial[Full_Classifier_Table_Cranial$Species==sp_holders[i],]
+    assign(species[i],Class)#This does what I want it to do but overwrites the Class so only the last run is saved.
+    
     }
+
+
 
 ```
