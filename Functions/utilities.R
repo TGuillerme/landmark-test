@@ -217,12 +217,13 @@ PCA.vectors<-function(x, minfirst=TRUE){
 
 #allometry analysis
 
-#@param procrustes_coordinate_file_with_centroid_size: "land_data_procrustes" of land_data contains all the objects of gpagen, including coords and Csize
+#@param procrustes_coordinate_file_with_centroid_size: "land_data_cranium_procrustes" of land_data contains all the objects of gpagen, including coords and Csize
 
+#this does not work because the code fails to extract the coords within the loop. but the workflow works outside the loop
 allom.shape<-function (procrustes_coordinate_file_with_centroid_size){
   coords=procrustes_coordinate_file_with_centroid_size$coords
   Csize=procrustes_coordinate_file_with_centroid_size$Csize
   
-  Allometry <- procD.allometry((coords)~ Csize, f2=NULL, f3=NULL, logsz = FALSE, iter=999)
+  Allometry <- procD.allometry(coords~ Csize, f2=NULL, f3=NULL, logsz = FALSE, iter=999)
   return(Allometry)
 }
