@@ -47,9 +47,9 @@ species <- c("CW", "SHNW", "NHNW")
 #these are required to pull out the subsets
 sp_holders <- c("Common wombat", "SHN wombat", "NHN wombat")
 
-    for (i in length(sp_holders)){
+    for (i in 1:length(sp_holders)){ #TG: I've added the 1:length() to go through the sequence
       
-    Class=Full_Classifier_Table_Cranial[Full_Classifier_Table_Cranial$Species==sp_holders[i],]
+    Class = Full_Classifier_Table_Cranial[Full_Classifier_Table_Cranial$Species == sp_holders[i],]
     assign(species[i],Class)#This does what I want it to do but overwrites the Class so only the last run is saved.
     
     }
