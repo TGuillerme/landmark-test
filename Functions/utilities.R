@@ -227,9 +227,5 @@ allom.shape<-function (procrustes_coordinate_file_with_centroid_size){
   Allometry <- procD.allometry(coords~ Csize, f2=NULL, f3=NULL, logsz = FALSE, iter=999)
   return(Allometry)
 }
-coords=land_data$coords
-Csize=procrustes_coordinate_file_with_centroid_size$Csize
 
-Allometry <- procD.allometry(coords~ Csize, f2=NULL, f3=NULL, logsz = FALSE, iter=999)
-return(Allometry)
 
