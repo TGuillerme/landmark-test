@@ -27,6 +27,19 @@ ClassifierCr=read.csv("../Data/Raw/classifier_cranium_wombat.csv")
 
 allom.shape(land_data$cranium$procrustes)
 
+allom.shape<-function (procrustes_coordinate_file_with_centroid_size){
+  coords=procrustes_coordinate_file_with_centroid_size$coords
+  Csize=procrustes_coordinate_file_with_centroid_size$Csize
+  
+  Allometry <- procD.allometry(coords~ Csize, f2=NULL, f3=NULL, logsz = FALSE, iter=999)
+  return(Allometry)
+}
+coords=land_data$cranium$procrustes$coords
+Csize=land_data$cranium$procrustes$Csize
+
+Allometry <- procD.allometry(coords~ Csize, f2=NULL, f3=NULL, logsz = FALSE, iter=999)
+return(Allometry)
+
 ```
 #2-Block Partial Least Squares analysis
 ```{r, message = FALSE, warning = FALSE}
@@ -47,13 +60,11 @@ species <- c("CW", "SHNW", "NHNW")
 #these are required to pull out the subsets
 sp_holders <- c("Common wombat", "SHN wombat", "NHN wombat")
 
-    for (i in length(sp_holders)){
+    for (i in (1:length(sp_holders))){
       
     Class=Full_Classifier_Table_Cranial[Full_Classifier_Table_Cranial$Species==sp_holders[i],]
     assign(species[i],Class)#This does what I want it to do but overwrites the Class so only the last run is saved.
     
     }
-
-
 
 ```
