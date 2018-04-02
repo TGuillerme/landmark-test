@@ -107,6 +107,16 @@ Csize=land_data$cranium$procrustes$Csize
 Allometry <- procD.allometry(coords~ Csize, f2=NULL, f3=NULL, logsz = FALSE, iter=999)
 return(Allometry)
 
+
+#TG: I've put the procD type functions in a "safe" wrapping function, you can now use them as follow (sourced from utilities.R)
+handle.procD.formula(formula = coords ~ Csize, procrustes = land_data$cranium$procrustes, procD.fun = procD.allometry, logsz = FALSE, iter = 1)
+
+#TG: The first term (coords ~ Csize) is the formula to test
+#TG: the second (land_data$cranium$procrustes) is the procrustes data object,
+#TG: the third is the function to apply to that (procD.allometry - it can be any procD.something function)
+#TG: the following arguments (logsz and iter) are optional arguments to be passed to the procD function.
+
+
 ```
 #2-Block Partial Least Squares analysis
 
