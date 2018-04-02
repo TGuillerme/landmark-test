@@ -17,7 +17,7 @@ pipeline.test <- function(species, dataset, path, verbose = FALSE, rarefaction, 
 
     ## Procrustes variation ranges
     if(verbose) message("Calculate range...")
-    procrustes_var <- variation.range(data$procrustes, type = "vector", what = "length")
+    procrustes_var <- variation.range(data$procrustes, type = "spherical", what = "radius")
     if(verbose) message("Done.\n")
 
     ## landmarks partitions
@@ -87,10 +87,10 @@ pipeline.plots <- function(results, export = FALSE){
 
 ## Function for applying the rand tests
 lapply.rand.test <- function(partition, data, test, ...) {
-    rand.test(data[, "length"], partition, test = test, test.parameter = TRUE, ...)
+    rand.test(data[, "radius"], partition, test = test, test.parameter = TRUE, ...)
 }
 lapply.bootstrap.test <- function(partition, data, statistic, ...) {
-    bootstrap.test(data[, "length"], partition, statistic = statistic, ...)
+    bootstrap.test(data[, "radius"], partition, statistic = statistic, ...)
 }
 
 
@@ -118,15 +118,55 @@ make.table <- function(results, correction) {
     return(summary_table)
 }
 
+make.xtable <- function(results, correction, digits = 3, caption, label, longtable = FALSE, path) {
+
+    ## Make the results table
+    results_table <- make.table(results, correction = correction)
+
+    ## Add significance values
+    p_col <- grep("p value", colnames(results_table))
+    if(length(p_col) > 0) {
+        for(row in 1:nrow(results_table)) {
+            if(as.numeric(results_table[row, p_col]) < 0.05) {
+                results_table[row, p_col] <- paste0("BOLD", results_table[row, p_col])
+            }
+        }
+    }
+
+    ## Bold cells function
+    bold.cells <- function(x) gsub('BOLD(.*)', paste0('\\\\textbf{\\1', '}'), x)
+
+    ## convert into xtable format
+    textable <- xtable(results_table, digit = digits, caption = caption, label = label)
+
+    if(!missing(path)) {
+        if(longtable == TRUE) {
+            cat(print(textable, tabular.environment = 'longtable', floating = FALSE, include.rownames = FALSE, sanitize.text.function = bold.cells), file = paste0(path, label, ".tex"))
+        } else {
+            cat(print(textable, include.rownames = FALSE, sanitize.text.function = bold.cells), file = paste0(path, label, ".tex"))
+        }
+    }
+
+    if(longtable == TRUE) {
+        print(textable, tabular.environment = 'longtable', floating = FALSE, include.rownames = FALSE, sanitize.text.function = bold.cells)
+    } else {
+        print(textable, include.rownames = FALSE, sanitize.text.function = bold.cells)
+    }
+}
+
 
 ## Function for plotting the test results
-make.plots <- function(results, type, add.p = FALSE, correction, rarefaction = FALSE, rare.level) {
+make.plots <- function(results, type, add.p = FALSE, correction, rarefaction = FALSE, rare.level, path) {
 
     ## Number of plots
     n_plots <- length(results)
 
     ## Plotting parameters
-    par(mfrow = c(ceiling(sqrt(n_plots)), floor(sqrt(n_plots))), bty = "n")
+    if(!missing(path)) {
+        pdf(file = path)
+    } else {
+        par(mfrow = c(ceiling(sqrt(n_plots)), floor(sqrt(n_plots))), bty = "n")
+    }
 
     ## Getting the results table
     if(add.p) {
@@ -152,10 +192,14 @@ make.plots <- function(results, type, add.p = FALSE, correction, rarefaction = F
         ## p_value
         if(add.p) {
             ## Get the coordinates for the text
-            text_pos <- ifelse(table_res[one_plot, "Observed"] < table_res[one_plot, 2], "topleft", "topright")
+            text_pos <- ifelse(table_res[one_plot, "Observed"] < table_res[one_plot, "Random mean"], "topleft", "topright")
             ## Add the text
             legend(text_pos, paste(colnames(table_res)[6], round(table_res[one_plot, 6], 5), sep = "\n")  , bty = "n")
         }
+    }
+
+    if(!missing(path)) {
+        dev.off()
     }
 }
 

@@ -13,12 +13,27 @@ output:
 ## Loading the libraries (and installing if necessary)
 if(!require(devtools)) install.packages("devtools")
 if(!require(knitr)) install.packages("knitr")
+if(!require(xtable)) install.packages("knitr")
 if(!require(geomorph)) install.packages("geomorph")
 if(!require(dispRity)) install_github("TGuillerme/dispRity")
 if(!require(landmarktest)) install_github("TGuillerme/landmark-test")
 source("../Functions/utilities.R")
-set.seed(1)
+set.seed(42)
 ```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 # Within species
 
@@ -27,8 +42,10 @@ set.seed(1)
 ### Cranium
 
 ```{r, echo = FALSE, message = FALSE}
-results <- pipeline.test("Wombat_ursinus", "cranium", "../Data/Processed/", verbose = TRUE, combine.land = TRUE)
-save(results, file = "../Data/Results/Wombat_ursinus_cranium.Rda")
+species <- "Wombat_ursinus"
+dataset <- "cranium"
+results <- pipeline.test(species, dataset, "../Data/Processed/", verbose = TRUE, combine.land = FALSE)
+save(results, file = paste0("../Data/Results/", species, "_", dataset, ".Rda"))
 
 caption_diff <- paste0("Results of the area difference random test for the ", results$dataset, " of ", results$species)
 caption_over <- paste0("Results of the overlap probability random test for the ", results$ataset, " of ", results$species)
@@ -38,6 +55,12 @@ kable(make.table(results$differences, "bonferroni"), digits = 5, caption = capti
 
 ## Probability of overlap
 kable(make.table(results$overlaps, "bonferroni"), digits = 5, caption = caption_over)
+```
+
+```{r, eval = TRUE, echo = FALSE, print = FALSE, results = 'hide'}
+## xtables for pub
+make.xtable(results$differences, "bonferroni", digits = 3, caption = caption_diff, path = "../Manuscript/Tables/", label = paste0(species, "_", dataset, "_difference"))
+make.xtable(results$overlaps, "bonferroni", digits = 3, caption = caption_over, path = "../Manuscript/Tables/", label = paste0(species, "_", dataset, "_overlaps"))
 ```
 
 #### Area difference
@@ -50,13 +73,20 @@ make.plots(results$differences, type = "area difference", add.p = TRUE, correcti
 ```{r, fig.width = 10, fig.height = 15, echo = FALSE, message = FALSE}
 ## Plot the size differences
 make.plots(results$overlaps, type = "Bhattacharyya Coefficient", add.p = TRUE, correction = "bonferroni")
+```
+
+```{r, eval = TRUE, echo = FALSE, print = FALSE, results = 'hide'}
+make.plots(results$differences, type = "area difference", add.p = TRUE, correction = "bonferroni", path = paste0("../Manuscript/Figures/", species, "_", dataset, "_difference.pdf"))
+make.plots(results$overlaps, type = "Bhattacharyya Coefficient", add.p = TRUE, correction = "bonferroni", path = paste0("../Manuscript/Figures/", species, "_", dataset, "_overlaps.pdf"))
 ```
 
 ### Mandible
 
 ```{r, echo = FALSE, message = FALSE}
-results <- pipeline.test("Wombat_ursinus", "mandible", "../Data/Processed/", verbose = TRUE, combine.land = TRUE)
-save(results, file = "../Data/Results/Wombat_ursinus_mandible.Rda")
+species <- "Wombat_ursinus"
+dataset <- "mandible"
+results <- pipeline.test(species, dataset, "../Data/Processed/", verbose = TRUE, combine.land = FALSE)
+save(results, file = paste0("../Data/Results/", species, "_", dataset, ".Rda"))
 
 caption_diff <- paste0("Results of the area difference random test for the ", results$dataset, " of ", results$species)
 caption_over <- paste0("Results of the overlap probability random test for the ", results$ataset, " of ", results$species)
@@ -66,6 +96,12 @@ kable(make.table(results$differences, "bonferroni"), digits = 5, caption = capti
 
 ## Probability of overlap
 kable(make.table(results$overlaps, "bonferroni"), digits = 5, caption = caption_over)
+```
+
+```{r, eval = TRUE, echo = FALSE, print = FALSE, results = 'hide'}
+## xtables for pub
+make.xtable(results$differences, "bonferroni", digits = 3, caption = caption_diff, path = "../Manuscript/Tables/", label = paste0(species, "_", dataset, "_difference"))
+make.xtable(results$overlaps, "bonferroni", digits = 3, caption = caption_over, path = "../Manuscript/Tables/", label = paste0(species, "_", dataset, "_overlaps"))
 ```
 
 #### Area difference
@@ -79,6 +115,23 @@ make.plots(results$differences, type = "area difference", add.p = TRUE, correcti
 ## Plot the size differences
 make.plots(results$overlaps, type = "Bhattacharyya Coefficient", add.p = TRUE, correction = "bonferroni")
 ```
+
+```{r, eval = TRUE, echo = FALSE, print = FALSE, results = 'hide'}
+make.plots(results$differences, type = "area difference", add.p = TRUE, correction = "bonferroni", path = paste0("../Manuscript/Figures/", species, "_", dataset, "_difference.pdf"))
+make.plots(results$overlaps, type = "Bhattacharyya Coefficient", add.p = TRUE, correction = "bonferroni", path = paste0("../Manuscript/Figures/", species, "_", dataset, "_overlaps.pdf"))
+```
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 ## Wombat krefftii
@@ -86,8 +139,10 @@ make.plots(results$overlaps, type = "Bhattacharyya Coefficient", add.p = TRUE, c
 ### Cranium
 
 ```{r, echo = FALSE, message = FALSE}
-results <- pipeline.test("Wombat_krefftii", "cranium", "../Data/Processed/", verbose = TRUE, combine.land = TRUE)
-save(results, file = "../Data/Results/Wombat_krefftii_cranium.Rda")
+species <- "Wombat_krefftii"
+dataset <- "cranium"
+results <- pipeline.test(species, dataset, "../Data/Processed/", verbose = TRUE, combine.land = FALSE)
+save(results, file = paste0("../Data/Results/", species, "_", dataset, ".Rda"))
 
 caption_diff <- paste0("Results of the area difference random test for the ", results$dataset, " of ", results$species)
 caption_over <- paste0("Results of the overlap probability random test for the ", results$ataset, " of ", results$species)
@@ -97,6 +152,12 @@ kable(make.table(results$differences, "bonferroni"), digits = 5, caption = capti
 
 ## Probability of overlap
 kable(make.table(results$overlaps, "bonferroni"), digits = 5, caption = caption_over)
+```
+
+```{r, eval = TRUE, echo = FALSE, print = FALSE, results = 'hide'}
+## xtables for pub
+make.xtable(results$differences, "bonferroni", digits = 3, caption = caption_diff, path = "../Manuscript/Tables/", label = paste0(species, "_", dataset, "_difference"))
+make.xtable(results$overlaps, "bonferroni", digits = 3, caption = caption_over, path = "../Manuscript/Tables/", label = paste0(species, "_", dataset, "_overlaps"))
 ```
 
 #### Area difference
@@ -111,12 +172,18 @@ make.plots(results$differences, type = "area difference", add.p = TRUE, correcti
 make.plots(results$overlaps, type = "Bhattacharyya Coefficient", add.p = TRUE, correction = "bonferroni")
 ```
 
+```{r, eval = TRUE, echo = FALSE, print = FALSE, results = 'hide'}
+make.plots(results$differences, type = "area difference", add.p = TRUE, correction = "bonferroni", path = paste0("../Manuscript/Figures/", species, "_", dataset, "_difference.pdf"))
+make.plots(results$overlaps, type = "Bhattacharyya Coefficient", add.p = TRUE, correction = "bonferroni", path = paste0("../Manuscript/Figures/", species, "_", dataset, "_overlaps.pdf"))
+```
 
 ### Mandible
 
 ```{r, echo = FALSE, message = FALSE}
-results <- pipeline.test("Wombat_krefftii", "mandible", "../Data/Processed/", verbose = TRUE, combine.land = TRUE)
-save(results, file = "../Data/Results/Wombat_krefftii_mandible.Rda")
+species <- "Wombat_krefftii"
+dataset <- "mandible"
+results <- pipeline.test(species, dataset, "../Data/Processed/", verbose = TRUE, combine.land = FALSE)
+save(results, file = paste0("../Data/Results/", species, "_", dataset, ".Rda"))
 
 caption_diff <- paste0("Results of the area difference random test for the ", results$dataset, " of ", results$species)
 caption_over <- paste0("Results of the overlap probability random test for the ", results$ataset, " of ", results$species)
@@ -126,6 +193,12 @@ kable(make.table(results$differences, "bonferroni"), digits = 5, caption = capti
 
 ## Probability of overlap
 kable(make.table(results$overlaps, "bonferroni"), digits = 5, caption = caption_over)
+```
+
+```{r, eval = TRUE, echo = FALSE, print = FALSE, results = 'hide'}
+## xtables for pub
+make.xtable(results$differences, "bonferroni", digits = 3, caption = caption_diff, path = "../Manuscript/Tables/", label = paste0(species, "_", dataset, "_difference"))
+make.xtable(results$overlaps, "bonferroni", digits = 3, caption = caption_over, path = "../Manuscript/Tables/", label = paste0(species, "_", dataset, "_overlaps"))
 ```
 
 #### Area difference
@@ -139,6 +212,22 @@ make.plots(results$differences, type = "area difference", add.p = TRUE, correcti
 ## Plot the size differences
 make.plots(results$overlaps, type = "Bhattacharyya Coefficient", add.p = TRUE, correction = "bonferroni")
 ```
+
+```{r, eval = TRUE, echo = FALSE, print = FALSE, results = 'hide'}
+make.plots(results$differences, type = "area difference", add.p = TRUE, correction = "bonferroni", path = paste0("../Manuscript/Figures/", species, "_", dataset, "_difference.pdf"))
+make.plots(results$overlaps, type = "Bhattacharyya Coefficient", add.p = TRUE, correction = "bonferroni", path = paste0("../Manuscript/Figures/", species, "_", dataset, "_overlaps.pdf"))
+```
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -147,8 +236,10 @@ make.plots(results$overlaps, type = "Bhattacharyya Coefficient", add.p = TRUE, c
 ### Cranium
 
 ```{r, echo = FALSE, message = FALSE}
-results <- pipeline.test("Wombat_latifrons", "cranium", "../Data/Processed/", verbose = TRUE, combine.land = TRUE)
-save(results, file = "../Data/Results/Wombat_latifrons_cranium.Rda")
+species <- "Wombat_latifrons"
+dataset <- "cranium"
+results <- pipeline.test(species, dataset, "../Data/Processed/", verbose = TRUE, combine.land = FALSE)
+save(results, file = paste0("../Data/Results/", species, "_", dataset, ".Rda"))
 
 caption_diff <- paste0("Results of the area difference random test for the ", results$dataset, " of ", results$species)
 caption_over <- paste0("Results of the overlap probability random test for the ", results$ataset, " of ", results$species)
@@ -158,6 +249,12 @@ kable(make.table(results$differences, "bonferroni"), digits = 5, caption = capti
 
 ## Probability of overlap
 kable(make.table(results$overlaps, "bonferroni"), digits = 5, caption = caption_over)
+```
+
+```{r, eval = TRUE, echo = FALSE, print = FALSE, results = 'hide'}
+## xtables for pub
+make.xtable(results$differences, "bonferroni", digits = 3, caption = caption_diff, path = "../Manuscript/Tables/", label = paste0(species, "_", dataset, "_difference"))
+make.xtable(results$overlaps, "bonferroni", digits = 3, caption = caption_over, path = "../Manuscript/Tables/", label = paste0(species, "_", dataset, "_overlaps"))
 ```
 
 #### Area difference
@@ -172,12 +269,18 @@ make.plots(results$differences, type = "area difference", add.p = TRUE, correcti
 make.plots(results$overlaps, type = "Bhattacharyya Coefficient", add.p = TRUE, correction = "bonferroni")
 ```
 
+```{r, eval = TRUE, echo = FALSE, print = FALSE, results = 'hide'}
+make.plots(results$differences, type = "area difference", add.p = TRUE, correction = "bonferroni", path = paste0("../Manuscript/Figures/", species, "_", dataset, "_difference.pdf"))
+make.plots(results$overlaps, type = "Bhattacharyya Coefficient", add.p = TRUE, correction = "bonferroni", path = paste0("../Manuscript/Figures/", species, "_", dataset, "_overlaps.pdf"))
+```
 
 ### Mandible
 
 ```{r, echo = FALSE, message = FALSE}
-results <- pipeline.test("Wombat_latifrons", "mandible", "../Data/Processed/", verbose = TRUE, combine.land = TRUE)
-save(results, file = "../Data/Results/Wombat_latifrons_mandible.Rda")
+species <- "Wombat_latifrons"
+dataset <- "mandible"
+results <- pipeline.test(species, dataset, "../Data/Processed/", verbose = TRUE, combine.land = FALSE)
+save(results, file = paste0("../Data/Results/", species, "_", dataset, ".Rda"))
 
 caption_diff <- paste0("Results of the area difference random test for the ", results$dataset, " of ", results$species)
 caption_over <- paste0("Results of the overlap probability random test for the ", results$ataset, " of ", results$species)
@@ -187,6 +290,12 @@ kable(make.table(results$differences, "bonferroni"), digits = 5, caption = capti
 
 ## Probability of overlap
 kable(make.table(results$overlaps, "bonferroni"), digits = 5, caption = caption_over)
+```
+
+```{r, eval = TRUE, echo = FALSE, print = FALSE, results = 'hide'}
+## xtables for pub
+make.xtable(results$differences, "bonferroni", digits = 3, caption = caption_diff, path = "../Manuscript/Tables/", label = paste0(species, "_", dataset, "_difference"))
+make.xtable(results$overlaps, "bonferroni", digits = 3, caption = caption_over, path = "../Manuscript/Tables/", label = paste0(species, "_", dataset, "_overlaps"))
 ```
 
 #### Area difference
@@ -200,15 +309,34 @@ make.plots(results$differences, type = "area difference", add.p = TRUE, correcti
 ## Plot the size differences
 make.plots(results$overlaps, type = "Bhattacharyya Coefficient", add.p = TRUE, correction = "bonferroni")
 ```
+
+```{r, eval = TRUE, echo = FALSE, print = FALSE, results = 'hide'}
+make.plots(results$differences, type = "area difference", add.p = TRUE, correction = "bonferroni", path = paste0("../Manuscript/Figures/", species, "_", dataset, "_difference.pdf"))
+make.plots(results$overlaps, type = "Bhattacharyya Coefficient", add.p = TRUE, correction = "bonferroni", path = paste0("../Manuscript/Figures/", species, "_", dataset, "_overlaps.pdf"))
+```
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 # Between species
 
-### Cranium
+## Cranium
 
 ```{r, echo = FALSE, message = FALSE}
-results <- pipeline.test("Wombat", "cranium", "../Data/Processed/", verbose = TRUE, combine.land = TRUE)
-save(results, file = "../Data/Results/Wombat_cranium.Rda")
+species <- "Wombat"
+dataset <- "cranium"
+results <- pipeline.test(species, dataset, "../Data/Processed/", verbose = TRUE, combine.land = FALSE)
+save(results, file = paste0("../Data/Results/", species, "_", dataset, ".Rda"))
 
 caption_diff <- paste0("Results of the area difference random test for the ", results$dataset, " of ", results$species)
 caption_over <- paste0("Results of the overlap probability random test for the ", results$ataset, " of ", results$species)
@@ -220,24 +348,36 @@ kable(make.table(results$differences, "bonferroni"), digits = 5, caption = capti
 kable(make.table(results$overlaps, "bonferroni"), digits = 5, caption = caption_over)
 ```
 
-#### Area difference
+```{r, eval = TRUE, echo = FALSE, print = FALSE, results = 'hide'}
+## xtables for pub
+make.xtable(results$differences, "bonferroni", digits = 3, caption = caption_diff, path = "../Manuscript/Tables/", label = paste0(species, "_", dataset, "_difference"))
+make.xtable(results$overlaps, "bonferroni", digits = 3, caption = caption_over, path = "../Manuscript/Tables/", label = paste0(species, "_", dataset, "_overlaps"))
+```
+
+### Area difference
 ```{r, fig.width = 10, fig.height = 15, echo = FALSE, message = FALSE}
 ## Plot the size differences
 make.plots(results$differences, type = "area difference", add.p = TRUE, correction = "bonferroni")
 ```
 
-#### Bhattacharyya Coefficient
+### Bhattacharyya Coefficient
 ```{r, fig.width = 10, fig.height = 15, echo = FALSE, message = FALSE}
 ## Plot the size differences
 make.plots(results$overlaps, type = "Bhattacharyya Coefficient", add.p = TRUE, correction = "bonferroni")
 ```
 
+```{r, eval = TRUE, echo = FALSE, print = FALSE, results = 'hide'}
+make.plots(results$differences, type = "area difference", add.p = TRUE, correction = "bonferroni", path = paste0("../Manuscript/Figures/", species, "_", dataset, "_difference.pdf"))
+make.plots(results$overlaps, type = "Bhattacharyya Coefficient", add.p = TRUE, correction = "bonferroni", path = paste0("../Manuscript/Figures/", species, "_", dataset, "_overlaps.pdf"))
+```
 
-### Mandible
+## Mandible
 
 ```{r, echo = FALSE, message = FALSE}
-results <- pipeline.test("Wombat", "mandible", "../Data/Processed/", verbose = TRUE, combine.land = TRUE)
-save(results, file = "../Data/Results/Wombat_mandible.Rda")
+species <- "Wombat"
+dataset <- "mandible"
+results <- pipeline.test(species, dataset, "../Data/Processed/", verbose = TRUE, combine.land = FALSE)
+save(results, file = paste0("../Data/Results/", species, "_", dataset, ".Rda"))
 
 caption_diff <- paste0("Results of the area difference random test for the ", results$dataset, " of ", results$species)
 caption_over <- paste0("Results of the overlap probability random test for the ", results$ataset, " of ", results$species)
@@ -249,14 +389,26 @@ kable(make.table(results$differences, "bonferroni"), digits = 5, caption = capti
 kable(make.table(results$overlaps, "bonferroni"), digits = 5, caption = caption_over)
 ```
 
-#### Area difference
+```{r, eval = TRUE, echo = FALSE, print = FALSE, results = 'hide'}
+## xtables for pub
+make.xtable(results$differences, "bonferroni", digits = 3, caption = caption_diff, path = "../Manuscript/Tables/", label = paste0(species, "_", dataset, "_difference"))
+make.xtable(results$overlaps, "bonferroni", digits = 3, caption = caption_over, path = "../Manuscript/Tables/", label = paste0(species, "_", dataset, "_overlaps"))
+```
+
+### Area difference
 ```{r, fig.width = 10, fig.height = 15, echo = FALSE, message = FALSE}
 ## Plot the size differences
 make.plots(results$differences, type = "area difference", add.p = TRUE, correction = "bonferroni")
 ```
 
-#### Bhattacharyya Coefficient
+### Bhattacharyya Coefficient
 ```{r, fig.width = 10, fig.height = 15, echo = FALSE, message = FALSE}
 ## Plot the size differences
 make.plots(results$overlaps, type = "Bhattacharyya Coefficient", add.p = TRUE, correction = "bonferroni")
 ```
+
+```{r, eval = TRUE, echo = FALSE, print = FALSE, results = 'hide'}
+make.plots(results$differences, type = "area difference", add.p = TRUE, correction = "bonferroni", path = paste0("../Manuscript/Figures/", species, "_", dataset, "_difference.pdf"))
+make.plots(results$overlaps, type = "Bhattacharyya Coefficient", add.p = TRUE, correction = "bonferroni", path = paste0("../Manuscript/Figures/", species, "_", dataset, "_overlaps.pdf"))
+```
+
