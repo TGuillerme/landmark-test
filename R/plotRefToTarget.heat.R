@@ -5,7 +5,7 @@
 #' @param M1 Matrix of landmark coordinates for the first (reference) specimen
 #' @param M2 Matrix of landmark coordinates for the second (target) specimen
 #' @param method Method used to visualize shape difference: either \code{"vector"} (default) or \code{"points"}. For \code{"surface"} or \code{"TPS"}, use \code{\link[geomorph]{plotRefToTarget}}.
-#' @param plotRefToTarget.args additional arguments to be passed to \code{\link[geomorph]{plotRefTarget}.
+#' @param plotRefToTarget.args additional arguments to be passed to \code{\link[geomorph]{plotRefTarget}}.
 #' @param ... Additional parameters to \code{\link[graphics]{plot}} or \code{\link[rgl]{plot3d}}.
 #' @param col Either a single color value (\code{"character"}), vector of values or function for colouring both points and vectors; or a list of two of any of these three elements. The first argument is passed to the points and the second to the vectors (\code{default = list("grey", "black")} for grey points and black vectors - see details).
 #' @param col.val Optional, if \code{col} is a function for assigning colours (or a list of two functions), which values to pass to the function to assign the colors).

@@ -15,6 +15,8 @@ plotRefToTarget.heat(M1, M2, method = "vector",
 
 \item{method}{Method used to visualize shape difference: either \code{"vector"} (default) or \code{"points"}. For \code{"surface"} or \code{"TPS"}, use \code{\link[geomorph]{plotRefToTarget}}.}
 
+\item{plotRefToTarget.args}{additional arguments to be passed to \code{\link[geomorph]{plotRefTarget}}.}
+
 \item{...}{Additional parameters to \code{\link[graphics]{plot}} or \code{\link[rgl]{plot3d}}.}
 
 \item{col}{Either a single color value (\code{"character"}), vector of values or function for colouring both points and vectors; or a list of two of any of these three elements. The first argument is passed to the points and the second to the vectors (\code{default = list("grey", "black")} for grey points and black vectors - see details).}
