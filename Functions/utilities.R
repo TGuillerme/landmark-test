@@ -204,6 +204,18 @@ make.plots <- function(results, type, add.p = FALSE, correction, rarefaction = F
 }
 
 
+#@param formula: a formula object (e.g. coords ~ Csize)
+#@param procrustes: the procrustes object (e.g. land_data$cranium$procrustes)
+#@param procD.fun: the procD function (e.g. procD.allometry)
+#@param ...: any optional arguments to be passed to procD.fun (e.g. logsz = FALSE, iter = 1, etc...)
+handle.procD.formula <- function(formula, procrustes, procD.fun = procD.allometry, ...) {
+
+    geomorph_data_frame <- geomorph.data.frame(procrustes)
+
+    return(procD.fun(f1 = formula, data = geomorph_data_frame, ...))
+}
+
+
 # Utilities based on existing functions
 
 #colouring partition spheres
