@@ -237,3 +237,55 @@ coordinates.difference <- function(coordinates, reference, type = "cartesian", a
 
 #     })
 # }
+
+
+# stop("DEBUG in coordinates difference")
+
+# ## Get the ranges
+# range_1 <- apply(proc_super$coords[,, 33], 2, range)
+# range_2 <- apply(proc_super$coords[,, 14], 2, range)
+# xlim <- ylim <- range(as.vector(range_1), as.vector(range_2))
+
+# par(bty = "n")
+# plot(NULL, xlim = xlim, ylim = ylim, xlab = "", ylab = "")
+
+# ## Adding the consensus shape
+# points(proc_super$consensus, pch = 19, col = "grey")
+# centroid <- apply(proc_super$consensus, 2, mean)
+# points(x = centroid[1], y = centroid[2], pch = 13, cex = 2)
+# for(land in 1:nrow(proc_super$consensus)) {
+#     lines(x = c(centroid[1], proc_super$consensus[land,1]), y = c(centroid[2], proc_super$consensus[land,2]), col = "grey", lty = 3)
+# }
+
+# ## Adding the min var
+# point_val <- 33
+# col_val <- "blue"
+# points(proc_super$coords[,, point_val], pch = 19, col = col_val)
+# for(land in 1:nrow(proc_super$consensus)) {
+#     ## Adding the distance from centroid
+#     lines(x = c(centroid[1], proc_super$coords[land,1, point_val]), y = c(centroid[2], proc_super$coords[land,2, point_val]), col = col_val, lty = 3)
+#     ## Adding the magnitude
+#     lines(x = c(proc_super$consensus[land,1], proc_super$coords[land,1, point_val]), y = c(proc_super$consensus[land,2], proc_super$coords[land,2, point_val]), col = col_val, lty = 1)
+# }
+
+# ## Adding the max var
+# point_val <- 14
+# col_val <- "red"
+# points(proc_super$coords[,, point_val], pch = 19, col = col_val)
+# for(land in 1:nrow(proc_super$consensus)) {
+#     ## Adding the distance from centroid
+#     lines(x = c(centroid[1], proc_super$coords[land,1, point_val]), y = c(centroid[2], proc_super$coords[land,2, point_val]), col = col_val, lty = 3)
+#     ## Adding the magnitude
+#     lines(x = c(proc_super$consensus[land,1], proc_super$coords[land,1, point_val]), y = c(proc_super$consensus[land,2], proc_super$coords[land,2, point_val]), col = col_val, lty = 1)
+# }
+
+# ## Add the difference between max and min
+# point_val <- c(33, 14)
+# col_val <- "black"
+# for(land in 1:nrow(proc_super$consensus)) {
+#     ## Adding the distance from centroid
+#     lines(x = c(proc_super$coords[land,1, point_val[1]], proc_super$coords[land,1, point_val[2]]), y = c(proc_super$coords[land,2, point_val[1]], proc_super$coords[land,2, point_val[2]]), col = col_val, lty = 1)
+
+# }
+
+

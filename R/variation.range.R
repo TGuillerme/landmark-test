@@ -141,7 +141,7 @@ variation.range <- function(procrustes, type = "spherical", angle = "degree", wh
         }
 
         ## Get the distances from the maximum
-        diff_from_max <- coordinates.difference(procrustes$coords, procrustes$coords[,,max_specimen], type = type, angle = angle)
+        diff_from_max <- coordinates.difference(procrustes$coords[, , -max_specimen], procrustes$coords[, , max_specimen], type = type, angle = angle)
 
         ## Getting all the areas
         areas_max <- unlist(lapply(diff_from_max, coordinates.area, what = what))
@@ -156,7 +156,7 @@ variation.range <- function(procrustes, type = "spherical", angle = "degree", wh
         }
 
         ## Get the variation range
-        variation_range <- coordinates.difference(procrustes$coords[,,min_specimen], procrustes$coords[,,max_specimen], type = type, angle = angle)[[1]]
+        variation_range <- coordinates.difference(procrustes$coords[, , min_specimen], procrustes$coords[, , max_specimen], type = type, angle = angle)[[1]]
     
 
     } else {
