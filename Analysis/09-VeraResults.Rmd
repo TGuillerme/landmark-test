@@ -16,24 +16,91 @@ if(!require(geomorph)) install.packages("geomorph")
 source("../Functions/utilities.R")
 set.seed(42)
 
-#loading the below loads an object called land_data, NOT "wombat"
+#loading the below loads objects called land_data, NOT "wombat"
 load("../Data/Processed/wombat_krefftii.Rda")
-ClassifierCr=read.csv("../Data/Raw/classifier_cranium_wombat.csv")
+NHNW<-land_data
+load("../Data/Processed/wombat_latifrons.Rda")
+SHNW<-land_data
+load("../Data/Processed/wombat_ursinus.Rda")
+CW<-land_data
+
+#read classifiers
+cranium<-read.csv("../Data/Raw/classifier_cranium_wombat.csv")
+mandible<-read.csv("../Data/Raw/classifier_mandible_wombat.csv")
+
+```
+
+#Checking for outliers
+
+```{r, message = FALSE, warning = FALSE}
+
+
+#set up the gridpars for plotRefToTarget
+Points=gridPar(pt.size=0.7)
+
+#Common wombat
+
+##Cranium
+
+###plot the procrustes distances from mean for specimens to identify the ones beyone the upper/lower quartiles
+
+plotOutliers(CW$cranium$procrustes$coords)#CW_M11 (individual 14 is an outlier)
+
+###use plotRefToTarget with lollipop graphs to check if outlier has landmark error; replace number according to which individuals have been identified as outliers
+open3d()
+plotRefToTarget(CW$cranium$procrustes$consensus, CW$cranium$procrustes$coords[,,14], method="vector", gridPars = Points)#No evidence of landmarking error
+
+##Mandible
+plotOutliers(CW$mandible$procrustes$coords)#20, 10 and 11 are outliers
+mshapeCW<-mshape(CW$mandible$procrustes$coords)
+open3d()
+plotRefToTarget(mshapeCW, CW$mandible$procrustes$coords[,,20], method="vector", gridPars = Points) #Slight assymetry in 2 cases but no evidence of landmarking error
+
+
+#SHN wombat
+
+##Cranium
+plotOutliers(NHNW$cranium$procrustes$coords)#NHNW_M11 (individual 21 is an outlier)
+mshapeNHNW<-mshape(NHNW$cranium$procrustes$coords)
+open3d()
+plotRefToTarget(mshapeNHNW, NHNW$cranium$procrustes$coords[,,21], method="vector", gridPars = Points)#No evidence of landmarking errlr
+
+##Mandible
+plotOutliers(NHNW$mandible$procrustes$coords)#No outliers
+
+
+#NHN wombat
+
+##Cranium
+plotOutliers(NHNW$cranium$procrustes$coords)#No outliers
+
+##Mandible
+plotOutliers(NHNW$mandible$procrustes$coords)#No outliers
+
 ```
 
 #Allometry analyses
 
 ```{r, message = FALSE, warning = FALSE}
 
-allom.shape(land_data$cranium$procrustes)
+
 
 allom.shape<-function (procrustes_coordinate_file_with_centroid_size){
+  
+  
   coords=procrustes_coordinate_file_with_centroid_size$coords
   Csize=procrustes_coordinate_file_with_centroid_size$Csize
+
+    data_list <- list("coords"=coords, "Csize"=Csize)
   
-  Allometry <- procD.allometry(coords~ Csize, f2=NULL, f3=NULL, logsz = FALSE, iter=999)
-  return(Allometry)
+   
+  Allometry <- procD.allometry(coords~ Csize, data=data_list, f2=NULL, f3=NULL, logsz = FALSE, iter=999)
+  print(attributes(Allometry))
+#  return(Allometry)
 }
+
+allom.shape(land_data$cranium$procrustes)
+
 coords=land_data$cranium$procrustes$coords
 Csize=land_data$cranium$procrustes$Csize
 
@@ -42,39 +109,122 @@ return(Allometry)
 
 ```
 #2-Block Partial Least Squares analysis
+
+##reduce classifier datasets to those that only have craniums and crania
 ```{r, message = FALSE, warning = FALSE}
 
 
-#reduce datasets down to those that have mandibles and crania
-#@params GPA_coords is a file containing coords, e.g. land_data_cranium
-
-#Classifiers
+#@params Full_Classifier_Table_ is the tables of mandibular or cranial classifiers (e.g. read.csv("../Data/Raw/classifier_cranium_wombat.csv")); spp is a vector of species (e.g. c("CW", "SHNW", "NHNW"))
 
 
-```{r}
-#I want to later make this a function for "Full_Classifier_Table" but this was to help me figure out if the code works in principle
-Full_Classifier_Table_Cranial=read.csv("../Data/Raw/classifier_cranium_wombat.csv")
-
-#I want these names to go into the output
 species <- c("CW", "SHNW", "NHNW")
-#these are required to pull out the subsets
-sp_holders <- c("Common wombat", "SHN wombat", "NHN wombat")
+sp_holders <-c("Common wombat", "SHN wombat", "NHN wombat")
 
-<<<<<<< HEAD
-    for (i in (1:length(sp_holders))){
-=======
-    for (i in 1:length(sp_holders)){ #TG: I've added the 1:length() to go through the sequence
->>>>>>> a53ab1e64fcbea1e3f280ad91ef3f01ef12debca
-      
-    Class = Full_Classifier_Table_Cranial[Full_Classifier_Table_Cranial$Species == sp_holders[i],]
-    assign(species[i],Class)#This does what I want it to do but overwrites the Class so only the last run is saved.
+##cranium
+for (i in 1:length(unique(cranium$Species))){
+   
+    Class = cranium[cranium$Species == sp_holders[i],]
+    
+    sp_name=paste(species[i],deparse(substitute(cranium)),"TBPLS", "Class", sep="_")#prepare for giving names to outputs
+   
+     assign(sp_name,Class)
     
     }
 
-<<<<<<< HEAD
-```
-=======
+##mandible
+for (i in 1:length(unique(mandible$Species))){
+   
+    Class = mandible[mandible$Species == sp_holders[i],]
+    
+    sp_name=paste(species[i],deparse(substitute(mandible)),"TBPLS", "Class", sep="_")#prepare for giving names to outputs
+   
+     assign(sp_name,Class)
+    
+    }
+
+
+##The below works, but not wrapped in a function. I am sure I am just missing something simple.The below can be deleted once the above is successfully wrapped
 
 
 ```
->>>>>>> a53ab1e64fcbea1e3f280ad91ef3f01ef12debca
+##reduce coordinate datasets to only those that have mandibles and crania
+
+```{r, message = FALSE, warning = FALSE}
+
+AllData=list("NHNW"=NHNW, "SHNW"=SHNW, "CW"=CW)
+AllClassifiers=list("NHNW"=list("cranium"=NHNW_cranium_TBPLS_Class, "mandible"=NHNW_mandible_TBPLS_Class), "SHNW"=list("cranium"=SHNW_cranium_TBPLS_Class, "mandible"=SHNW_mandible_TBPLS_Class),"CW"=list("cranium"=CW_cranium_TBPLS_Class, "mandible"=CW_mandible_TBPLS_Class))
+
+reduce.check<-function(AllData, AllClassifiers){
+
+  coords_PLS_output=list()
+  check_output=list()
+  
+  for (i in 1:length(AllData)){
+     coords_PLS_output[[i]]=list()
+     
+    for (k in 1:length(AllClassifiers[[i]])){
+     coords_PLS_output[[i]][[k]] <- AllData [[i]][[k]]$procrustes$coords [ , ,as.character(AllClassifiers[[i]][[k]]$TBPLS) != "Nil"]
+    }
+    names(coords_PLS_output[[i]])<-names(AllData[[i]])
+  }
+  
+  names(coords_PLS_output)<-names(AllData)
+  
+  for (i in 1:length(AllData)){
+    matchCheck=match(attributes(coords_PLS_output[[i]]$cranium)$dimnames[[3]], attributes(coords_PLS_output[[i]]$mandible)$dimnames[[3]])
+    check_output[[i]]=!is.na(matchCheck)&&all(matchCheck==sort(matchCheck))
+  }
+  names(check_output)<-names(AllData)
+  return(list(coords_PLS_output, check_output))
+}
+
+matched_coords<-reduce.check(AllData, AllClassifiers)
+#the below indicates whether cranial and mandibular coord datasets match
+matched_coords[[2]]
+
+```
+##run 2BPLS code
+
+```{r, message = FALSE, warning = FALSE}
+SHNWTBPLS <- two.b.pls(matched_coords[[1]]$SHNW$cranium ,matched_coords[[1]]$SHNW$mandible ,iter=1) 
+summary(SHNWTBPLS)
+save(SHNWTBPLS, file="../Data/Results/SHNWTBLS.Rda")
+#When run, hash out the above and just load the resutls of the 2Block analysis
+load("../Data/Results/SHNWTBLS.Rda")
+NHNWTBPLS <- two.b.pls(matched_coords[[1]]$NHNW$cranium ,matched_coords[[1]]$NHNW$mandible, iter=1) 
+ summary(NHNWTBPLS)
+save(NHNWTBPLS, file="../Data/Results/NHNWTBLS.Rda")
+load("../Data/Results/NHNWTBLS.Rda")
+CWTBPLS <- two.b.pls(matched_coords[[1]]$CW$cranium ,matched_coords[[1]]$CW$mandible ,iter=1) 
+ summary(CWTBPLS)
+ save(CWTBPLS, file="../Data/Results/CWTBLS.Rda")
+load("../Data/Results/CWTBLS.Rda")
+ 
+ 
+```
+##correlate 2BPLS scores with the first 2 principal components for each species
+```{r, message = FALSE, warning = FALSE}
+CWTBPLS_Cranium_Scores <- as.data.frame(CWTBPLS$XScores[c(1:18)], row.names=dimnames(CWTBPLS$XScores)[[1]])
+
+#the below doesn't work because the ordination in land_data doesn't have pc scoress
+CWPC1=as.data.frame(CW$cranium$ordination$scores[,1])
+
+CWCsize=as.data.frame(CW$cranium$procrustes$Csize)
+
+CWPLS_PCA_separate=merge(CWTBPLS_Cranium_Scores,CWPC1,by="row.names",all.x=TRUE)
+
+CWPLS_PCA_inonego<-merge((as.data.frame(CW$cranium$ordination$scores[,1])), (as.data.frame(CW$cranium$procrustes$Csize)))
+
+
+CWPLS_CPLS=merge(CWTBPLS_Cranium_Scores,CWCsize,by="row.names",all.x=TRUE)#Why can't I merge all three??
+
+
+
+plot(CWPLS_PCA[,2], CWPLS_PCA[,3])
+summary(lm((CWPLS_PCA[,2]~CWPLS_PCA[,3])))
+summary(lm((CWPLS_CPLS[,2]~CWPLS_CPLS[,3])))
+
+ 
+summary(lm((SHNWPLS_PCA[,2]~SHNWPLS_PCA[,3])))##NOTE PC2 used for SHNW!
+summary(lm((SHNWPLS_Csize[,2]~SHNWPLS_Csize[,3])))##NOTE PC2 used for SHNW!
+```
