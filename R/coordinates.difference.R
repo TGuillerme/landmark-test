@@ -47,6 +47,8 @@
 
 coordinates.difference <- function(coordinates, reference, type = "cartesian", angle = "radian", absolute.distance = TRUE) {
 
+#coordinates.difference(procrustes$coords, procrustes$coords[,,max_specimen], type = type, angle = angle)
+
     ## Sanitizing
 
     ## Coordinates
@@ -206,6 +208,12 @@ coordinates.difference <- function(coordinates, reference, type = "cartesian", a
 
         ## Get the vector coordinates for each coordinates
         coordinates <- lapply(coordinates, get.vector.diffs, dimension = dimensions[2], angle = angle, absolute.distance = absolute.distance)
+
+        # test <- list()
+        # for(coord in 1:length(coordinates)) {
+        #     cat(paste0(coord, "\n"))
+        #     test[[coord]] <- get.vector.diffs(coordinates[[coord]], dimension = dimensions[2], angle = angle, absolute.distance = absolute.distance)
+        # }
     }
 
     return(coordinates)

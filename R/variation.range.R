@@ -3,12 +3,13 @@
 #' @description Selecting the range of differences between the maximum and minimum variation specimen
 #'
 #' @param procrustes Procrustes data of class \code{"gpagen"}.
-#' @param type Which type of coordinates to calculate (see \code{\link{coordinates.differences}} - default is \code{"spherical"}).
+#' @param type Which type of coordinates to calculate (see \code{\link{coordinates.differences}} - default is \code{"sperical"}).
 #' @param angle Which type of angle to calculate (see \code{\link{coordinates.differences}} - default is \code{"degree"}).
 #' @param what Which element from the \code{\link{coordinates.differences}} to use (default is \code{"radius"}).
 #' @param ordination Optional, either \code{TRUE} to perform an ordination or directly an ordinated PCA matrix (\code{"prcomp"}) to calculate the range from there.
 #' @param axis Optional, if an ordinated matrix is used, which axis (axes) to use. If left empty, all the axes will be used.
 #' @param return.ID \code{logical}, whether to return the ID of the max/min specimens or not.
+#' @param CI Optional, a value of confidence interval to use (rather than the max/min).
 #' 
 #' @examples
 #' ## Loading the geomorph dataset
@@ -30,8 +31,17 @@
 #' 
 #' 
 #' ## Getting the two most different specimen based on the first axis of the ordination
-#' variation.range(proc_super, ordination = TRUE, axis = 1)
+#' variation.range(proc_super, ordination = TRUE, axis = 1, type = "vector", what = "length")
 #' 
+#' 
+#' ## Getting the range variation between specimen using a 95 confidence interval range
+#' spec_range95 <- variation.range(proc_super, CI = 0.95, return.ID = TRUE)
+#' 
+#' ## The absolute maximum and minimum specimens
+#' spec_range$min.max
+#' 
+#' ## The lower and upper 95% range CI specimens
+#' spec_range95$min.max
 #'
 #' @seealso \code{\link{coordinates.difference}}, \code{\link{area.diff}}, \code{\link{rand.test}}
 #' 
@@ -39,7 +49,7 @@
 #' @export
 #' @importFrom stats prcomp
 
-variation.range <- function(procrustes, type = "spherical", angle = "degree", what = "radius", ordination, axis, return.ID = FALSE) {
+variation.range <- function(procrustes, type = "spherical", angle = "degree", what = "radius", ordination, axis, return.ID = FALSE, CI) {
 
     ## Sanitizing
     ## procrustes
@@ -48,6 +58,17 @@ variation.range <- function(procrustes, type = "spherical", angle = "degree", wh
     ## type and angle are dealt with by coordinates.data
 
     ## what is dealt with by coordinates.area
+
+    ## CI
+    if(missing(CI)) {
+        do_CI <- FALSE
+    } else {
+        do_CI <- TRUE
+        check.length(CI, 1, msg = " must be on confidence interval in probability.")
+        if(CI < 0 || CI > 1) {
+            stop("CI must be a percentage between 0 and 1.")
+        }
+    }
 
     ## ordination
     if(!missing(ordination)) {
@@ -110,8 +131,14 @@ variation.range <- function(procrustes, type = "spherical", angle = "degree", wh
         ## Get the volume of change for each element (area under the curve)
         areas <- unlist(lapply(diff_consensus, coordinates.area, what = what))
 
-        ## Finding the specimen the most different from the consensus
-        max_specimen <- which(areas == max(areas))
+        ## Finding the max specimen
+        if(do_CI) {
+            ## Take the the specimen in the upper CI
+            max_specimen <- which(areas == max(areas[which(areas <= quantile(areas, probs = CI))]))  #add abs(areas)?
+        } else {
+            ## Take the actual max specimen
+            max_specimen <- which(areas == max(areas))  #add abs(areas)?
+        }
 
         ## Get the distances from the maximum
         diff_from_max <- coordinates.difference(procrustes$coords, procrustes$coords[,,max_specimen], type = type, angle = angle)
@@ -119,8 +146,14 @@ variation.range <- function(procrustes, type = "spherical", angle = "degree", wh
         ## Getting all the areas
         areas_max <- unlist(lapply(diff_from_max, coordinates.area, what = what))
 
-        ## Finding the specimen the most different from the consensus
-        min_specimen <- which(areas_max == max(areas_max))
+        ## Finding the min specimen
+        if(do_CI) {
+            ## Take the the specimen in the upper CI
+            min_specimen <- which(areas_max == max(areas_max[which(areas_max <= quantile(areas_max, probs = CI))]))  #add abs(areas)?
+        } else {
+            ## Take the actual max specimen
+            min_specimen <- which(areas_max == max(areas_max))  #add abs(areas)?
+        }
 
         ## Get the variation range
         variation_range <- coordinates.difference(procrustes$coords[,,min_specimen], procrustes$coords[,,max_specimen], type = type, angle = angle)[[1]]
@@ -129,19 +162,29 @@ variation.range <- function(procrustes, type = "spherical", angle = "degree", wh
     } else {
 
         ## Internal function from geomorph:plotTangentSpace
-        get.pc.min.max <- function(axis, what, PCA, GPA) {
+        get.pc.min.max <- function(axis, what, PCA, GPA, CI) {
             if(length(axis) == 1) {
-               output <- arrayspecs(as.vector(t(GPA$consensus)) + c(what(PCA$x[,axis]), rep(0, ncol(PCA$x)-length(axis))) %*% t(PCA$rotation), dim(GPA$consensus)[1], dim(GPA$consensus)[2])
+               output <- arrayspecs(as.vector(t(GPA$consensus)) + c(what(PCA$x[,axis], CI = CI), rep(0, ncol(PCA$x)-length(axis))) %*% t(PCA$rotation), dim(GPA$consensus)[1], dim(GPA$consensus)[2])
             } else {
-               output <- arrayspecs(as.vector(t(GPA$consensus)) + c(apply(PCA$x, 2, what), rep(0, ncol(PCA$x)-length(axis))) %*% t(PCA$rotation), dim(GPA$consensus)[1], dim(GPA$consensus)[2])
+               output <- arrayspecs(as.vector(t(GPA$consensus)) + c(apply(PCA$x, 2, what, CI = CI), rep(0, ncol(PCA$x)-length(axis))) %*% t(PCA$rotation), dim(GPA$consensus)[1], dim(GPA$consensus)[2])
             }
         }
 
+        ## Get the selector function
+        if(do_CI) {
+            fun_max <- function(x, CI) return(max(x[which(x <= quantile(x, probs = CI))]))
+            fun_min <- function(x, CI) return(min(x[which(x >= quantile(x, probs = 1-CI))]))
+        } else {
+            CI <- NULL
+            fun_max <- function(x, CI) return(max(x))
+            fun_min <- function(x, CI) return(min(x))
+        }
+
         ## Applying the method the an ordination
-        max_coordinates <- get.pc.min.max(axis = axis, what = max, PCA = ordination, GPA = procrustes)
+        max_coordinates <- get.pc.min.max(axis = axis, what = fun_max, PCA = ordination, GPA = procrustes, CI = CI)
         dimensions <- dim(max_coordinates)
         max_coordinates <- matrix(max_coordinates, dimensions[1], dimensions[2])
-        min_coordinates <- get.pc.min.max(axis = axis, what = min, PCA = ordination, GPA = procrustes)
+        min_coordinates <- get.pc.min.max(axis = axis, what = fun_min, PCA = ordination, GPA = procrustes, CI = CI)
         min_coordinates <- matrix(min_coordinates, dimensions[1], dimensions[2])
 
         ## Get the variation range
