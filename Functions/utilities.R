@@ -204,17 +204,6 @@ make.plots <- function(results, type, add.p = FALSE, correction, rarefaction = F
 }
 
 
-#@param formula: a formula object (e.g. coords ~ Csize)
-#@param procrustes: the procrustes object (e.g. land_data$cranium$procrustes)
-#@param procD.fun: the procD function (e.g. procD.allometry)
-#@param ...: any optional arguments to be passed to procD.fun (e.g. logsz = FALSE, iter = 1, etc...)
-handle.procD.formula <- function(formula, procrustes, procD.fun = procD.allometry, ...) {
-
-    geomorph_data_frame <- geomorph.data.frame(procrustes)
-
-    return(procD.fun(f1 = formula, data = geomorph_data_frame, ...))
-}
-
 
 # Utilities based on existing functions
 
@@ -271,17 +260,25 @@ PCA.vectors<-function(x, minfirst=TRUE){
   }
 }
 
-#allometry analysis
+#procD code (for procD.allometry and procD.lm) analysis
 
-#@param procrustes_coordinate_file_with_centroid_size: "land_data_cranium_procrustes" of land_data contains all the objects of gpagen, including coords and Csize
-
-#this does not work because the code fails to extract the coords within the loop. but the workflow works outside the loop
-allom.shape<-function (procrustes_coordinate_file_with_centroid_size){
-  coords=procrustes_coordinate_file_with_centroid_size$coords
-  Csize=procrustes_coordinate_file_with_centroid_size$Csize
+#@param formula: a formula object (e.g. coords ~ Csize)
+#@param procrustes: the procrustes object (e.g. land_data$cranium$procrustes)
+#@param procD.fun: the procD function (e.g. procD.allometry)
+#@param ...: any optional arguments to be passed to procD.fun (e.g. logsz = FALSE, iter = 1, etc...)
+handle.procD.formula <- function(formula, procrustes, procD.fun = procD.allometry, ...) {
   
-  Allometry <- procD.allometry(coords~ Csize, f2=NULL, f3=NULL, logsz = FALSE, iter=999)
-  return(Allometry)
+  geomorph_data_frame <- geomorph.data.frame(procrustes)
+  
+  return(procD.fun(f1 = formula, data = geomorph_data_frame, ...))
 }
 
 
+#Allometry analysis (based on above handle.procD.formula)
+
+allom.shape<-function (procrustes_coordinate_file_with_centroid_size){
+  
+  Allometry <- handle.procD.formula(formula=coords~ Csize, procrustes=procrustes_coordinate_file_with_centroid_size, procD.fun = procD.allometry, logsz = FALSE, iter = 1000)
+  print(attributes(Allometry))
+  return(Allometry)
+}
