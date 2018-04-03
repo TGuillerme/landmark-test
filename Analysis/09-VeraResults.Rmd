@@ -265,7 +265,7 @@ for (i in 1:length(Geo_GDFs)){
   Geo_procD_outputs<-list()
   
     for (k in 1:length(Geo_GDFs[[2]])){
-      #the below code works by itself but won't loop
+      #the below code works by itself but won't loop; I am probably forgetting some return rule
   Geo_procD_outputs[[i]][[k]] <-procD.lm(coords~Temp, data=Geo_GDFs[[i]][[k]], iter=1000)
   
 }
