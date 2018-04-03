@@ -1,4 +1,14 @@
-## Ignmore rda file
+## Ignore rda file
 *.Rda
 *.rda
+<<<<<<< HEAD
 *.Rda
+=======
+
+## Ignore the tables and figures for now
+Manuscript/Tables/*.tex
+Manuscript/Figures/*.pdf
+
+## Ignore .Rapp.histories
+*.Rapp.history
+>>>>>>> 06a6d28d151a141e77bedc769b144dc524fac9e3
