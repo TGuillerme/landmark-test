@@ -281,4 +281,33 @@ allom.shape<-function (procrustes_coordinate_file_with_centroid_size){
   Allometry <- handle.procD.formula(formula=coords~ Csize, procrustes=procrustes_coordinate_file_with_centroid_size, procD.fun = procD.allometry, logsz = FALSE, iter = 1000)
   print(attributes(Allometry))
   return(Allometry)
+  
+  
+  
+#Reducing datasets to those with counterparts
+#@params AllData is a list of procrustes objects after gpa (e.g. land_data, in this case the different species); AllClassifiers is a list of classifiers matched with the AllData shape dataset, which includes subsetting information  
+  
+reduce.check<-function(AllData, AllClassifiers){
+    
+    coords_PLS_output=list()
+    check_output=list()
+    
+    for (i in 1:length(AllData)){
+      coords_PLS_output[[i]]=list()
+      
+      for (k in 1:length(AllClassifiers[[i]])){
+        coords_PLS_output[[i]][[k]] <- AllData [[i]][[k]]$procrustes$coords [ , ,as.character(AllClassifiers[[i]][[k]]$TBPLS) != "Nil"]
+      }
+      names(coords_PLS_output[[i]])<-names(AllData[[i]])
+    }
+    
+    names(coords_PLS_output)<-names(AllData)
+    
+    for (i in 1:length(AllData)){
+      matchCheck=match(attributes(coords_PLS_output[[i]]$cranium)$dimnames[[3]], attributes(coords_PLS_output[[i]]$mandible)$dimnames[[3]])
+      check_output[[i]]=!is.na(matchCheck)&&all(matchCheck==sort(matchCheck))
+    }
+    names(check_output)<-names(AllData)
+    return(list(coords_PLS_output, check_output))
+  }
 }
