@@ -281,7 +281,7 @@ allom.shape<-function (procrustes_coordinate_file_with_centroid_size){
   Allometry <- handle.procD.formula(formula=coords~ Csize, procrustes=procrustes_coordinate_file_with_centroid_size, procD.fun = procD.allometry, logsz = FALSE, iter = 1000)
   print(attributes(Allometry))
   return(Allometry)
-  
+}
   
   
 #Reducing datasets to those with counterparts
@@ -310,4 +310,3 @@ reduce.check<-function(AllData, AllClassifiers){
     names(check_output)<-names(AllData)
     return(list(coords_PLS_output, check_output))
   }
-}
