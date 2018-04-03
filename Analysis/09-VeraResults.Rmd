@@ -84,37 +84,69 @@ plotOutliers(NHNW$mandible$procrustes$coords)#No outliers
 ```{r, message = FALSE, warning = FALSE}
 
 
+AllData=list("NHNW"=NHNW, "SHNW"=SHNW, "CW"=CW)
 
-allom.shape<-function (procrustes_coordinate_file_with_centroid_size){
-  
-  
-  coords=procrustes_coordinate_file_with_centroid_size$coords
-  Csize=procrustes_coordinate_file_with_centroid_size$Csize
+allom_output=list()
 
-    data_list <- list("coords"=coords, "Csize"=Csize)
+
+for (i in 1:length(AllData)){
   
-   
-  Allometry <- procD.allometry(coords~ Csize, data=data_list, f2=NULL, f3=NULL, logsz = FALSE, iter=999)
-  print(attributes(Allometry))
-#  return(Allometry)
+      for (k in 1:length(AllData[[1]])){
+      
+      allom_output[i][[k]]=list()
+        
+      allom_output[[i]][[k]]  <-handle.procD.formula(coords~Csize, AllData[[i]][[k]]$procrustes, procD.fun=procD.allometry, iter=1000)
+      
+    }
+names(allom_output)=names(AllData)
+
 }
 
-allom.shape(land_data$cranium$procrustes)
 
-coords=land_data$cranium$procrustes$coords
-Csize=land_data$cranium$procrustes$Csize
-
-Allometry <- procD.allometry(coords~ Csize, f2=NULL, f3=NULL, logsz = FALSE, iter=999)
-return(Allometry)
+names(allom_output[[1]])=names(AllData[[1]])#I can't name "mandible" and "cranium"; this only works if I call allom_output[[1]]separately. A minor issue for later.
 
 
-#TG: I've put the procD type functions in a "safe" wrapping function, you can now use them as follow (sourced from utilities.R)
-handle.procD.formula(formula = coords ~ Csize, procrustes = land_data$cranium$procrustes, procD.fun = procD.allometry, logsz = FALSE, iter = 1)
 
-#TG: The first term (coords ~ Csize) is the formula to test
-#TG: the second (land_data$cranium$procrustes) is the procrustes data object,
-#TG: the third is the function to apply to that (procD.allometry - it can be any procD.something function)
-#TG: the following arguments (logsz and iter) are optional arguments to be passed to the procD function.
+
+```
+
+#Other procD analyses
+
+```{r, message = FALSE, warning = FALSE}
+
+
+coordsMa.SHNW.geo <- SHNWgpa.Ma$coords[ , , SHNWMaClass$Geolocation == "Yes"]#subsetting to only those specimens for which geolocation is available
+coordsMa.SHNW.Sex <- SHNWgpa.Ma$coords[ , , !is.na(SHNWMaClass$Sex)]#Subsetting something that has nas. 
+SHNWSexMa=SHNWMaClass$Sex[!is.na(SHNWMaClass$Sex)]
+csizeMa.SHNW.Sex<-SHNWgpa.Ma$Csize[!is.na(SHNWMaClass$Sex)]
+procD.lm(coordsMa.SHNW.geo ~ SHNWMaClass$Aridity)
+procD.lm(coordsMa.SHNW.geo ~ SHNWMaClass$Temperature)
+procD.lm(coordsMa.SHNW.Sex ~ SHNWSexMa*csizeMa.SHNW.Sex)
+procD.lm(coordsMa.SHNW.Sex ~ SHNWSexMa+csizeMa.SHNW.Sex)
+
+summary(lm(csizeCr.SHNW.Sex~SHNWSexCr))
+summary(lm(csizeMa.SHNW.Sex~SHNWSexMa))
+
+
+
+
+for (i in 1:length(AllData)){
+  
+      for (k in 1:length(AllData[[1]])){
+      
+      allom_output[i][[k]]=list()
+        
+      allom_output[[i]][[k]]  <-handle.procD.formula(coords~Csize, AllData[[i]][[k]]$procrustes, procD.fun=procD.allometry, iter=1000)
+      
+    }
+names(allom_output)=names(AllData)
+
+}
+
+
+names(allom_output[[1]])=names(AllData[[1]])#I can't name "mandible" and "cranium"; this only works if I call allom_output[[1]]separately. A minor issue for later.
+
+
 
 
 ```
@@ -196,16 +228,16 @@ matched_coords[[2]]
 ##run 2BPLS code
 
 ```{r, message = FALSE, warning = FALSE}
-SHNWTBPLS <- two.b.pls(matched_coords[[1]]$SHNW$cranium ,matched_coords[[1]]$SHNW$mandible ,iter=1) 
+SHNWTBPLS <- two.b.pls(matched_coords[[1]]$SHNW$cranium ,matched_coords[[1]]$SHNW$mandible ,iter=1000) 
 summary(SHNWTBPLS)
 save(SHNWTBPLS, file="../Data/Results/SHNWTBLS.Rda")
 #When run, hash out the above and just load the resutls of the 2Block analysis
 load("../Data/Results/SHNWTBLS.Rda")
-NHNWTBPLS <- two.b.pls(matched_coords[[1]]$NHNW$cranium ,matched_coords[[1]]$NHNW$mandible, iter=1) 
+NHNWTBPLS <- two.b.pls(matched_coords[[1]]$NHNW$cranium ,matched_coords[[1]]$NHNW$mandible, iter=1000) 
  summary(NHNWTBPLS)
 save(NHNWTBPLS, file="../Data/Results/NHNWTBLS.Rda")
 load("../Data/Results/NHNWTBLS.Rda")
-CWTBPLS <- two.b.pls(matched_coords[[1]]$CW$cranium ,matched_coords[[1]]$CW$mandible ,iter=1) 
+CWTBPLS <- two.b.pls(matched_coords[[1]]$CW$cranium ,matched_coords[[1]]$CW$mandible ,iter=1000) 
  summary(CWTBPLS)
  save(CWTBPLS, file="../Data/Results/CWTBLS.Rda")
 load("../Data/Results/CWTBLS.Rda")
