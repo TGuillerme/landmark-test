@@ -79,8 +79,44 @@ plotOutliers(NHNW$mandible$procrustes$coords)#No outliers
 
 ```
 
-#Allometry analyses
+#Partition Classifiers according to species
 
+```{r, message = FALSE, warning = FALSE}
+
+#@params Full_Classifier_Table_ is the tables of mandibular or cranial classifiers (e.g. read.csv("../Data/Raw/classifier_cranium_wombat.csv")); spp is a vector of species (e.g. c("CW", "SHNW", "NHNW"))
+
+
+species <- c("CW", "SHNW", "NHNW")
+sp_holders <-c("Common wombat", "SHN wombat", "NHN wombat")
+
+##cranium
+for (i in 1:length(unique(cranium$Species))){
+   
+    Class = cranium[cranium$Species == sp_holders[i],]
+    
+    sp_name=paste(species[i],deparse(substitute(cranium)), "Class", sep="_")#prepare for giving names to outputs
+   
+     assign(sp_name,Class)
+    
+    }
+
+##mandible
+for (i in 1:length(unique(mandible$Species))){
+   
+    Class = mandible[mandible$Species == sp_holders[i],]
+    
+    sp_name=paste(species[i],deparse(substitute(mandible)), "Class", sep="_")#prepare for giving names to outputs
+   
+     assign(sp_name,Class)
+    
+    }
+
+
+
+```
+
+#Allometry analyse
+#Allometry Analyses
 ```{r, message = FALSE, warning = FALSE}
 
 
@@ -98,10 +134,10 @@ for (i in 1:length(AllData)){
       allom_output[[i]][[k]]  <-handle.procD.formula(coords~Csize, AllData[[i]][[k]]$procrustes, procD.fun=procD.allometry, iter=1000)
       
     }
-names(allom_output)=names(AllData)
 
 }
 
+names(allom_output)=names(AllData)
 
 names(allom_output[[1]])=names(AllData[[1]])#I can't name "mandible" and "cranium"; this only works if I call allom_output[[1]]separately. A minor issue for later.
 
@@ -113,6 +149,33 @@ names(allom_output[[1]])=names(AllData[[1]])#I can't name "mandible" and "craniu
 #Other procD analyses
 
 ```{r, message = FALSE, warning = FALSE}
+
+AllData=list("NHNW"=NHNW, "SHNW"=SHNW, "CW"=CW)
+AllClassifiers=list("NHNW"=list("cranium"=NHNW_cranium_Class, "mandible"=NHNW_mandible_Class), "SHNW"=list("cranium"=SHNW_cranium_Class, "mandible"=SHNW_mandible_Class),"CW"=list("cranium"=CW_cranium_Class, "mandible"=CW_mandible_Class))
+
+coords_Geo_output=list()
+    
+    for (i in 1:length(AllData)){
+      coords_Geo_output[[i]]=list()
+      
+      for (k in 1:length(AllClassifiers[[i]])){
+        coords_Geo_output[[i]][[k]] <- AllData [[i]][[k]]$procrustes$coords [ , ,as.character(AllClassifiers[[i]][[k]]$Geolocation) == "Yes"]
+      }
+      names(coords_Geo_output[[i]])<-names(AllData[[i]])
+    }
+
+names(coords_Geo_output)<-names(AllData)
+
+
+################Building blocks of loops - first check that the individual analyses work
+
+    
+
+    
+#Separate out the coordinates
+coords_Geo_output=list()
+    
+coords_Geo_output[[2]][[1]] <- AllData [[2]][[1]]$procrustes$coords [ , ,as.character(AllClassifiers[[2]][[1]]$Geolocation) == "Yes"]#This works
 
 
 coordsMa.SHNW.geo <- SHNWgpa.Ma$coords[ , , SHNWMaClass$Geolocation == "Yes"]#subsetting to only those specimens for which geolocation is available
@@ -129,96 +192,15 @@ summary(lm(csizeMa.SHNW.Sex~SHNWSexMa))
 
 
 
-
-for (i in 1:length(AllData)){
-  
-      for (k in 1:length(AllData[[1]])){
-      
-      allom_output[i][[k]]=list()
-        
-      allom_output[[i]][[k]]  <-handle.procD.formula(coords~Csize, AllData[[i]][[k]]$procrustes, procD.fun=procD.allometry, iter=1000)
-      
-    }
-names(allom_output)=names(AllData)
-
-}
-
-
-names(allom_output[[1]])=names(AllData[[1]])#I can't name "mandible" and "cranium"; this only works if I call allom_output[[1]]separately. A minor issue for later.
-
-
-
-
 ```
 #2-Block Partial Least Squares analysis
-
-##reduce classifier datasets to those that only have craniums and crania
-```{r, message = FALSE, warning = FALSE}
-
-
-#@params Full_Classifier_Table_ is the tables of mandibular or cranial classifiers (e.g. read.csv("../Data/Raw/classifier_cranium_wombat.csv")); spp is a vector of species (e.g. c("CW", "SHNW", "NHNW"))
-
-
-species <- c("CW", "SHNW", "NHNW")
-sp_holders <-c("Common wombat", "SHN wombat", "NHN wombat")
-
-##cranium
-for (i in 1:length(unique(cranium$Species))){
-   
-    Class = cranium[cranium$Species == sp_holders[i],]
-    
-    sp_name=paste(species[i],deparse(substitute(cranium)),"TBPLS", "Class", sep="_")#prepare for giving names to outputs
-   
-     assign(sp_name,Class)
-    
-    }
-
-##mandible
-for (i in 1:length(unique(mandible$Species))){
-   
-    Class = mandible[mandible$Species == sp_holders[i],]
-    
-    sp_name=paste(species[i],deparse(substitute(mandible)),"TBPLS", "Class", sep="_")#prepare for giving names to outputs
-   
-     assign(sp_name,Class)
-    
-    }
-
-
-##The below works, but not wrapped in a function. I am sure I am just missing something simple.The below can be deleted once the above is successfully wrapped
-
-
-```
 ##reduce coordinate datasets to only those that have mandibles and crania
 
 ```{r, message = FALSE, warning = FALSE}
 
 AllData=list("NHNW"=NHNW, "SHNW"=SHNW, "CW"=CW)
-AllClassifiers=list("NHNW"=list("cranium"=NHNW_cranium_TBPLS_Class, "mandible"=NHNW_mandible_TBPLS_Class), "SHNW"=list("cranium"=SHNW_cranium_TBPLS_Class, "mandible"=SHNW_mandible_TBPLS_Class),"CW"=list("cranium"=CW_cranium_TBPLS_Class, "mandible"=CW_mandible_TBPLS_Class))
+AllClassifiers=list("NHNW"=list("cranium"=NHNW_cranium_Class, "mandible"=NHNW_mandible_Class), "SHNW"=list("cranium"=SHNW_cranium_Class, "mandible"=SHNW_mandible_Class),"CW"=list("cranium"=CW_cranium_Class, "mandible"=CW_mandible_Class))
 
-reduce.check<-function(AllData, AllClassifiers){
-
-  coords_PLS_output=list()
-  check_output=list()
-  
-  for (i in 1:length(AllData)){
-     coords_PLS_output[[i]]=list()
-     
-    for (k in 1:length(AllClassifiers[[i]])){
-     coords_PLS_output[[i]][[k]] <- AllData [[i]][[k]]$procrustes$coords [ , ,as.character(AllClassifiers[[i]][[k]]$TBPLS) != "Nil"]
-    }
-    names(coords_PLS_output[[i]])<-names(AllData[[i]])
-  }
-  
-  names(coords_PLS_output)<-names(AllData)
-  
-  for (i in 1:length(AllData)){
-    matchCheck=match(attributes(coords_PLS_output[[i]]$cranium)$dimnames[[3]], attributes(coords_PLS_output[[i]]$mandible)$dimnames[[3]])
-    check_output[[i]]=!is.na(matchCheck)&&all(matchCheck==sort(matchCheck))
-  }
-  names(check_output)<-names(AllData)
-  return(list(coords_PLS_output, check_output))
-}
 
 matched_coords<-reduce.check(AllData, AllClassifiers)
 #the below indicates whether cranial and mandibular coord datasets match
