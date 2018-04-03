@@ -147,16 +147,16 @@ names(allom_output[[1]])=names(AllData[[1]])#I can't name "mandible" and "craniu
 ```
 
 #Other procD analyses
-
+##subset data to geolocation and sex subsets
 ```{r, message = FALSE, warning = FALSE}
 
 AllData=list("NHNW"=NHNW, "SHNW"=SHNW, "CW"=CW)
 AllClassifiers=list("NHNW"=list("cranium"=NHNW_cranium_Class, "mandible"=NHNW_mandible_Class), "SHNW"=list("cranium"=SHNW_cranium_Class, "mandible"=SHNW_mandible_Class),"CW"=list("cranium"=CW_cranium_Class, "mandible"=CW_mandible_Class))
 
+##Coordinates for specimens with Geolocation
 coords_Geo_output=list()
-    
     for (i in 1:length(AllData)){
-      coords_Geo_output[[i]]=list()
+    coords_Geo_output[[i]]=list()
       
       for (k in 1:length(AllClassifiers[[i]])){
         coords_Geo_output[[i]][[k]] <- AllData [[i]][[k]]$procrustes$coords [ , ,as.character(AllClassifiers[[i]][[k]]$Geolocation) == "Yes"]
@@ -167,21 +167,85 @@ coords_Geo_output=list()
 names(coords_Geo_output)<-names(AllData)
 
 
-################Building blocks of loops - first check that the individual analyses work
+##Csize for specimens with Geolocation
 
-    
+Csize_Geo_output=list()
+    for (i in 1:length(AllData)){
+      Csize_Geo_output[[i]]=list()
+      
+      for (k in 1:length(AllClassifiers[[i]])){
+        Csize_Geo_output[[i]][[k]] <- AllData [[i]][[k]]$procrustes$Csize [as.character(AllClassifiers[[i]][[k]]$Geolocation) == "Yes"]
+      }
+      names(Csize_Geo_output[[i]])<-names(AllData[[i]])
+    }
+names(Csize_Geo_output)<-names(AllData)
 
-    
-#Separate out the coordinates
-coords_Geo_output=list()
-    
-coords_Geo_output[[2]][[1]] <- AllData [[2]][[1]]$procrustes$coords [ , ,as.character(AllClassifiers[[2]][[1]]$Geolocation) == "Yes"]#This works
+
+#create Geomorph data frame
+#This puts the subsetted coordinates and Csizes from above together with the subsetted classifier (for which subsetting is done inside the loop)
+
+Geo_GDFs=list()
+
+  for (i in 1:length(coords_Geo_output)){
+  Geo_GDFs[[i]]=list()
+  for (k in 1:length(AllClassifiers[[i]])){
+   Geo_GDFs[[i]][[k]]<-geomorph.data.frame(coords=coords_Geo_output[[i]][[k]], Csize=Csize_Geo_output[[i]][[k]], Temp=AllClassifiers[[i]][[k]][AllClassifiers[[i]][[k]]$Geolocation=="Yes",]$Temperature, Aridity=AllClassifiers[[i]][[k]][AllClassifiers[[i]][[k]]$Geolocation=="Yes",]$Aridity) 
+
+  }
+  names(Geo_GDFs[[i]])<-names(AllData[[i]]) 
+  
+}
+
+names(Geo_GDFs)<-names(AllData) 
+
+match(dimnames(Geo_GDFs$SHNW$cranium$coords)[[3]],names(Geo_GDFs$SHNW$cranium$Csize))#this is correct; The temp data are also correct but I don't have a way of testing this other than visually confirming
 
 
-coordsMa.SHNW.geo <- SHNWgpa.Ma$coords[ , , SHNWMaClass$Geolocation == "Yes"]#subsetting to only those specimens for which geolocation is available
-coordsMa.SHNW.Sex <- SHNWgpa.Ma$coords[ , , !is.na(SHNWMaClass$Sex)]#Subsetting something that has nas. 
-SHNWSexMa=SHNWMaClass$Sex[!is.na(SHNWMaClass$Sex)]
-csizeMa.SHNW.Sex<-SHNWgpa.Ma$Csize[!is.na(SHNWMaClass$Sex)]
+procD.lm(coords~Temp,data=Geo_GDFs$CW$cranium, iter=1000 )#WOOOOOOOOOORKS!!
+
+
+##coordinates of individuals with Sex
+coords_Sex_output=list()
+    for (i in 1:length(AllData)){
+    coords_Sex_output[[i]]=list()
+      
+      for (k in 1:length(AllClassifiers[[i]])){
+        coords_Sex_output[[i]][[k]] <- AllData [[i]][[k]]$procrustes$coords [ , ,!is.na(AllClassifiers[[i]][[k]]$Sex)]
+      }
+      names(coords_Sex_output[[i]])<-names(AllData[[i]])
+    }
+names(coords_Sex_output)<-names(AllData)
+
+##For analysis of Csize and Sex
+
+##Csizes of individuals with sex
+Csize_Sex_output=list()
+    for (i in 1:length(AllData)){
+      Csize_Sex_output[[i]]=list()
+      
+      for (k in 1:length(AllClassifiers[[i]])){
+        Csize_Sex_output[[i]][[k]] <- AllData [[i]][[k]]$procrustes$Csize [!is.na(AllClassifiers[[i]][[k]]$Sex)]
+      }
+      names(Csize_Sex_output[[i]])<-names(AllData[[i]])
+    }
+names(Csize_Sex_output)<-names(AllData)
+
+```
+
+#run procD.lm analyses
+
+```{r, message = FALSE, warning = FALSE}
+
+
+#Geolocation
+coords=coords_Geo_output$SHNW$cranium
+Aridity=SHNW_cranium_Class$Aridity[!is.na(SHNW_cranium_Class$Aridity)]
+Temp=SHNW_cranium_Class$Temperature[!is.na(SHNW_cranium_Class$Temperature)]
+procD.lm(coords~Aridity)
+procD.lm(coords~Temp)
+
+
+
 procD.lm(coordsMa.SHNW.geo ~ SHNWMaClass$Aridity)
 procD.lm(coordsMa.SHNW.geo ~ SHNWMaClass$Temperature)
 procD.lm(coordsMa.SHNW.Sex ~ SHNWSexMa*csizeMa.SHNW.Sex)
