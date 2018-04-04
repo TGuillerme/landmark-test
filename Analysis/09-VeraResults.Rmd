@@ -266,25 +266,49 @@ for (i in 1:length(Geo_GDFs)){
   
     for (k in 1:length(Geo_GDFs[[2]])){
     
-  Geo_procD_outputs[[i]][[k]] <-procD.lm(coords~Temp, data=Geo_GDFs[[i]][[k]], iter=1000)
+  Geo_procD_outputs[[i]][[k]] <-procD.lm(coords~Aridity, data=Geo_GDFs[[i]][[k]], iter=1000)
   
 }
 names(Geo_procD_outputs[[i]])<-names(Geo_GDFs[[i]])
   }
 names(Geo_procD_outputs)<-names(Geo_GDFs)
 
+Geo_procD_outputs
 
+#Sex
+Sex_procD_outputs<-list()
 
-
-
-
- Geo_procD_outputs<-list()
+for (i in 1:length(Sex_GDFs)){
+  Sex_procD_outputs[[i]]<-list()
   
-    for (k in 1:length(Geo_GDFs[[2]])){
-      #the below code works by itself but won't loop; I am probably forgetting some return rule
-  Geo_procD_outputs[[2]][[2]] <-procD.lm(coords~Temp, data=Geo_GDFs[[2]][[2]], iter=1000)
+    for (k in 1:length(Sex_GDFs[[2]])){
+    
+  Sex_procD_outputs[[i]][[k]] <-procD.lm(coords~Sex+Csize, data=Sex_GDFs[[i]][[k]], iter=1000)
   
 }
+names(Sex_procD_outputs[[i]])<-names(Sex_GDFs[[i]])
+  }
+names(Sex_procD_outputs)<-names(Sex_GDFs)
+
+Sex_procD_outputs
+
+#Differences between sexes in centroid size
+
+Sex_procD_outputs<-list()
+
+for (i in 1:length(Sex_GDFs)){
+  Sex_procD_outputs[[i]]<-list()
+  
+    for (k in 1:length(Sex_GDFs[[2]])){
+    
+  Sex_procD_outputs[[i]][[k]] <-procD.lm(Csize~Sex, data=Sex_GDFs[[i]][[k]], iter=1000)
+  
+}
+names(Sex_procD_outputs[[i]])<-names(Sex_GDFs[[i]])
+  }
+names(Sex_procD_outputs)<-names(Sex_GDFs)
+
+Sex_procD_outputs
 
 
 ```
