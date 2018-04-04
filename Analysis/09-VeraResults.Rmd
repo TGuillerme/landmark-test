@@ -17,6 +17,8 @@ source("../Functions/utilities.R")
 set.seed(42)
 
 #loading the below loads objects called land_data, NOT "wombat"
+load("../Data/Processed/wombat.Rda")
+AllWombats<-land_data
 load("../Data/Processed/wombat_krefftii.Rda")
 NHNW<-land_data
 load("../Data/Processed/wombat_latifrons.Rda")
@@ -24,13 +26,50 @@ SHNW<-land_data
 load("../Data/Processed/wombat_ursinus.Rda")
 CW<-land_data
 
+
 #read classifiers
 cranium<-read.csv("../Data/Raw/classifier_cranium_wombat.csv")
 mandible<-read.csv("../Data/Raw/classifier_mandible_wombat.csv")
 
 ```
 
-#Checking for outliers
+#Partition Classifiers according to species
+
+```{r, message = FALSE, warning = FALSE}
+
+#@params Full_Classifier_Table_ is the tables of mandibular or cranial classifiers (e.g. read.csv("../Data/Raw/classifier_cranium_wombat.csv")); spp is a vector of species (e.g. c("CW", "SHNW", "NHNW"))
+
+
+species <- c("CW", "SHNW", "NHNW")
+sp_holders <-c("Common wombat", "SHN wombat", "NHN wombat")
+
+##cranium
+for (i in 1:length(unique(cranium$Species))){
+   
+    Class = cranium[cranium$Species == sp_holders[i],]
+    
+    sp_name=paste(species[i],deparse(substitute(cranium)), "Class", sep="_")#prepare for giving names to outputs
+   
+     assign(sp_name,Class)
+    
+    }
+
+##mandible
+for (i in 1:length(unique(mandible$Species))){
+   
+    Class = mandible[mandible$Species == sp_holders[i],]
+    
+    sp_name=paste(species[i],deparse(substitute(mandible)), "Class", sep="_")#prepare for giving names to outputs
+   
+     assign(sp_name,Class)
+    
+    }
+
+
+
+```
+
+#Checking for shape outliers
 
 ```{r, message = FALSE, warning = FALSE}
 
@@ -79,44 +118,26 @@ plotOutliers(NHNW$mandible$procrustes$coords)#No outliers
 
 ```
 
-#Partition Classifiers according to species
+#Shape disparity comparison
 
 ```{r, message = FALSE, warning = FALSE}
+#Create gdfs with species for the data frames
+Cr_gdf<-geomorph.data.frame(coords=land_data$cranium$procrustes$coords, Csize=land_data$cranium$procrustes$Csize, species=as.factor(cranium$Species))
+Mand_gdf<-geomorph.data.frame(coords=land_data$mandible$procrustes$coords, Csize=land_data$mandible$procrustes$Csize, species=as.factor(mandible$Species))
 
-#@params Full_Classifier_Table_ is the tables of mandibular or cranial classifiers (e.g. read.csv("../Data/Raw/classifier_cranium_wombat.csv")); spp is a vector of species (e.g. c("CW", "SHNW", "NHNW"))
+#run analyses using the gdfs
+CraniumDisparity <- morphol.disparity(coords~species, groups=~species, iter = 9999, seed = 42, data = Cr_gdf, print.progress = TRUE) # Disparity within groups compared to that group's mean
+summary(CraniumDisparity)
 
-
-species <- c("CW", "SHNW", "NHNW")
-sp_holders <-c("Common wombat", "SHN wombat", "NHN wombat")
-
-##cranium
-for (i in 1:length(unique(cranium$Species))){
-   
-    Class = cranium[cranium$Species == sp_holders[i],]
-    
-    sp_name=paste(species[i],deparse(substitute(cranium)), "Class", sep="_")#prepare for giving names to outputs
-   
-     assign(sp_name,Class)
-    
-    }
-
-##mandible
-for (i in 1:length(unique(mandible$Species))){
-   
-    Class = mandible[mandible$Species == sp_holders[i],]
-    
-    sp_name=paste(species[i],deparse(substitute(mandible)), "Class", sep="_")#prepare for giving names to outputs
-   
-     assign(sp_name,Class)
-    
-    }
-
-
+MandibleDisparity <- morphol.disparity(coords~species, groups=~species, iter = 9999, seed = 42, data = Mand_gdf, print.progress = TRUE) # Disparity within groups compared to that group's mean
+summary(MandibleDisparity)
 
 ```
 
-#Allometry analyse
+
+
 #Allometry Analyses
+
 ```{r, message = FALSE, warning = FALSE}
 
 
