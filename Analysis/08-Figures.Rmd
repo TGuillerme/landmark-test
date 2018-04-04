@@ -40,11 +40,19 @@ mandible<-read.csv("../Data/Raw/classifier_mandible_wombat.csv")
 ```{r, message = FALSE, warning = FALSE}
 #separate land_data into the relevant components
 
+#Define the partitions (needs to be done individually)
+#LandmarkRegions=define.modules(land_data$cranium$procrustes$coords[,,5],2)
+#write.csv(LandmarkRegions, file="../Data/Results/additional_snout.csv")
+
+#Optional:
 PartNames<-c("Zyg", "Sn", "Oc", "Po", "Rest")# This is not necessary for colouring the cranium AND needs to be separately accessed, but helps in identifying the partitionss
 
 plot.partitions(land_data$cranium)
 plot.partitions(land_data$mandible)
 
+#The best way to fine-tune is to plot the coloured regions with the number
+plot.partitions(land_data$cranium)
+text3d(mshape(land_data$cranium$procrustes$coords), text=c(1:826))
 
 ```
 
@@ -60,6 +68,7 @@ PCA.vectors(land_data$cranium, minfirst=TRUE)
 ```{r, message = FALSE, warning = FALSE}
 
 Classifiers=list("cranium"=cranium, "mandible"=mandible)
+PC=list()
 
 for (i in 1:length(Classifiers)){
   #prep classifiers
@@ -74,11 +83,11 @@ for (i in 1:length(Classifiers)){
   Environment[is.na(Environment)] <- " "           #Change NA to "U"
   
   #prep pc scores
-  PC=list()
+  
   PC[[i]] <- data.frame(land_data[[i]]$ordination$x[,1], land_data[[i]]$ordination$x[,2])#Why does this not work??
-  #names(PC)[[i]]<-names(Classifiers)[[i]]
+  
  }
-
+names(PC)<-names(Classifiers)
 
 
 #outside the loop this works. I think I need to learn MUCH more about how to use selector addresses!
