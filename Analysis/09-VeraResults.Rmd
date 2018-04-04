@@ -149,9 +149,9 @@ names(allom_output[[1]])=names(AllData[[1]])#I can't name "mandible" and "craniu
 #Other procD analyses
 ##subset data to geolocation and sex subsets
 ```{r, message = FALSE, warning = FALSE}
-
-AllData=list("NHNW"=NHNW, "SHNW"=SHNW, "CW"=CW)
-AllClassifiers=list("NHNW"=list("cranium"=NHNW_cranium_Class, "mandible"=NHNW_mandible_Class), "SHNW"=list("cranium"=SHNW_cranium_Class, "mandible"=SHNW_mandible_Class),"CW"=list("cranium"=CW_cranium_Class, "mandible"=CW_mandible_Class))
+#Not using NHNWs because they do not vary in location and have no sex assigned
+AllData=list("SHNW"=SHNW, "CW"=CW)
+AllClassifiers=list("SHNW"=list("cranium"=SHNW_cranium_Class, "mandible"=SHNW_mandible_Class),"CW"=list("cranium"=CW_cranium_Class, "mandible"=CW_mandible_Class))
 
 #Geolocation subset
 
@@ -262,10 +262,10 @@ names(Sex_GDFs)<-names (AllData)
 Geo_procD_outputs<-list()
 
 for (i in 1:length(Geo_GDFs)){
-  Geo_procD_outputs<-list()
+  Geo_procD_outputs[[i]]<-list()
   
     for (k in 1:length(Geo_GDFs[[2]])){
-      #the below code works by itself but won't loop; I am probably forgetting some return rule
+    
   Geo_procD_outputs[[i]][[k]] <-procD.lm(coords~Temp, data=Geo_GDFs[[i]][[k]], iter=1000)
   
 }
@@ -274,7 +274,17 @@ names(Geo_procD_outputs[[i]])<-names(Geo_GDFs[[i]])
 names(Geo_procD_outputs)<-names(Geo_GDFs)
 
 
-procD.lm(coords~Temp, data=Geo_GDFs[[2]][[2]], iter=1000)#this works by itself
+
+
+
+
+ Geo_procD_outputs<-list()
+  
+    for (k in 1:length(Geo_GDFs[[2]])){
+      #the below code works by itself but won't loop; I am probably forgetting some return rule
+  Geo_procD_outputs[[2]][[2]] <-procD.lm(coords~Temp, data=Geo_GDFs[[2]][[2]], iter=1000)
+  
+}
 
 
 ```
