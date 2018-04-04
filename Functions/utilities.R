@@ -220,12 +220,17 @@ make.plots <- function(results, type, add.p = FALSE, correction, rarefaction = F
 #@param land_data_partition the landmark data e.g. land_data$cranium
 #@param partnames is an optional vector with names for each partition number
 
+#Defining partitions using the define.module (needs individual execution)
+
+
+
+
 plot.partitions<-function(land_data_partition, PartNames){
   ##the object with the landmarks subset according to partitions
   Part=list()
   WomCrGPA<-land_data_partition$procrustes
   WomCrPart<-land_data_partition$landmarkgroups
-  WomCrRef <- mshape(WomCrGPA$coords) 
+  WomCrRef <- mshape(land_data_partition$procrustes$coords) 
   
   
   #provides the numbers of the parts
@@ -255,6 +260,7 @@ plot.partitions<-function(land_data_partition, PartNames){
 #Visualizing differences between PC min and max
 #@param x is the coordinates after gpa e.g. land_data$cranium
 #@param minfirst is whether min vs max or other way round (for PlotRefToTarget )
+
 
 PCA.vectors<-function(x, minfirst=TRUE){
   gridPar=gridPar(pt.bg = "white", pt.size = 0.5)#These are needed to give it the right parameters for the point size, colour and size - the default is too large points
