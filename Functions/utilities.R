@@ -123,6 +123,15 @@ make.xtable <- function(results, correction, digits = 3, caption, label, longtab
     ## Make the results table
     results_table <- make.table(results, correction = correction)
 
+    ## Rounding
+    results_table[, c(2,3,6)] <- round(results_table[, c(2,3,6)], digits = digits)
+
+    if(all(as.vector(round(results_table[, c(4,5)], digits = digits) == 0))) {
+        results_table[, c(4,5)] <- round(results_table[, c(4,5)], digits = digits+2)
+    } else {
+        results_table[, c(4,5)] <- round(results_table[, c(4,5)], digits = digits)
+    }
+
     ## Add significance values
     p_col <- grep("p value", colnames(results_table))
     if(length(p_col) > 0) {
@@ -137,7 +146,7 @@ make.xtable <- function(results, correction, digits = 3, caption, label, longtab
     bold.cells <- function(x) gsub('BOLD(.*)', paste0('\\\\textbf{\\1', '}'), x)
 
     ## convert into xtable format
-    textable <- xtable(results_table, digit = digits, caption = caption, label = label)
+    textable <- xtable(results_table, caption = caption, label = label)
 
     if(!missing(path)) {
         if(longtable == TRUE) {
@@ -234,7 +243,7 @@ plot.partitions<-function(land_data_partition, PartNames){
       names(Part)[i]<-PartNames[i]
     }
   }
-  ##colours the spheres for each partition
+  ##colours the spheres for each partitin
   open3d()
   for (i in 1:length(PartLevels)){
     spheres3d(WomCrRef[Part[[i]],1], WomCrRef[Part[[i]],2], WomCrRef[Part[[i]],3], col=Colours[i], lit=TRUE,radius = 0.001, asp=F)
