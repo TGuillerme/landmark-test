@@ -133,7 +133,33 @@ MandibleDisparity <- morphol.disparity(coords~species, groups=~species, iter = 9
 summary(MandibleDisparity)
 
 ```
+#Assessing range of Centroid sizes
+```{r, message = FALSE, warning = FALSE}
+#separate out centroid sizes
 
+CentroidSize=list()
+
+for (i in  1:length(levels(cranium$Species))){
+  CentroidSize[[i]]=list()
+CentroidSize[[i]]<-AllWombats$cranium$procrustes$Csize[cranium$Species==levels(cranium$Species)[i]]
+}
+names(CentroidSize)=(levels(cranium$Species))#ARgh how od I get rid of the upticks??
+
+max(CentroidSize$`Common wombat`)-min(CentroidSize$`Common wombat`)
+max(CentroidSize$`NHN wombat`)-min(CentroidSize$`NHN wombat`)
+max(CentroidSize$`SHN wombat`)-min(CentroidSize$`SHN wombat`)
+
+Csizes=c(CentroidSize$`Common wombat`,CentroidSize$`NHN wombat`, CentroidSize$`SHN wombat`)
+Species_Csize=as.factor(c(cranium$Species))
+plot.new()
+boxplot(Csizes~Species_Csize, names=levels(cranium$Species), range=1, ylab="Centroid Size")
+
+
+
+CSizeaov=aov(Csizes~Species_Csize)
+TukeyHSD(CSizeaov,"Species_Csize" )
+
+```
 
 
 #Allometry Analyses
