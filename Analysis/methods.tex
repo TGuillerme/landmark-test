@@ -16,24 +16,24 @@ Version dated: \today
 \begin{center}
 
 %Title
-\noindent{\Large{\bf{Landmark test}}}\
+\noindent{\Large{\bf{Landmark test}}}\\
 \bigskip
 %Author
-Thomas Guillerme\\href{guillert@tcd.is}{guillert@tcd.is}
+Thomas Guillerme\\\href{guillert@tcd.ie}{guillert@tcd.ie}
 
 \end{center}
 
 \section{Testing the variation of landmark regions within and between species}
 
 To understand the [WHATHEVER THE PAPER IS ABOUT] we tested whether some landmark regions (e.g. the landmarks on the zygomatic arch) varied significantly more or less than the rest of the skull within and between each species.
-To test these variation, we applied a  ``landmark partition test'' that tests whether the maximum variation between landmarks position in a set of landmarks is significantly different than any random same size set of landmarks.
+To test these variation, we applied a ``landmark partition test'' that tests whether the maximum variation between landmarks position in a set of landmarks is significantly different than any random same size set of landmarks.
 This test is a kind of permutation test testing $H_{0}: \Theta_{0} = \Theta$ with a two-sided alternative $H_{1}: \Theta_{0} \neq \Theta$.
-If $H_{0}$ can be rejected it means that the statistic measured from the set of landmarks (see below) is different than the overall statistic from the population of landmarks (in other words: the landmark set is different than the other landmarks).
+If $H_{0}$ can be rejected it means that the statistic measured from the set of landmarks (see below) is different than the overall statistic from the population of landmarks (in other words: the landmark set is different than the all the landmarks combined).
 
 We measured two statistic, the overall difference in landmark size (area difference - see below) and the probability of size overlap between two landmarks sets (Bhattacharyya Coefficient - see below).
 These two statistics were measured between the two most extreme specimens selected on the range of variation between the specimens landmarks coordinates (see below).
-We tested the differences for five cranium partitions ([WHAT ARE THEY?]) and six mandible ones ([WHAT ARE THEY?]) for each species (\textit{Wombat ursinus}, \textit{Wombat kreffti} and \textit{Wombat latifrons}) and for the three species combined.
-To account for type I error due to multiple testing and for the number of replicates involved in the landmark partition tests, we adjusted the \textit{p}-values using a Bonferonni-Holm [CITE] correction and lowered our \textit{p-value} rejection threshold to 0.1.
+We tested the differences for three cranium partitions ([WHAT ARE THEY?]) and three mandible ones ([WHAT ARE THEY?]) for each species (\textit{Wombat ursinus}, \textit{Lasiorhinus krefftii} and \textit{Lasiorhinus latifrons}) and for the three species combined.
+To account for type I error due to multiple testing and for the number of replicates involved in the landmark partition tests, we adjusted the \textit{p}-values using a Bonferonni-Holm [CITE] correction and lowered our \textit{p-value} rejection threshold to 0.01 (see below).
 The whole procedure, including the landmark variation is described in details below and implemented in \texttt{R}: \url{https://github.com/TGuillerme/landmark-test}.
 
 
@@ -56,7 +56,7 @@ To calculate the maximum range of landmark variation (the two individuals with t
  \item \label{rank_diff} Rank each set of $n$ radii and measure the area under the resulting curve (see \ref{area_diff} below).
  \item \label{get_max} Select the specimen with the highest $n$ radii area. This is now the ``maximum'' Procrustes (i.e. the specimen with the most different shape compared to the mean).
  \item \label{max_diff} Calculate the radii for all $n$ landmarks between the ``maximum'' Procrustes and the remaining individual ones.
- \item \label{min_diff} Repeat step \ref{rank_diff} and \ref{get_max}. The result specimen with the highest $n$ radii area is now the ``minimum'' Procrustes (i.e. the specimen with the most different shape compared to the ``maximum'' Procrustes).
+ \item \label{min_diff} Repeat step \ref{rank_diff} and \ref{get_max}. The resulting specimen with the highest $n$ radii area is now the ``minimum'' Procrustes (i.e. the specimen with the most different shape compared to the ``maximum'' Procrustes).
 
 \end{enumerate}
 
@@ -74,7 +74,7 @@ To measure the overall differences in the length of the radii, we can calculate 
 
 \begin{equation}
 \label{area_diff}
-    \textnormal{Area difference} = \int_{0}^{n-1} (f_{x} - f_{y})
+    \textnormal{Area difference} = \int_{0}^{n-1} (f_{x} - f_{y})d(x,y)
 \end{equation}
 
 \noindent Where $n$ is minimum number of comparable landmarks and $f_{x}$ and $f_{y}$ are ranked functions (i.e. $f_{0} \geq f_{1} \geq f_{2} ...$) for the landmarks in the partition and all the landmarks respectively.
@@ -86,7 +86,7 @@ If one of the functions $f_{x}$ or $f_{y}$ have $m$ elements (with $m > n$) $f^{
 \end{equation}
 
 \noindent Where $p$ is the number of rarefaction replicates.
-$p$ is chosen based on the Silverman's rule of thumb for choosing the bandwidth of a Gaussian kernel density estimator multiplied by 1000 with a result forced to be 100 $\leq p \leq$ 1000 [@silverman1986density].
+$p$ is chosen based on the Silverman's rule of thumb for choosing the bandwidth of a Gaussian kernel density estimator multiplied by 1000 with a result forced to be 100 $\leq p \leq$ 1000 [CITE SILVERNMAN].
 
 \begin{equation}
 \label{Silverman_rule}
@@ -94,7 +94,7 @@ $p$ is chosen based on the Silverman's rule of thumb for choosing the bandwidth 
 \end{equation}
 
 \noindent With $\sigma_{m}$ being the minimum of the standard deviation and the interquartile range of the distribution.
-This allows the rarefaction algorithm to be fast but ``fair'' (i.e. reducing the number of re-sampling the more the distribution is homogeneous CITE SILVERMAN).
+This allows the rarefaction algorithm to be fast but ``fair'' (i.e. reducing the number of re-sampling the when the distribution is more homogeneous CITE SILVERMAN).
 If the area difference is positive, the landmark's variation in the partition is bigger than the overall landmark's variation, if the difference is negative, the variation is smaller.
 
 
@@ -119,7 +119,7 @@ Values in between these two threshold just show the probability of overlap betwe
 \subsection{Random permutation test}
 
 To test whether the landmarks' variation (i.e. the radii between the ``maximum'' and ``minimum'' cranium/mandible) one partition is different than the rest of the landmark's variation, we used a kind of permutation test (based on a modification from \texttt{ade4::as.randtest} [CITE THIOULOUS]).
-This is a pretty intuitive yet powerful test aiming to calculate whether the observed difference in statistic (either the area difference or the probability of overlap) is different than the same statistic drawn randomly from the same population (here, the distribution of landmark's variation).
+This is a pretty intuitive yet powerful test aiming to calculate whether the observed difference in statistic (either the area difference or the probability of overlap) is different than the same statistic drawn randomly from the same population (here, the distribution of all the landmark's variation).
 First we measured the statistic between the landmark partition of interest and all the other landmarks (including the ones from the partition).
 Second, we generated 1000 statistics by randomly sampling the same number of landmarks as in the partition in the whole distributions and compared them again to the full distribution.
 This resulted in 1000 null comparisons (i.e. assuming the null hypothesis that the statistic in the partition is the same as the statistic in the total distribution).
@@ -129,5 +129,7 @@ We then calculated the \textit{p} value based on:
     p=\frac{\sum_1^B\left(random_{i} >= observed\right)+1}{B + 1}
 \end{equation}
 \noindent Where $B$ is the number of random draws (1000 bootstrap pseudo-replicates), $random_{i}$ is the $i^{th}$ statistic from the comparison of the $i^{th}$ randomly drawn partition and the distribution and $observed$ is the observed statistic between the partition and the distribution.
+An increased number of bootstrap pseudo-replications increases the type I error.
+We therefore lowered our threshold for accepting $H_{0}$ to 0.01 instead of the commonly used 0.05.
 
 \end{document}
