@@ -11,11 +11,11 @@ output:
 
 ```{r, message = FALSE, warning = FALSE}
 if(!require(knitr)) install.packages("knitr")
+if(!require(xtable)) install.packages("xtable")
 source("../Functions/utilities.R")
 ```
 
 ## Rarefied results summary
-
 
 ```{r, echo = FALSE}
 get.token <- function(p) {
@@ -36,14 +36,16 @@ get.token <- function(p) {
 species <- c("Wombat", "Wombat_krefftii", "Wombat_latifrons", "Wombat_ursinus")
 datasets <- c("cranium", "mandible")
 
-results_table <- data.frame(matrix(NA, ncol = length(species)*3, nrow = 11))
+rounding = 3
+
+results_table <- data.frame(matrix(NA, ncol = length(species)*4, nrow = 6+1))
 
 for(sp in 1:length(species)) {
 
     for(ds in 1:length(datasets)) {
 
         ## Extract the results
-        load(paste0("../Data/Results/", species[sp], "_", datasets[ds], "_rarefied.Rda"))
+        load(paste0("../Data/Results/", species[sp], "_", datasets[ds], "rarefied.Rda"))
 
         ## Summarise the results
         difference <- make.table(results$difference, correction = "bonferroni")
@@ -51,33 +53,39 @@ for(sp in 1:length(species)) {
 
         ## Fill the table
         if(ds == 1) {
-            ## Cranium
-            results_table[1:5, 1+(3*(sp-1))] <- difference[,2]
-            results_table[1:5, 2+(3*(sp-1))] <- sapply(difference[,6], get.token)
-            results_table[1:5, 3+(3*(sp-1))] <- sapply(overlap[,6], get.token)
-            ## Make the differences to be 0 if non-signif
+            ## Values
+            results_table[2:4, 1+(4*(sp-1))] <- round(difference[,2], digits = rounding)
+            results_table[2:4, 3+(4*(sp-1))] <- round(overlap[,2], digits = rounding-1)
+            ## Signif
+            results_table[2:4, 2+(4*(sp-1))] <- paste0(round(difference[,6], digits = rounding),  sapply(difference[,6], get.token)) # Remove the first component of the paste if only tokens needed
+            results_table[2:4, 4+(4*(sp-1))] <- paste0(round(overlap[,6], digits = rounding),  sapply(overlap[,6], get.token))
+
         } else {
-            ## Mandible
-            results_table[6:11, 1+(3*(sp-1))] <- difference[,2]
-            results_table[6:11, 2+(3*(sp-1))] <- sapply(difference[,6], get.token)
-            results_table[6:11, 3+(3*(sp-1))] <- sapply(overlap[,6], get.token)
+            ## Values
+            results_table[5:7, 1+(4*(sp-1))] <- round(difference[,2], digits = rounding)
+            results_table[5:7, 3+(4*(sp-1))] <- round(overlap[,2], digits = rounding-1)
+            ## Signif
+            results_table[5:7, 2+(4*(sp-1))] <- paste0(round(difference[,6], digits = rounding),  sapply(difference[,6], get.token))
+            results_table[5:7, 4+(4*(sp-1))] <- paste0(round(overlap[,6], digits = rounding),  sapply(overlap[,6], get.token))
         }
     }
 }
 
-## Colnames sequence
-sequence <- seq(from = 1, to =11, by = 3)
-
-## Renaming the columns
-colnames(results_table)[sequence] <- species
-colnames(results_table)[sequence+1] <- "diff"
-colnames(results_table)[sequence+2] <- "over"
-
-## Renaming the rows
-rownames(results_table) <- c(paste0(datasets[1], 1:5), paste0(datasets[2], 1:6))
+## Renaming the table elements
+rownames(results_table) <- c("test", paste("Cranium", c(1,2,3)), paste("Mandible", c(1,2,3)))
+results_table[1,] <- rep(c("diff", "p", "overlap", "p"), length(species))
+colnames(results_table) <- names(unlist(sapply(species, rep, 4, simplify = FALSE)))
 
 
 ##
 kable(results_table, digits = 4)
+```
 
+```{r, eval = TRUE, echo = FALSE, print = FALSE, results = 'hide'}
+path <- "../Manuscript/Tables/"
+label_table <- "all_differences_rarefied"
+caption_table <- "\"diff\" is the difference in landmark length between the ones from the partition and all the other. \"overlap\" is the probability of overlap between the distribution of the landmark lengths in the partitions and all the other. The p values are adjusted using a Bonferroni-Holm correction. Because of the number of bootstrap pseudo-replicates involved in the test (1000), we lowered our threshold for rejecting H0 to p <= 0.01. Signif. codes: 0 ‘**’ 0.001 ‘*’ 0.01 ‘.’ 0.05 ‘ ’ 1"
+
+textable <- xtable(results_table, caption = caption_table, label = label_table)
+cat(print(textable), file = paste0(path, label_table, ".tex"))
 ```
