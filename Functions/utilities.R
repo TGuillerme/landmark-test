@@ -163,8 +163,6 @@ make.xtable <- function(results, correction, digits = 3, caption, label, longtab
     }
 }
 
-
-## Function for plotting the test results
 make.plots <- function(results, type, add.p = FALSE, correction, rarefaction = FALSE, rare.level, path) {
 
     ## Number of plots
@@ -174,7 +172,13 @@ make.plots <- function(results, type, add.p = FALSE, correction, rarefaction = F
     if(!missing(path)) {
         pdf(file = path)
     } else {
-        par(mfrow = c(ceiling(sqrt(n_plots)), floor(sqrt(n_plots))), bty = "n")
+
+        n_rows <- c(ceiling(sqrt(n_plots)), floor(sqrt(n_plots)))
+        if(n_rows[1]*n_rows[2] < n_plots) {
+            n_rows <- c(ceiling(sqrt(n_plots)), ceiling(sqrt(n_plots)))
+        }
+
+        par(mfrow = n_rows, bty = "n")
     }
 
     ## Getting the results table
@@ -193,8 +197,8 @@ make.plots <- function(results, type, add.p = FALSE, correction, rarefaction = F
 
         plot(results[[one_plot]], xlab = type, main = main_lab)
 
-        ## Rarefaction
-        if(rarefaction) {
+        ## Rarefaction (unless the rarefied results are invariant, i.e. minimum level)
+        if(rarefaction && length(unique(unlist(results[[one_plot]]$observed))) != 1) {
             add.rare.plot(results[[one_plot]])
         }
 
