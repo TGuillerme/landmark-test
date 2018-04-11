@@ -221,10 +221,6 @@ make.plots <- function(results, type, add.p = FALSE, correction, rarefaction = F
 #@param partnames is an optional vector with names for each partition number
 
 #Defining partitions using the define.module (needs individual execution)
-
-
-
-
 plot.partitions<-function(land_data_partition, PartNames){
   ##the object with the landmarks subset according to partitions
   Part=list()
@@ -236,6 +232,7 @@ plot.partitions<-function(land_data_partition, PartNames){
   #provides the numbers of the parts
   PartLevels= unique(WomCrPart[,2])
   Colours<-rainbow(length(PartLevels))
+  Colours <- c("blue", "orange", "green")
   
   ##subset the landmarks according to the partitions
   for(i in 1:length(PartLevels)){
