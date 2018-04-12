@@ -93,7 +93,7 @@ for(chain in chains) {
 chain <- chains[1]
 
 ## Getting the species names
-species <- c("ursinus", "latifrons", "krefftii")
+species <- c("ursinus", "latifrons", "krefftii", "lasiorhinus")
 sp_holders <- c("Common wombat", "SHN wombat", "NHN wombat")
 
 land_data <- list()
@@ -104,7 +104,7 @@ for(sp in 1:length(species)) {
 
         ## Reading the wombat species
         wombat_sp <- read.csv(paste0("../Data/Raw/classifier_", dataset, "_wombat.csv"))
-        for(spec in 1:length(species)) {
+        for(spec in 1:length(species[1:3])) {
             wombat_sp$Species <- gsub(sp_holders[spec], species[spec],
                                       as.character(wombat_sp$Species))
         }
@@ -120,8 +120,13 @@ for(sp in 1:length(species)) {
         ## Make into a 3D array
         landmarks <- geomorph::arrayspecs(landmarks, k = 3, p = ncol(landmarks)/3)
 
-        ## Selecting the subset of species
-        landmarks <- landmarks[, , which(wombat_sp$Species == species[sp])]
+        ## Selecting the subset of species (if sp == 4, select both krefftii and latifrons)
+        if(sp != 4) {
+            which_sp <- sp
+        } else {
+            which_sp <- c(2,3)
+        }
+        landmarks <- landmarks[, , which(wombat_sp$Species %in% species[which_sp])]
 
         ## Running the Procrustes superimposition
         land_data[[dataset]][[2]] <- geomorph::gpagen(landmarks, print.progress = FALSE)
