@@ -10,3 +10,7 @@ Manuscript/Figures/*.pdf
 ## Ignore .Rapp.histories
 *.Rapp.history
 *.RData
+
+
+## Ignore compiled files (html)
+*.html
