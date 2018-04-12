@@ -47,7 +47,7 @@ get.token <- function(p) {
     }
 }
 
-species <- c("Wombat", "Wombat_krefftii", "Wombat_latifrons", "Wombat_ursinus")
+species <- c("Wombat", "Wombat_krefftii", "Wombat_latifrons", "Wombat_ursinus", "Wombat_lasiorhinus")
 datasets <- c("cranium", "mandible")
 
 rounding = 3
@@ -89,6 +89,9 @@ for(sp in 1:length(species)) {
 rownames(results_table) <- c("test", paste("Cranium", c(1,2,3)), paste("Mandible", c(1,2,3)))
 results_table[1,] <- rep(c("diff", "p", "overlap", "p"), length(species))
 colnames(results_table) <- names(unlist(sapply(species, rep, 4, simplify = FALSE)))
+
+## Flip the table
+results_table <- t(results_table)
 
 
 ##
