@@ -49,18 +49,18 @@ pipeline.test <- function(species, dataset, path, verbose = FALSE, rarefaction, 
     ## Size differences
     if(verbose) message("Run size difference test...")
     if(rarefaction) {
-        differences <- lapply(partitions, lapply.rand.test, data = procrustes_var, test = area.diff, replicates = 1000, rarefaction = part_min)
+        differences <- lapply(partitions, lapply.rand.test, data = procrustes_var, test = area.diff, replicates = 1000, rarefaction = part_min, resample = FALSE)
     } else {
-        differences <- lapply(partitions, lapply.rand.test, data = procrustes_var, test = area.diff, replicates = 1000)
+        differences <- lapply(partitions, lapply.rand.test, data = procrustes_var, test = area.diff, replicates = 1000, resample = FALSE)
     }
     if(verbose) message("Done.\n")
 
     ## Probabilities of overlap
     if(verbose) message("Run overlap probability test...")
     if(rarefaction) {
-        overlaps <- lapply(partitions, lapply.rand.test, data = procrustes_var, test = bhatt.coeff, replicates = 1000, rarefaction = part_min)
+        overlaps <- lapply(partitions, lapply.rand.test, data = procrustes_var, test = bhatt.coeff, replicates = 1000, rarefaction = part_min, resample = FALSE)
     } else {
-        overlaps <- lapply(partitions, lapply.rand.test, data = procrustes_var, test = bhatt.coeff, replicates = 1000)
+        overlaps <- lapply(partitions, lapply.rand.test, data = procrustes_var, test = bhatt.coeff, replicates = 1000, resample = FALSE)
     }
     if(verbose) message("Done.\n")
 

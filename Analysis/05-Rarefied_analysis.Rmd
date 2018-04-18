@@ -45,11 +45,11 @@ set.seed(42)
 species <- "Wombat_ursinus"
 dataset <- "cranium"
 
-#results <- pipeline.test(species, dataset, "../Data/Processed/", verbose = TRUE, rarefaction = TRUE)
-#save(results, file = paste0("../Data/Results/", species, "_", dataset, "rarefied.Rda"))
-load(paste0("../Data/Results/", species, "_", dataset, "rarefied.Rda"))
-load(paste0("../Data/Processed/", species, ".Rda"))
-results$rarefaction <- min(table(land_data[[dataset]]$landmarkgroups[,2]))
+results <- pipeline.test(species, dataset, "../Data/Processed/", verbose = TRUE, rarefaction = TRUE)
+save(results, file = paste0("../Data/Results/", species, "_", dataset, "rarefied.Rda"))
+#load(paste0("../Data/Results/", species, "_", dataset, "rarefied.Rda"))
+#load(paste0("../Data/Processed/", species, ".Rda"))
+#results$rarefaction <- min(table(land_data[[dataset]]$landmarkgroups[,2]))
 
 caption_diff <- paste0("Results of the area difference random test (rarefied - ", results$rarefaction, ") for the ", results$dataset, " of ", results$species)
 caption_over <- paste0("Results of the overlap probability random test (rarefied - ", results$rarefaction, ") for the ", results$ataset, " of ", results$species)
@@ -89,11 +89,11 @@ make.plots(results$overlaps, type = "Bhattacharyya Coefficient", add.p = TRUE, c
 ```{r, echo = FALSE, message = FALSE}
 species <- "Wombat_ursinus"
 dataset <- "mandible"
-#results <- pipeline.test(species, dataset, "../Data/Processed/", verbose = TRUE, rarefaction = TRUE)
-#save(results, file = paste0("../Data/Results/", species, "_", dataset, "rarefied.Rda"))
-load(paste0("../Data/Results/", species, "_", dataset, "rarefied.Rda"))
-load(paste0("../Data/Processed/", species, ".Rda"))
-results$rarefaction <- min(table(land_data[[dataset]]$landmarkgroups[,2]))
+results <- pipeline.test(species, dataset, "../Data/Processed/", verbose = TRUE, rarefaction = TRUE)
+save(results, file = paste0("../Data/Results/", species, "_", dataset, "rarefied.Rda"))
+#load(paste0("../Data/Results/", species, "_", dataset, "rarefied.Rda"))
+#load(paste0("../Data/Processed/", species, ".Rda"))
+#results$rarefaction <- min(table(land_data[[dataset]]$landmarkgroups[,2]))
 
 caption_diff <- paste0("Results of the area difference random test (rarefied - ", results$rarefaction, ") for the ", results$dataset, " of ", results$species)
 caption_over <- paste0("Results of the overlap probability random test (rarefied - ", results$rarefaction, ") for the ", results$ataset, " of ", results$species)
@@ -148,11 +148,11 @@ make.plots(results$overlaps, type = "Bhattacharyya Coefficient", add.p = TRUE, c
 ```{r, echo = FALSE, message = FALSE}
 species <- "Wombat_krefftii"
 dataset <- "cranium"
-#results <- pipeline.test(species, dataset, "../Data/Processed/", verbose = TRUE, rarefaction = TRUE)
-#save(results, file = paste0("../Data/Results/", species, "_", dataset, "rarefied.Rda"))
-load(paste0("../Data/Results/", species, "_", dataset, "rarefied.Rda"))
-load(paste0("../Data/Processed/", species, ".Rda"))
-results$rarefaction <- min(table(land_data[[dataset]]$landmarkgroups[,2]))
+results <- pipeline.test(species, dataset, "../Data/Processed/", verbose = TRUE, rarefaction = TRUE)
+save(results, file = paste0("../Data/Results/", species, "_", dataset, "rarefied.Rda"))
+#load(paste0("../Data/Results/", species, "_", dataset, "rarefied.Rda"))
+#load(paste0("../Data/Processed/", species, ".Rda"))
+#results$rarefaction <- min(table(land_data[[dataset]]$landmarkgroups[,2]))
 
 caption_diff <- paste0("Results of the area difference random test (rarefied - ", results$rarefaction, ") for the ", results$dataset, " of ", results$species)
 caption_over <- paste0("Results of the overlap probability random test (rarefied - ", results$rarefaction, ") for the ", results$ataset, " of ", results$species)
@@ -192,11 +192,11 @@ make.plots(results$overlaps, type = "Bhattacharyya Coefficient", add.p = TRUE, c
 ```{r, echo = FALSE, message = FALSE}
 species <- "Wombat_krefftii"
 dataset <- "mandible"
-#results <- pipeline.test(species, dataset, "../Data/Processed/", verbose = TRUE, rarefaction = TRUE)
-#save(results, file = paste0("../Data/Results/", species, "_", dataset, "rarefied.Rda"))
-load(paste0("../Data/Results/", species, "_", dataset, "rarefied.Rda"))
-load(paste0("../Data/Processed/", species, ".Rda"))
-results$rarefaction <- min(table(land_data[[dataset]]$landmarkgroups[,2]))
+results <- pipeline.test(species, dataset, "../Data/Processed/", verbose = TRUE, rarefaction = TRUE)
+save(results, file = paste0("../Data/Results/", species, "_", dataset, "rarefied.Rda"))
+#load(paste0("../Data/Results/", species, "_", dataset, "rarefied.Rda"))
+#load(paste0("../Data/Processed/", species, ".Rda"))
+#results$rarefaction <- min(table(land_data[[dataset]]$landmarkgroups[,2]))
 
 caption_diff <- paste0("Results of the area difference random test (rarefied - ", results$rarefaction, ") for the ", results$dataset, " of ", results$species)
 caption_over <- paste0("Results of the overlap probability random test (rarefied - ", results$rarefaction, ") for the ", results$ataset, " of ", results$species)
@@ -251,11 +251,11 @@ make.plots(results$overlaps, type = "Bhattacharyya Coefficient", add.p = TRUE, c
 ```{r, echo = FALSE, message = FALSE}
 species <- "Wombat_latifrons"
 dataset <- "cranium"
-#results <- pipeline.test(species, dataset, "../Data/Processed/", verbose = TRUE, rarefaction = TRUE)
-#save(results, file = paste0("../Data/Results/", species, "_", dataset, "rarefied.Rda"))
-load(paste0("../Data/Results/", species, "_", dataset, "rarefied.Rda"))
-load(paste0("../Data/Processed/", species, ".Rda"))
-results$rarefaction <- min(table(land_data[[dataset]]$landmarkgroups[,2]))
+results <- pipeline.test(species, dataset, "../Data/Processed/", verbose = TRUE, rarefaction = TRUE)
+save(results, file = paste0("../Data/Results/", species, "_", dataset, "rarefied.Rda"))
+#load(paste0("../Data/Results/", species, "_", dataset, "rarefied.Rda"))
+#load(paste0("../Data/Processed/", species, ".Rda"))
+#results$rarefaction <- min(table(land_data[[dataset]]$landmarkgroups[,2]))
 
 caption_diff <- paste0("Results of the area difference random test (rarefied - ", results$rarefaction, ") for the ", results$dataset, " of ", results$species)
 caption_over <- paste0("Results of the overlap probability random test (rarefied - ", results$rarefaction, ") for the ", results$ataset, " of ", results$species)
@@ -295,11 +295,11 @@ make.plots(results$overlaps, type = "Bhattacharyya Coefficient", add.p = TRUE, c
 ```{r, echo = FALSE, message = FALSE}
 species <- "Wombat_latifrons"
 dataset <- "mandible"
-#results <- pipeline.test(species, dataset, "../Data/Processed/", verbose = TRUE, rarefaction = TRUE)
-#save(results, file = paste0("../Data/Results/", species, "_", dataset, "rarefied.Rda"))
-load(paste0("../Data/Results/", species, "_", dataset, "rarefied.Rda"))
-load(paste0("../Data/Processed/", species, ".Rda"))
-results$rarefaction <- min(table(land_data[[dataset]]$landmarkgroups[,2]))
+results <- pipeline.test(species, dataset, "../Data/Processed/", verbose = TRUE, rarefaction = TRUE)
+save(results, file = paste0("../Data/Results/", species, "_", dataset, "rarefied.Rda"))
+#load(paste0("../Data/Results/", species, "_", dataset, "rarefied.Rda"))
+#load(paste0("../Data/Processed/", species, ".Rda"))
+#results$rarefaction <- min(table(land_data[[dataset]]$landmarkgroups[,2]))
 
 caption_diff <- paste0("Results of the area difference random test (rarefied - ", results$rarefaction, ") for the ", results$dataset, " of ", results$species)
 caption_over <- paste0("Results of the overlap probability random test (rarefied - ", results$rarefaction, ") for the ", results$ataset, " of ", results$species)
@@ -354,11 +354,11 @@ make.plots(results$overlaps, type = "Bhattacharyya Coefficient", add.p = TRUE, c
 ```{r, echo = FALSE, message = FALSE}
 species <- "Wombat"
 dataset <- "cranium"
-#results <- pipeline.test(species, dataset, "../Data/Processed/", verbose = TRUE, rarefaction = TRUE)
-#save(results, file = paste0("../Data/Results/", species, "_", dataset, "rarefied.Rda"))
-load(paste0("../Data/Results/", species, "_", dataset, "rarefied.Rda"))
-load(paste0("../Data/Processed/", species, ".Rda"))
-results$rarefaction <- min(table(land_data[[dataset]]$landmarkgroups[,2]))
+results <- pipeline.test(species, dataset, "../Data/Processed/", verbose = TRUE, rarefaction = TRUE)
+save(results, file = paste0("../Data/Results/", species, "_", dataset, "rarefied.Rda"))
+#load(paste0("../Data/Results/", species, "_", dataset, "rarefied.Rda"))
+#load(paste0("../Data/Processed/", species, ".Rda"))
+#results$rarefaction <- min(table(land_data[[dataset]]$landmarkgroups[,2]))
 
 caption_diff <- paste0("Results of the area difference random test (rarefied - ", results$rarefaction, ") for the ", results$dataset, " of ", results$species)
 caption_over <- paste0("Results of the overlap probability random test (rarefied - ", results$rarefaction, ") for the ", results$ataset, " of ", results$species)
@@ -398,11 +398,11 @@ make.plots(results$overlaps, type = "Bhattacharyya Coefficient", add.p = TRUE, c
 ```{r, echo = FALSE, message = FALSE}
 species <- "Wombat"
 dataset <- "mandible"
-#results <- pipeline.test(species, dataset, "../Data/Processed/", verbose = TRUE, rarefaction = TRUE)
-#save(results, file = paste0("../Data/Results/", species, "_", dataset, "rarefied.Rda"))
-load(paste0("../Data/Results/", species, "_", dataset, "rarefied.Rda"))
-load(paste0("../Data/Processed/", species, ".Rda"))
-results$rarefaction <- min(table(land_data[[dataset]]$landmarkgroups[,2]))
+results <- pipeline.test(species, dataset, "../Data/Processed/", verbose = TRUE, rarefaction = TRUE)
+save(results, file = paste0("../Data/Results/", species, "_", dataset, "rarefied.Rda"))
+#load(paste0("../Data/Results/", species, "_", dataset, "rarefied.Rda"))
+#load(paste0("../Data/Processed/", species, ".Rda"))
+#results$rarefaction <- min(table(land_data[[dataset]]$landmarkgroups[,2]))
 
 caption_diff <- paste0("Results of the area difference random test (rarefied - ", results$rarefaction, ") for the ", results$dataset, " of ", results$species)
 caption_over <- paste0("Results of the overlap probability random test (rarefied - ", results$rarefaction, ") for the ", results$ataset, " of ", results$species)
@@ -459,9 +459,9 @@ species <- "Wombat_lasiorhinus"
 dataset <- "cranium"
 results <- pipeline.test(species, dataset, "../Data/Processed/", verbose = TRUE, rarefaction = TRUE)
 save(results, file = paste0("../Data/Results/", species, "_", dataset, "rarefied.Rda"))
-#load(paste0("../Data/Results/", species, "_", dataset, "rarefied.Rda"))
-load(paste0("../Data/Processed/", species, ".Rda"))
-results$rarefaction <- min(table(land_data[[dataset]]$landmarkgroups[,2]))
+##load(paste0("../Data/Results/", species, "_", dataset, "rarefied.Rda"))
+#load(paste0("../Data/Processed/", species, ".Rda"))
+#results$rarefaction <- min(table(land_data[[dataset]]$landmarkgroups[,2]))
 
 caption_diff <- paste0("Results of the area difference random test (rarefied - ", results$rarefaction, ") for the ", results$dataset, " of ", results$species)
 caption_over <- paste0("Results of the overlap probability random test (rarefied - ", results$rarefaction, ") for the ", results$ataset, " of ", results$species)
@@ -503,9 +503,9 @@ species <- "Wombat_lasiorhinus"
 dataset <- "mandible"
 results <- pipeline.test(species, dataset, "../Data/Processed/", verbose = TRUE, rarefaction = TRUE)
 save(results, file = paste0("../Data/Results/", species, "_", dataset, "rarefied.Rda"))
-#load(paste0("../Data/Results/", species, "_", dataset, "rarefied.Rda"))
-load(paste0("../Data/Processed/", species, ".Rda"))
-results$rarefaction <- min(table(land_data[[dataset]]$landmarkgroups[,2]))
+##load(paste0("../Data/Results/", species, "_", dataset, "rarefied.Rda"))
+#load(paste0("../Data/Processed/", species, ".Rda"))
+#results$rarefaction <- min(table(land_data[[dataset]]$landmarkgroups[,2]))
 
 caption_diff <- paste0("Results of the area difference random test (rarefied - ", results$rarefaction, ") for the ", results$dataset, " of ", results$species)
 caption_over <- paste0("Results of the overlap probability random test (rarefied - ", results$rarefaction, ") for the ", results$ataset, " of ", results$species)
