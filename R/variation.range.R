@@ -49,6 +49,8 @@
 #' @export
 #' @importFrom stats prcomp
 
+
+
 variation.range <- function(procrustes, type = "spherical", angle = "degree", what = "radius", ordination, axis, return.ID = FALSE, CI) {
 
     ## Sanitizing
@@ -189,11 +191,23 @@ variation.range <- function(procrustes, type = "spherical", angle = "degree", wh
 
         ## Get the variation range
         variation_range <- coordinates.difference(min_coordinates, max_coordinates, type = type, angle = angle)[[1]]
+
+        ## Finding the max/min specimen
+        warning("max/min specimen selection for the PCA only works on a single axis.")
+        if(length(axis) != 1) {
+            axis <- axis[1]
+        }
+        max_specimen <- which(ordination$x[,axis] == fun_max(ordination$x[,axis], CI))
+        min_specimen <- which(ordination$x[,axis] == fun_min(ordination$x[,axis], CI))
     }
     
     if(!do_ordinate && return.ID){   
         return(list("range" = variation_range, "min.max" = c(min_specimen, max_specimen)))
     } else {
-        return(variation_range)
+        if(return.ID) {
+            return(list("range" = variation_range, "min.max" = c(min_specimen, max_specimen)))
+        } else {
+            return(variation_range)
+        }
     }
 }
