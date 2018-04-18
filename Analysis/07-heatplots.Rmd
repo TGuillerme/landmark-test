@@ -28,10 +28,17 @@ set.seed(1)
 
 ```{r}
 ## Loading a dataset
-load("../Data/Processed/wombat_ursinus.Rda")
 
-## Selecting a partition
-cranium <- land_data$cranium
+#loading the below loads objects called land_data, NOT "wombat"
+load("../Data/Processed/wombat.Rda")
+AllWombats<-land_data
+load("../Data/Processed/wombat_krefftii.Rda")
+NHNW<-land_data
+load("../Data/Processed/wombat_latifrons.Rda")
+SHNW<-land_data
+load("../Data/Processed/wombat_ursinus.Rda")
+CW<-land_data
+
 ```
 
 The "maximum" and "minimum" specimen:
@@ -53,11 +60,12 @@ plotRefToTarget.heat(cranium$procruste$coords[, , specimens_min_max[2]],
 ```
 
 
-Same but with the PCA
+#Same but with the PCA
 
 ```{r}
 ## Procrustes variation ranges
 variation_all_PC_axis <- variation.range(cranium$procrustes, return.ID = TRUE, CI = 0.5, ordination = TRUE, axis = 1)
+#This does not work
 specimens_min_max <- variation_all_PC_axis$min.max
 procrustes_var <- variation_all_PC_axis$range[,1]
 ```
@@ -70,3 +78,42 @@ plotRefToTarget.heat(cranium$procruste$coords[, , specimens_min_max[2]],
                      col = heat.colors, pt.size = 1, col.val = procrustes_var,
                      plotRefToTarget.args = list(mag = 1))
 ```
+
+
+#Trying to do this using hypothetical PC min/max landmarks WHICH STILL NEEDS A WAY OF COLOURING ACCORDING TO MAGNITUDE
+
+
+
+```{r, eval = FALSE}
+
+#@params procrustes_coords is coordinate data (e.g.CW$cranium$procrustes$coords ); I'd like to add a "required_PC" which is the PC number we want to look at but don't know how that works
+
+## Procrustes variation ranges
+variation <- variation.range(cranium$procrustes, return.ID = TRUE, CI = 0.5)
+specimens_min_max <- variation$min.max
+procrustes_var <- variation$range[,1]
+
+
+
+heatplot_PCs<-function (Procrustes_coords){
+
+PCA=plotTangentSpace(Procrustes_coords)
+  
+gridPar = gridPar(pt.bg = "white", pt.size = 0.5)
+open3d()
+plotRefToTarget.heat(PCA$pc.shapes$PC1min,
+                     PCA$pc.shapes$PC1max,
+                     col = heat.colors, pt.size = 0.7, col.val = procrustes_var,
+                     plotRefToTarget.args = list(mag = 1))
+}
+
+heatplot_PCs(CW$cranium$procrustes$coords)
+heatplot_PCs(SHNW$cranium$procrustes$coords)
+heatplot_PCs(NHNW$cranium$procrustes$coords)
+
+heatplot_PCs(CW$mandible$procrustes$coords)
+heatplot_PCs(SHNW$mandible$procrustes$coords)
+heatplot_PCs(NHNW$mandible$procrustes$coords)
+
+```
+

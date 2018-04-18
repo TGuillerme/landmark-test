@@ -23,6 +23,7 @@ devtools::install_github("cmartin/ggConvexHull")
 library(ggConvexHull)
 source("../Functions/utilities.R")
 set.seed(1)
+library(landmarktest)
 
 # load the data
 
@@ -51,8 +52,8 @@ plot.partitions(land_data$cranium)
 plot.partitions(land_data$mandible)
 
 #The best way to fine-tune is to plot the coloured regions with the number
-plot.partitions(land_data$cranium)
-text3d(mshape(land_data$cranium$procrustes$coords), text=c(1:826))
+plot.partitions(land_data$mandible)
+text3d(mshape(land_data$mandible$procrustes$coords), text=c(1:577))
 
 ```
 
@@ -115,7 +116,8 @@ Environment[is.na(Environment)] <- " "           #Change NA to "U"
 
 
 plot.new()
-ggplot(WomCrPC, aes(x=WomCrPC1Scores, y=WomCrPC2Scores, colour=Species, fill=Species))+
+#in the below, it doesn't work to use PC$cranium$land_data..i...ordination.x...1. and PC$cranium$land_data..i...ordination.x...2. for x and y - not sure why. It might be easier to just do the PCA manually
+ggplot(PC$cranium, aes(x=PC$cranium$land_data..i...ordination.x...1., y=PC$cranium$land_data..i...ordination.x...2., colour=Species, fill=Species))+
   geom_convexhull(alpha=.4)+
   scale_shape_manual(values = c(21, 22, 24))+
   geom_point(aes(shape=Sex, fill=Species), color="black", size=4, stroke = 0.75)+
@@ -126,4 +128,3 @@ ggplot(WomCrPC, aes(x=WomCrPC1Scores, y=WomCrPC2Scores, colour=Species, fill=Spe
 theme_set(theme_bw(12))
 
 ```
-
