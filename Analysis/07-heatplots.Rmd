@@ -51,3 +51,22 @@ plotRefToTarget.heat(cranium$procruste$coords[, , specimens_min_max[2]],
                      col = heat.colors, pt.size = 1, col.val = procrustes_var,
                      plotRefToTarget.args = list(mag = 1))
 ```
+
+
+Same but with the PCA
+
+```{r}
+## Procrustes variation ranges
+variation_all_PC_axis <- variation.range(cranium$procrustes, return.ID = TRUE, CI = 0.5, ordination = TRUE, axis = 1)
+specimens_min_max <- variation_all_PC_axis$min.max
+procrustes_var <- variation_all_PC_axis$range[,1]
+```
+
+```{r, eval = FALSE}
+gridPar = gridPar(pt.bg = "white", pt.size = 0.5)
+open3d()
+plotRefToTarget.heat(cranium$procruste$coords[, , specimens_min_max[2]],
+                     cranium$procruste$coords[, , specimens_min_max[1]],
+                     col = heat.colors, pt.size = 1, col.val = procrustes_var,
+                     plotRefToTarget.args = list(mag = 1))
+```
