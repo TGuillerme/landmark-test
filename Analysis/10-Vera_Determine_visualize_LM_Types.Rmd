@@ -51,7 +51,7 @@ LM_num <- which(LM == TRUE)
 
 #Assign each landmark the appropriate number; Fixed is 1, semis are 2, patches are 3
 
-#you need a 2-column matrix with column 1 the landmark number and column 2 available for filling (I am using a file that has some numbers already)
+#using landmarkgroups as a file to fill in 
 landmarkgroups=read.csv("../Data/Raw/landmarkgroups_cranium_wombat.csv")
 
 landmark_LM_types<-landmarkgroups
@@ -117,12 +117,12 @@ for(i in 1:length(PartLevels)){
 #plotting the spheres- if you get only white, increase the radius!!       
 open3d()
 for (i in 1:length(PartLevels)){
-  spheres3d(WomMaRef[Part[[i]],1], WomMaRef[Part[[i]],2], WomMaRef[Part[[i]],3], col=Colours[i], lit=TRUE,radius = 0.4, asp=F)
+  spheres3d(Wom_cranium_Ref[Part[[i]],1], Wom_cranium_Ref[Part[[i]],2], Wom_cranium_Ref[Part[[i]],3], col=Colours[i], lit=TRUE,radius = 0.4, asp=F)
   
 }
 
 #Add text to see which LM number is a curve/fixed LM/ patch; Viewbox is really chaotic in the order of curve points!
-text3d(WomMaRef, text=c(1:826), adj=1.2, cex=0.8)
+text3d(Wom_cranium_Ref, text=c(1:826), adj=1.2, cex=0.8)
 
 
 ```
