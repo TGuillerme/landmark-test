@@ -55,6 +55,9 @@ plot.partitions(land_data$mandible)
 plot.partitions(land_data$mandible)
 text3d(mshape(land_data$mandible$procrustes$coords), text=c(1:577))
 
+
+
+
 ```
 
 # Visualizing shape changes between Principal component extremes
