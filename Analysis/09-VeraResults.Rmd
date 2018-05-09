@@ -382,18 +382,19 @@ matched_coords<-reduce.check(AllData, AllClassifiers)
 matched_coords[[2]]
 
 ```
-##run 2BPLS code
+##run 2BPLS code - depending on processor speed, this can take a while, so recommend just loading the results which are saved in the "Results" folder
 
 ```{r, message = FALSE, warning = FALSE}
 SHNWTBPLS <- two.b.pls(matched_coords[[1]]$SHNW$cranium ,matched_coords[[1]]$SHNW$mandible ,iter=1000) 
 summary(SHNWTBPLS)
 save(SHNWTBPLS, file="../Data/Results/SHNWTBLS.Rda")
-#When run, hash out the above and just load the resutls of the 2Block analysis
 load("../Data/Results/SHNWTBLS.Rda")
+
 NHNWTBPLS <- two.b.pls(matched_coords[[1]]$NHNW$cranium ,matched_coords[[1]]$NHNW$mandible, iter=1000) 
  summary(NHNWTBPLS)
 save(NHNWTBPLS, file="../Data/Results/NHNWTBLS.Rda")
 load("../Data/Results/NHNWTBLS.Rda")
+
 CWTBPLS <- two.b.pls(matched_coords[[1]]$CW$cranium ,matched_coords[[1]]$CW$mandible ,iter=1000) 
  summary(CWTBPLS)
  save(CWTBPLS, file="../Data/Results/CWTBLS.Rda")
@@ -419,7 +420,7 @@ CWPLS_CPLS=merge(CWTBPLS_Cranium_Scores,CWCsize,by="row.names",all.x=TRUE)#Why c
 
 
 
-plot(CWPLS_PCA[,2], CWPLS_PCA[,3])
+plot(CWPLS_PCA_separate[,2], CWPLS_PCA_separate[,3])
 summary(lm((CWPLS_PCA[,2]~CWPLS_PCA[,3])))
 summary(lm((CWPLS_CPLS[,2]~CWPLS_CPLS[,3])))
 
