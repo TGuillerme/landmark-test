@@ -8,6 +8,7 @@ Manuscript/Figures/*.pdf
 *.pdf
 
 ## Ignore .Rapp.histories
+.Rhistory
 *.Rapp.history
 *.RData
 
