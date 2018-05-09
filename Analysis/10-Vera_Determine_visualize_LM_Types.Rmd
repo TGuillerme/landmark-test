@@ -12,17 +12,31 @@ fig_height: 6
 library(stringr)
 library(geomorph)
 
+#loading the below loads objects called land_data, NOT "wombat"
+load("../Data/Processed/wombat.Rda")
+AllWombats<-land_data
+load("../Data/Processed/wombat_krefftii.Rda")
+NHNW<-land_data
+load("../Data/Processed/wombat_latifrons.Rda")
+SHNW<-land_data
+load("../Data/Processed/wombat_ursinus.Rda")
+CW<-land_data
+
+
+#read classifiers
+cranium<-read.csv("../Data/Raw/classifier_cranium_wombat.csv")
+mandible<-read.csv("../Data/Raw/classifier_mandible_wombat.csv")
 ```
 # Load data. These need to be raw data so I can pull out the landmark names
 ```{r}
   ## Create vectors of patch points, semi-landmarks, and landmarks
   # LM point name metadata
   
+#change "cranium" designations to "mandible" desiignations as needed
 
+rawdata_mandible_wombat<-read.csv ("../Data/Raw/landmarkdata_mandible_wombat.csv")
 
-rawdata_cranium_wombat<-read.csv ("../Data/Raw/landmarkdata_cranium_wombat.csv")
-
-pt_names <-rawdata_cranium_wombat[, 1] # grabs first column of raw coords
+pt_names <-rawdata_mandible_wombat[, 1] # grabs first column of raw coords
 foo2 <- str_sub(pt_names, 3, -1) # gets rid of X, Y, Z designations
 u_pt_names <- unique(foo2)
 
@@ -38,9 +52,9 @@ LM_num <- which(LM == TRUE)
 #Assign each landmark the appropriate number; Fixed is 1, semis are 2, patches are 3
 
 #you need a 2-column matrix with column 1 the landmark number and column 2 available for filling (I am using a file that has some numbers already)
-landmarkgroups=read.csv("../Data/Raw/landmarkgroups_cranium_wombat.csv")
+landmarkgroups=read.csv("../Data/Raw/landmarkgroups_mandible_wombat.csv")
 
-landmark_LM_types<-landmark_LM_types
+landmark_LM_types<-landmarkgroups
 for (i in 1:length(landmark_LM_types[,1])){
 if(landmark_LM_types[i,1] %in% pat_num ==TRUE)
 landmark_LM_types[i,2]<-3
@@ -57,6 +71,19 @@ landmark_LM_types[i,2]<-1
 
 }
 
+#create Surfslide file
+  wombat_mandible_surfslide=which(landmark_LM_types$x==3)
+  write.csv(wombat_mandible_surfslide, file="../Data/Processed/wombat_mandible_surfslide.csv")
+
+#curveslide file created manually using the visualization code below and the Viewbox landmark names contained in the landmarkdata_mandible_wombat raw data file.
+
+# Checking that the sliding semilandmarks were correctly chosen
+wombat_mandible_curves=which(landmark_LM_types$x==2)
+curveslide=read.csv(file="../Data/Processed/wombat_mandible_curveslide.csv")
+
+#check that the sliding lms as designated in viewbox match with the lms designated in the curveslide file
+setdiff(curveslide$slider, wombat_mandible_curves)
+setdiff(wombat_mandible_curves, curveslide$slider)
 
 ``` 
   
@@ -65,15 +92,15 @@ landmark_LM_types[i,2]<-1
 
 ```{r}
 
+# import raw data for visualizing curves
 # Transpose rows and columns because of the format that Viewbox exports in
-WomCrData <- t(rawdata_cranium_wombat) 
+Wom_mandible_Data <- t(rawdata_mandible_wombat) 
 # Remove any empty rows
-WomCrData <- WomCrData[complete.cases(WomCrData),] 
+Wom_mandible_Data <- Wom_mandible_Data[complete.cases(Wom_mandible_Data),] 
 # Make 3D Array
-WomCrData <- arrayspecs(WomCrData, k=3, p=ncol(WomCrData)/3) 
+Wom_mandible_Data <- arrayspecs(Wom_mandible_Data, k=3, p=ncol(Wom_mandible_Data)/3) 
 
-WomCrRef <- WomCrData[,,5]
-
+Wom_mandible_Ref <- Wom_mandible_Data[,,6]
 
 
 
@@ -90,8 +117,12 @@ for(i in 1:length(PartLevels)){
 #plotting the spheres- if you get only white, increase the radius!!       
 open3d()
 for (i in 1:length(PartLevels)){
-  spheres3d(WomCrRef[Part[[i]],1], WomCrRef[Part[[i]],2], WomCrRef[Part[[i]],3], col=Colours[i], lit=TRUE,radius = 1, asp=F)
+  spheres3d(WomMaRef[Part[[i]],1], WomMaRef[Part[[i]],2], WomMaRef[Part[[i]],3], col=Colours[i], lit=TRUE,radius = 0.4, asp=F)
   
 }
+
+#Add text to see which LM number is a curve/fixed LM/ patch; Viewbox is really chaotic in the order of curve points!
+text3d(WomMaRef, text=c(1:826), adj=1.2, cex=0.8)
+
 
 ```
