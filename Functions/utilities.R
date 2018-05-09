@@ -4,7 +4,7 @@
 # @param combine.land whether to combine the landmarks (only two partitions)
 
 ## Test pipeline
-pipeline.test <- function(species, dataset, path, verbose = FALSE, rarefaction, combine.land = FALSE){
+pipeline.test <- function(species, dataset, path, verbose = FALSE, rarefaction, combine.land = FALSE, CI){
     ## Loading a dataset
     if(verbose) message("Load data...")
     load(paste0(path, species, ".Rda"))
@@ -17,7 +17,7 @@ pipeline.test <- function(species, dataset, path, verbose = FALSE, rarefaction, 
 
     ## Procrustes variation ranges
     if(verbose) message("Calculate range...")
-    procrustes_var <- variation.range(data$procrustes, type = "spherical", what = "radius")
+    procrustes_var <- variation.range(data$procrustes, type = "spherical", what = "radius", CI = CI)
     if(verbose) message("Done.\n")
 
     ## landmarks partitions
