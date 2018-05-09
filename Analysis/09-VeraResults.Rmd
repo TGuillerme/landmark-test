@@ -83,47 +83,56 @@ Points=gridPar(pt.size=0.7)
 
 ###plot the procrustes distances from mean for specimens to identify the ones beyone the upper/lower quartiles
 
-plotOutliers(CW$cranium$procrustes$coords)#CW_M11 (individual 14 is an outlier)
+plotOutliers(CW$cranium$procrustes$coords)#CW_M11 (individual 14,11 are out)
 
 ###use plotRefToTarget with lollipop graphs to check if outlier has landmark error; replace number according to which individuals have been identified as outliers
 open3d()
 plotRefToTarget(CW$cranium$procrustes$consensus, CW$cranium$procrustes$coords[,,14], method="vector", gridPars = Points)#No evidence of landmarking error
 
 ##Mandible
-plotOutliers(CW$mandible$procrustes$coords)#20, 10 and 11 are outliers
+plotOutliers(CW$mandible$procrustes$coords)#20,  11 are out
 mshapeCW<-mshape(CW$mandible$procrustes$coords)
 open3d()
-plotRefToTarget(mshapeCW, CW$mandible$procrustes$coords[,,20], method="vector", gridPars = Points) #Slight assymetry in 2 cases but no evidence of landmarking error
-
-
-#SHN wombat
-
-##Cranium
-plotOutliers(NHNW$cranium$procrustes$coords)#NHNW_M11 (individual 21 is an outlier)
-mshapeNHNW<-mshape(NHNW$cranium$procrustes$coords)
-open3d()
-plotRefToTarget(mshapeNHNW, NHNW$cranium$procrustes$coords[,,21], method="vector", gridPars = Points)#No evidence of landmarking errlr
-
-##Mandible
-plotOutliers(NHNW$mandible$procrustes$coords)#No outliers
+plotRefToTarget(mshapeCW, CW$mandible$procrustes$coords[,,20], method="vector", gridPars = Points) # no evidence of landmarking error
 
 
 #NHN wombat
 
 ##Cranium
-plotOutliers(NHNW$cranium$procrustes$coords)#No outliers
+plotOutliers(NHNW$cranium$procrustes$coords)#NHNW_M11 (individual 21 is out)
+mshapeNHNW<-mshape(NHNW$cranium$procrustes$coords)
+open3d()
+plotRefToTarget(mshapeNHNW, NHNW$cranium$procrustes$coords[,,21], method="vector", gridPars = Points)#No evidence of landmarking error
 
 ##Mandible
-plotOutliers(NHNW$mandible$procrustes$coords)#No outliers
+plotOutliers(NHNW$mandible$procrustes$coords)#Specimen 3 is out
+mshapeNHNW<-mshape(NHNW$mandible$procrustes$coords)
+open3d()
+plotRefToTarget(mshapeNHNW, NHNW$mandible$procrustes$coords[,,3], method="vector", gridPars = Points)#No evidence of landmarking error
+
+#SHN wombat
+
+##Cranium
+plotOutliers(SHNW$cranium$procrustes$coords)#21, 20 and 5 are out
+mshapeSHNW<-mshape(SHNW$cranium$procrustes$coords)
+open3d()
+plotRefToTarget(mshapeSHNW, SHNW$cranium$procrustes$coords[,,5], method="vector", gridPars = Points)#No evidence of landmarking error
+
+
+##Mandible
+plotOutliers(SHNW$mandible$procrustes$coords)#No outliers
+
 
 ```
 
 #Shape disparity comparison
 
 ```{r, message = FALSE, warning = FALSE}
+
+
 #Create gdfs with species for the data frames
-Cr_gdf<-geomorph.data.frame(coords=land_data$cranium$procrustes$coords, Csize=land_data$cranium$procrustes$Csize, species=as.factor(cranium$Species))
-Mand_gdf<-geomorph.data.frame(coords=land_data$mandible$procrustes$coords, Csize=land_data$mandible$procrustes$Csize, species=as.factor(mandible$Species))
+Cr_gdf<-geomorph.data.frame(coords=AllWombats$cranium$procrustes$coords, Csize=AllWombats$cranium$procrustes$Csize, species=as.factor(cranium$Species))
+Mand_gdf<-geomorph.data.frame(coords=AllWombats$mandible$procrustes$coords, Csize=AllWombats$mandible$procrustes$Csize, species=as.factor(mandible$Species))
 
 #run analyses using the gdfs
 CraniumDisparity <- morphol.disparity(coords~species, groups=~species, iter = 9999, seed = 42, data = Cr_gdf, print.progress = TRUE) # Disparity within groups compared to that group's mean
@@ -304,7 +313,7 @@ names(Sex_GDFs)<-names (AllData)
 ```{r, message = FALSE, warning = FALSE}
 
 
-#Geolocation 
+#Geolocation; run separately for Temp and Aridity 
 
 Geo_procD_outputs<-list()
 
@@ -313,7 +322,7 @@ for (i in 1:length(Geo_GDFs)){
   
     for (k in 1:length(Geo_GDFs[[2]])){
     
-  Geo_procD_outputs[[i]][[k]] <-procD.lm(coords~Aridity, data=Geo_GDFs[[i]][[k]], iter=1000)
+  Geo_procD_outputs[[i]][[k]] <-procD.lm(coords~Temp, data=Geo_GDFs[[i]][[k]], iter=1000)
   
 }
 names(Geo_procD_outputs[[i]])<-names(Geo_GDFs[[i]])

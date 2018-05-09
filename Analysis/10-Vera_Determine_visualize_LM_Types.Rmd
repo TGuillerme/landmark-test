@@ -32,11 +32,11 @@ mandible<-read.csv("../Data/Raw/classifier_mandible_wombat.csv")
   ## Create vectors of patch points, semi-landmarks, and landmarks
   # LM point name metadata
   
-#change "cranium" designations to "mandible" desiignations as needed
+#change "cranium" designations to "mandible" designations as needed
 
-rawdata_mandible_wombat<-read.csv ("../Data/Raw/landmarkdata_mandible_wombat.csv")
+rawdata_cranium_wombat<-read.csv ("../Data/Raw/landmarkdata_cranium_wombat.csv")
 
-pt_names <-rawdata_mandible_wombat[, 1] # grabs first column of raw coords
+pt_names <-rawdata_cranium_wombat[, 1] # grabs first column of raw coords
 foo2 <- str_sub(pt_names, 3, -1) # gets rid of X, Y, Z designations
 u_pt_names <- unique(foo2)
 
@@ -52,7 +52,7 @@ LM_num <- which(LM == TRUE)
 #Assign each landmark the appropriate number; Fixed is 1, semis are 2, patches are 3
 
 #you need a 2-column matrix with column 1 the landmark number and column 2 available for filling (I am using a file that has some numbers already)
-landmarkgroups=read.csv("../Data/Raw/landmarkgroups_mandible_wombat.csv")
+landmarkgroups=read.csv("../Data/Raw/landmarkgroups_cranium_wombat.csv")
 
 landmark_LM_types<-landmarkgroups
 for (i in 1:length(landmark_LM_types[,1])){
@@ -72,18 +72,18 @@ landmark_LM_types[i,2]<-1
 }
 
 #create Surfslide file
-  wombat_mandible_surfslide=which(landmark_LM_types$x==3)
-  write.csv(wombat_mandible_surfslide, file="../Data/Processed/wombat_mandible_surfslide.csv")
+  surfslide_cranium_wombat=which(landmark_LM_types$x==3)
+  write.csv(surfslide_cranium_wombat, file="../Data/Raw/surfslide_cranium_wombat.csv")
 
-#curveslide file created manually using the visualization code below and the Viewbox landmark names contained in the landmarkdata_mandible_wombat raw data file.
+#curveslide file created manually using the visualization code below and the Viewbox landmark names contained in the landmarkdata_cranium_wombat raw data file.
 
 # Checking that the sliding semilandmarks were correctly chosen
-wombat_mandible_curves=which(landmark_LM_types$x==2)
-curveslide=read.csv(file="../Data/Processed/wombat_mandible_curveslide.csv")
+curves_cranium_wombat=which(landmark_LM_types$x==2)
+curveslide=read.csv(file="../Data/Raw/curveslide_cranium_wombat.csv")
 
-#check that the sliding lms as designated in viewbox match with the lms designated in the curveslide file
-setdiff(curveslide$slider, wombat_mandible_curves)
-setdiff(wombat_mandible_curves, curveslide$slider)
+#check that the sliding lms as designated in viewbox match with the lms designated in the curveslide file; because the curveslide file needs to be done manually, this is an important step
+setdiff(curveslide$slider, curves_cranium_wombat)
+setdiff(curves_cranium_wombat, curveslide$slider)
 
 ``` 
   
@@ -94,13 +94,13 @@ setdiff(wombat_mandible_curves, curveslide$slider)
 
 # import raw data for visualizing curves
 # Transpose rows and columns because of the format that Viewbox exports in
-Wom_mandible_Data <- t(rawdata_mandible_wombat) 
+Wom_cranium_Data <- t(rawdata_cranium_wombat) 
 # Remove any empty rows
-Wom_mandible_Data <- Wom_mandible_Data[complete.cases(Wom_mandible_Data),] 
+Wom_cranium_Data <- Wom_cranium_Data[complete.cases(Wom_cranium_Data),] 
 # Make 3D Array
-Wom_mandible_Data <- arrayspecs(Wom_mandible_Data, k=3, p=ncol(Wom_mandible_Data)/3) 
+Wom_cranium_Data <- arrayspecs(Wom_cranium_Data, k=3, p=ncol(Wom_cranium_Data)/3) 
 
-Wom_mandible_Ref <- Wom_mandible_Data[,,6]
+Wom_cranium_Ref <- Wom_cranium_Data[,,6]
 
 
 

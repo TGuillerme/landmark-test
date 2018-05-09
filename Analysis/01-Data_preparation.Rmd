@@ -23,7 +23,8 @@ Data type | Data set | Species | File format
 ----------|----------|---------|------------
 classifier|  cranium|wombat|.csv
 landmarkdata | cranium  | wombat | .csv
-landmarkgroups | mandible | wombat |
+landmarkgroups | mandible | wombat |.csv
+curveslide|cranium|wombat|.csv
 
 
 
@@ -32,7 +33,7 @@ landmarkgroups | mandible | wombat |
 Includes gpa coordinates (procrustes), landmark partitions (landmarkgroups), and principal component output (ordination)
 
 ```{r}
-## The chain names
+## The chain names; in case there are several species, but it is only one species here
 chains <- c("wombat")
 
 ## The datasets
@@ -54,12 +55,16 @@ for(chain in chains) {
         ## Read the landmarks
         landmarks  <- t(read.csv(paste0("../Data/Raw/landmarkdata_", dataset, "_", chain, ".csv"),
                                  header = TRUE, row.names = 1))
-
+        
         ## Make into a 3D array
         landmarks <- geomorph::arrayspecs(landmarks, k = 3, p = ncol(landmarks)/3)
+        
+        ## Read the curve and surfslide files
+        curveslide<-read.csv(paste0("../Data/Raw/curveslide_", dataset, "_", chain, ".csv"))
+        surfslide<-read.csv(paste0("../Data/Raw/surfslide_", dataset, "_", chain, ".csv"))
 
         ## Running the Procrustes superimposition
-        land_data[[dataset]][[2]] <- geomorph::gpagen(landmarks, print.progress = FALSE)
+        land_data[[dataset]][[2]] <- geomorph::gpagen(landmarks,curves=curveslide, surfaces=surfslide$x, print.progress = TRUE)
 
         ## Convert the array in 2D
         array_2d <- geomorph::two.d.array(land_data[[dataset]][[2]]$coords)
@@ -116,7 +121,11 @@ for(sp in 1:length(species)) {
         ## Read the landmarks
         landmarks  <- t(read.csv(paste0("../Data/Raw/landmarkdata_", dataset, "_", chain, ".csv"),
                                  header = TRUE, row.names = 1))
-
+       
+         ## Read the curve and surfslide files
+        curveslide<-read.csv(paste0("../Data/Raw/curveslide_", dataset, "_", chain, ".csv"))
+        surfslide<-read.csv(paste0("../Data/Raw/surfslide_", dataset, "_", chain, ".csv"))
+        
         ## Make into a 3D array
         landmarks <- geomorph::arrayspecs(landmarks, k = 3, p = ncol(landmarks)/3)
 
@@ -129,7 +138,7 @@ for(sp in 1:length(species)) {
         landmarks <- landmarks[, , which(wombat_sp$Species %in% species[which_sp])]
 
         ## Running the Procrustes superimposition
-        land_data[[dataset]][[2]] <- geomorph::gpagen(landmarks, print.progress = FALSE)
+        land_data[[dataset]][[2]] <- geomorph::gpagen(landmarks, curves=curveslide, surfaces=surfslide$x, print.progress = TRUE)
 
         ## Convert the array in 2D
         array_2d <- geomorph::two.d.array(land_data[[dataset]][[2]]$coords)
