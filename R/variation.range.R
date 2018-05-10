@@ -70,6 +70,10 @@ variation.range <- function(procrustes, type = "spherical", angle = "degree", wh
         if(CI < 0 || CI > 1) {
             stop("CI must be a percentage between 0 and 1.")
         }
+
+        ## Convert the CI value into quantile boundaries
+        quantile_max <- 0.5 + (CI/2)
+        quantile_min <- 0.5 - (CI/2)
     }
 
     ## ordination
@@ -127,6 +131,11 @@ variation.range <- function(procrustes, type = "spherical", angle = "degree", wh
     ## Applying the method to the Procrustes
     if(!do_ordinate) {
 
+        ## Add names to the list to keep track of each specimen
+        if(is.null(names(procrustes$coords)) || is.null(attributes(procrustes$coords)$dimnames[[3]])) {
+            attributes(procrustes$coords)$dimnames[[3]] <- seq(1:dim(procrustes$coords)[3])
+        }
+
         ## Get the distances from the consensus
         diff_consensus <- coordinates.difference(procrustes$coords, procrustes$consensus, type = type, angle = angle)
 
@@ -136,14 +145,18 @@ variation.range <- function(procrustes, type = "spherical", angle = "degree", wh
         ## Finding the max specimen
         if(do_CI) {
             ## Take the the specimen in the upper CI
-            max_specimen <- which(areas == max(areas[which(areas <= quantile(areas, probs = CI))]))  #add abs(areas)?
+            max_specimen <- which(areas == max(areas[which(areas <= quantile(areas, probs = quantile_max))]))  #add abs(areas)?
+            ## Adding the specimens to remove
+            max_specimen <- c(max_specimen, which(areas > areas[max_specimen]))
         } else {
             ## Take the actual max specimen
             max_specimen <- which(areas == max(areas))  #add abs(areas)?
         }
+        ## Save the ID of the max specimen
+        max_specimenID <- names(max_specimen[1])
 
         ## Get the distances from the maximum
-        diff_from_max <- coordinates.difference(procrustes$coords[, , -max_specimen], procrustes$coords[, , max_specimen], type = type, angle = angle)
+        diff_from_max <- coordinates.difference(procrustes$coords[, , -max_specimen], procrustes$coords[, , max_specimen[1]], type = type, angle = angle)
 
         ## Getting all the areas
         areas_max <- unlist(lapply(diff_from_max, coordinates.area, what = what))
@@ -151,7 +164,7 @@ variation.range <- function(procrustes, type = "spherical", angle = "degree", wh
         ## Finding the min specimen
         if(do_CI) {
             ## Take the the specimen in the upper CI
-            min_specimen <- which(areas_max == max(areas_max[which(areas_max <= quantile(areas_max, probs = CI))]))  #add abs(areas)?
+            min_specimen <- which(areas_max == max(areas_max[which(areas_max <= quantile(areas_max, probs = quantile_max))]))  #add abs(areas)?
         } else {
             ## Take the actual max specimen
             min_specimen <- which(areas_max == max(areas_max))  #add abs(areas)?
