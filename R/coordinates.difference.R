@@ -62,6 +62,8 @@ coordinates.difference <- function(coordinates, reference, type = "cartesian", a
             ## Convert array into list
             if(!is.null(attributes(coordinates)$dimnames[[3]])) {
                 coordi_names <- attributes(coordinates)$dimnames[[3]]
+            } else {
+                coordi_names <- 1:dim(coordinates)[3]
             }
             coordinates <- sapply(1:dim(coordinates)[3], function(x, coordinates) return(list(coordinates[,,x])), coordinates)
             names(coordinates) <- coordi_names
