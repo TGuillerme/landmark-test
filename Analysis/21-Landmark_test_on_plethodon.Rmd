@@ -136,14 +136,109 @@ We can then rerun the same analysis but using difference confidence intervals.
 
 ```{r}
 ## Variation range with confidence intervals
+var_range_95_hdr <- variation.range(procrustes, type = "spherical", what = "radius",
+                                    return.ID = TRUE, CI = 0.95, CI.hdr = TRUE)
+var_range_75_hdr <- variation.range(procrustes, type = "spherical", what = "radius",
+                                    return.ID = TRUE, CI = 0.75, CI.hdr = TRUE)
+var_range_50_hdr <- variation.range(procrustes, type = "spherical", what = "radius",
+                                    return.ID = TRUE, CI = 0.5, CI.hdr = FALSE)
 var_range_95 <- variation.range(procrustes, type = "spherical", what = "radius",
-                                return.ID = TRUE, CI = 0.95)
+                                    return.ID = TRUE, CI = 0.95, CI.hdr = FALSE)
 var_range_75 <- variation.range(procrustes, type = "spherical", what = "radius",
-                                return.ID = TRUE, CI = 0.75)
+                                    return.ID = TRUE, CI = 0.75, CI.hdr = FALSE)
 var_range_50 <- variation.range(procrustes, type = "spherical", what = "radius",
-                                return.ID = TRUE, CI = 0.5)
+                                    return.ID = TRUE, CI = 0.6, CI.hdr = FALSE)
+
+
+## Variation range with confidence intervals
+var_range_95_hdr_pre <- variation.range(procrustes, type = "spherical", what = "radius",
+                                    return.ID = TRUE, CI = 0.95, CI.hdr = TRUE, CI.pre = TRUE)
+var_range_75_hdr_pre <- variation.range(procrustes, type = "spherical", what = "radius",
+                                    return.ID = TRUE, CI = 0.75, CI.hdr = TRUE, CI.pre = TRUE)
+var_range_50_hdr_pre <- variation.range(procrustes, type = "spherical", what = "radius",
+                                    return.ID = TRUE, CI = 0.6, CI.hdr = FALSE, CI.pre = TRUE)
+var_range_95_pre <- variation.range(procrustes, type = "spherical", what = "radius",
+                                    return.ID = TRUE, CI = 0.95, CI.hdr = FALSE, CI.pre = TRUE)
+var_range_75_pre <- variation.range(procrustes, type = "spherical", what = "radius",
+                                    return.ID = TRUE, CI = 0.75, CI.hdr = FALSE, CI.pre = TRUE)
+var_range_50_pre <- variation.range(procrustes, type = "spherical", what = "radius",
+                                    return.ID = TRUE, CI = 0.6, CI.hdr = FALSE, CI.pre = TRUE)
+
 ```
 
+Or, to compare them more easily:
+
+
+```{r, fig.width = 12, fig.height = 12, echo = FALSE}
+par(bty = "n", mfrow = c(2,2))
+C100 <- procrustes_var
+C95 <- var_range_95
+C75 <- var_range_75
+C50 <- var_range_50
+## Getting the ranges histograms
+plot(sort(C100$range[, "radius"], decreasing = TRUE), type = "l", ylim = c(0, 0.1),
+     xlab = "ranked landmarks", ylab = "landmark difference", main = "Variation range ranking (no hdr)")
+lines(sort(C95$range[, "radius"], decreasing = TRUE), col = "orange")
+lines(sort(C75$range[, "radius"], decreasing = TRUE), col = "blue")
+lines(sort(C50$range[, "radius"], decreasing = TRUE), col = "darkgreen")
+legend("topright", bty = "n", lty = 1, col = c("black", "orange", "blue", "darkgreen"), 
+    legend = c(paste0("100% CI (", paste0(C100$min.max, collapse = ", "), ")"),
+               paste0("95% CI (", paste0(C95$min.max, collapse = ", "), ")"),
+               paste0("75% CI (", paste0(C75$min.max, collapse = ", "), ")"),
+               paste0("60% CI (", paste0(C50$min.max, collapse = ", "), ")")))
+
+
+C95 <- var_range_95_hdr
+C75 <- var_range_75_hdr
+C50 <- var_range_50_hdr
+## Getting the ranges histograms
+plot(sort(C100$range[, "radius"], decreasing = TRUE), type = "l", ylim = c(0, 0.1),
+     xlab = "ranked landmarks", ylab = "landmark difference", main = "Variation range ranking (with hdr)")
+lines(sort(C95$range[, "radius"], decreasing = TRUE), col = "orange")
+lines(sort(C75$range[, "radius"], decreasing = TRUE), col = "blue")
+lines(sort(C50$range[, "radius"], decreasing = TRUE), col = "darkgreen")
+legend("topright", bty = "n", lty = 1, col = c("black", "orange", "blue", "darkgreen"), 
+    legend = c(paste0("100% CI (", paste0(C100$min.max, collapse = ", "), ")"),
+               paste0("95% CI (", paste0(C95$min.max, collapse = ", "), ")"),
+               paste0("75% CI (", paste0(C75$min.max, collapse = ", "), ")"),
+               paste0("60% CI (", paste0(C50$min.max, collapse = ", "), ")")))
+
+
+## Getting the ranges histograms
+C95 <- var_range_95_pre
+C75 <- var_range_75_pre
+C50 <- var_range_50_pre
+plot(sort(C100$range[, "radius"], decreasing = TRUE), type = "l", ylim = c(0, 0.1),
+     xlab = "ranked landmarks", ylab = "landmark difference", main = "Variation range ranking (no hdr ; pre CI)")
+lines(sort(C95$range[, "radius"], decreasing = TRUE), col = "orange")
+lines(sort(C75$range[, "radius"], decreasing = TRUE), col = "blue")
+lines(sort(C50$range[, "radius"], decreasing = TRUE), col = "darkgreen")
+legend("topright", bty = "n", lty = 1, col = c("black", "orange", "blue", "darkgreen"), 
+    legend = c(paste0("100% CI (", paste0(C100$min.max, collapse = ", "), ")"),
+               paste0("95% CI (", paste0(C95$min.max, collapse = ", "), ")"),
+               paste0("75% CI (", paste0(C75$min.max, collapse = ", "), ")"),
+               paste0("60% CI (", paste0(C50$min.max, collapse = ", "), ")")))
+
+## Getting the ranges histograms
+C95 <- var_range_95_hdr_pre
+C75 <- var_range_75_hdr_pre
+C50 <- var_range_50_hdr_pre
+plot(sort(C100$range[, "radius"], decreasing = TRUE), type = "l", ylim = c(0, 0.1),
+     xlab = "ranked landmarks", ylab = "landmark difference", main = "Variation range ranking (with hdr pre CI)")
+lines(sort(C95$range[, "radius"], decreasing = TRUE), col = "orange")
+lines(sort(C75$range[, "radius"], decreasing = TRUE), col = "blue")
+lines(sort(C50$range[, "radius"], decreasing = TRUE), col = "darkgreen")
+legend("topright", bty = "n", lty = 1, col = c("black", "orange", "blue", "darkgreen"), 
+    legend = c(paste0("100% CI (", paste0(C100$min.max, collapse = ", "), ")"),
+               paste0("95% CI (", paste0(C95$min.max, collapse = ", "), ")"),
+               paste0("75% CI (", paste0(C75$min.max, collapse = ", "), ")"),
+               paste0("60% CI (", paste0(C50$min.max, collapse = ", "), ")")))
+
+```
+
+
+
+We can also 
 And represent them in the same way:
 
 
@@ -236,21 +331,6 @@ points(M2, col = "orange", pch = 19, cex = 0.5)
 legend(legend = c("Consensus", paste("Specimen", procrustes_var$min.max[1]),
       paste("Specimen", procrustes_var$min.max[2])), "topleft", bty = "n",
       col = c("grey", "blue", "orange"), pch = 19)
-```
-
-Or, to compare them more easily:
-
-
-```{r, fig.width = 8, fig.height = 8, echo = FALSE}
-par(bty = "n")
-## Getting the ranges histograms
-plot(sort(procrustes_var$range[, "radius"], decreasing = TRUE), type = "l", ylim = c(0, 0.1),
-     xlab = "ranked landmarks", ylab = "landmark difference", main = "Variation range ranking")
-lines(sort(var_range_95$range[, "radius"], decreasing = TRUE), col = "orange")
-lines(sort(var_range_75$range[, "radius"], decreasing = TRUE), col = "blue")
-lines(sort(var_range_50$range[, "radius"], decreasing = TRUE), col = "darkgreen")
-legend("topright", bty = "n", lty = 1, col = c("black", "orange", "blue", "darkgreen"), 
-       legend = c("100% CI", "95% CI", "75% CI", "50% CI"))
 ```
 
 
