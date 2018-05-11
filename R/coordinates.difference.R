@@ -60,7 +60,13 @@ coordinates.difference <- function(coordinates, reference, type = "cartesian", a
     } else {
         if(coordinates_class == "array") {
             ## Convert array into list
+            if(!is.null(attributes(coordinates)$dimnames[[3]])) {
+                coordi_names <- attributes(coordinates)$dimnames[[3]]
+            } else {
+                coordi_names <- 1:dim(coordinates)[3]
+            }
             coordinates <- sapply(1:dim(coordinates)[3], function(x, coordinates) return(list(coordinates[,,x])), coordinates)
+            names(coordinates) <- coordi_names
         }
         ## Get dimensions
         dimensions <- unique(lapply(coordinates, dim))
@@ -80,6 +86,18 @@ coordinates.difference <- function(coordinates, reference, type = "cartesian", a
         ## Check the dimensions
         ref_dimensions <- dim(reference)
         if(!all(ifelse(ref_dimensions == dimensions, TRUE, FALSE))) stop("reference has not the same dimensions as coordinates!")
+    }
+
+    ## Check if the coordinates have names
+    add_names <- ifelse(is.null(names(coordinates)), FALSE, TRUE)
+    if(add_names) {
+        coordi_names <- names(coordinates)
+    } else {
+        ## Check if the names are not in an array dimnames attributes
+        if(!is.null(attributes(coordinates)$dimnames[[3]])) {
+            add_names <- TRUE
+            coordi_names <- attributes(coordinates)$dimnames[[3]]
+        }
     }
 
     ## Method
@@ -214,6 +232,10 @@ coordinates.difference <- function(coordinates, reference, type = "cartesian", a
         #     cat(paste0(coord, "\n"))
         #     test[[coord]] <- get.vector.diffs(coordinates[[coord]], dimension = dimensions[2], angle = angle, absolute.distance = absolute.distance)
         # }
+    }
+
+    if(add_names) {
+        names(coordinates) <- coordi_names
     }
 
     return(coordinates)
