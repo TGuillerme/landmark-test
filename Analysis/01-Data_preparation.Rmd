@@ -59,12 +59,8 @@ for(chain in chains) {
         ## Make into a 3D array
         landmarks <- geomorph::arrayspecs(landmarks, k = 3, p = ncol(landmarks)/3)
         
-        ## Read the curve and surfslide files
-        curveslide<-read.csv(paste0("../Data/Raw/curveslide_", dataset, "_", chain, ".csv"))
-        surfslide<-read.csv(paste0("../Data/Raw/surfslide_", dataset, "_", chain, ".csv"))
-
         ## Running the Procrustes superimposition
-        land_data[[dataset]][[2]] <- geomorph::gpagen(landmarks,curves=curveslide, surfaces=surfslide$x, print.progress = TRUE)
+        land_data[[dataset]][[2]] <- geomorph::gpagen(landmarks)
 
         ## Convert the array in 2D
         array_2d <- geomorph::two.d.array(land_data[[dataset]][[2]]$coords)
@@ -121,10 +117,6 @@ for(sp in 1:length(species)) {
         ## Read the landmarks
         landmarks  <- t(read.csv(paste0("../Data/Raw/landmarkdata_", dataset, "_", chain, ".csv"),
                                  header = TRUE, row.names = 1))
-       
-         ## Read the curve and surfslide files
-        curveslide<-read.csv(paste0("../Data/Raw/curveslide_", dataset, "_", chain, ".csv"))
-        surfslide<-read.csv(paste0("../Data/Raw/surfslide_", dataset, "_", chain, ".csv"))
         
         ## Make into a 3D array
         landmarks <- geomorph::arrayspecs(landmarks, k = 3, p = ncol(landmarks)/3)
@@ -138,7 +130,7 @@ for(sp in 1:length(species)) {
         landmarks <- landmarks[, , which(wombat_sp$Species %in% species[which_sp])]
 
         ## Running the Procrustes superimposition
-        land_data[[dataset]][[2]] <- geomorph::gpagen(landmarks, curves=curveslide, surfaces=surfslide$x, print.progress = TRUE)
+        land_data[[dataset]][[2]] <- geomorph::gpagen(landmarks)
 
         ## Convert the array in 2D
         array_2d <- geomorph::two.d.array(land_data[[dataset]][[2]]$coords)
