@@ -3,6 +3,8 @@
 #~~~~~~~~~~~
 ## Requires: pandoc!
 
+CI=$1
+
 ## Generate the LaTeX temp
 echo "\documentclass{article}" > table_result.temp
 echo "\\\begin{document}"  >> table_result.temp
@@ -10,7 +12,7 @@ echo ""  >> table_result.temp
 
 for tex in *.tex
 do
-    prefix=$(basename ${tex} .tex | sed 's/_/ /g')
+    prefix=$(basename ${tex} _${CI}.tex | sed 's/_/ /g')
     echo "\section{${prefix}}" >> table_result.temp
     echo "\input{${tex}}" >> table_result.temp
     echo ""  >> table_result.temp
@@ -21,7 +23,7 @@ echo "\end{document}" >> table_result.temp
 mv table_result.temp table_result.tex
 
 ## Convert into docx
-pandoc -i table_result.tex -o result_table.docx
+pandoc -i table_result.tex -o result_table_${CI}.docx
 
 ## Cleaning
 rm table_result.tex
