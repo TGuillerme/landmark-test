@@ -10,7 +10,7 @@ echo "\documentclass{article}" > table_result.temp
 echo "\\\begin{document}"  >> table_result.temp
 echo ""  >> table_result.temp
 
-for tex in *.tex
+for tex in *${CI}.tex
 do
     prefix=$(basename ${tex} _${CI}.tex | sed 's/_/ /g')
     echo "\section{${prefix}}" >> table_result.temp
