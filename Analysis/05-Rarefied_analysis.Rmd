@@ -45,11 +45,11 @@ set.seed(42)
 species <- "Wombat_ursinus"
 dataset <- "cranium"
 
-results <- pipeline.test(species, dataset, "../Data/Processed/", verbose = TRUE, rarefaction = TRUE)
-save(results, file = paste0("../Data/Results/", species, "_", dataset, "rarefied.Rda"))
-#load(paste0("../Data/Results/", species, "_", dataset, "rarefied.Rda"))
-#load(paste0("../Data/Processed/", species, ".Rda"))
-#results$rarefaction <- min(table(land_data[[dataset]]$landmarkgroups[,2]))
+#results <- pipeline.test((species, dataset, "../Data/Processed/", verbose = TRUE, rarefaction = TRUE, CI = 1)
+#save(results, file = paste0("../Data/Results/", species, "_", dataset, "rarefied_CI100.Rda"))
+load(paste0("../Data/Results/", species, "_", dataset, "rarefied.Rda"))
+load(paste0("../Data/Processed/", species, ".Rda"))
+results$rarefaction <- min(table(land_data[[dataset]]$landmarkgroups[,2]))
 
 caption_diff <- paste0("Results of the area difference random test (rarefied - ", results$rarefaction, ") for the ", results$dataset, " of ", results$species)
 caption_over <- paste0("Results of the overlap probability random test (rarefied - ", results$rarefaction, ") for the ", results$ataset, " of ", results$species)
@@ -63,8 +63,8 @@ kable(make.table(results$overlaps, "bonferroni"), digits = 5, caption = caption_
 
 ```{r, eval = TRUE, echo = FALSE, print = FALSE, results = 'hide'}
 ## xtables for pub
-make.xtable(results$differences, "bonferroni", digits = 3, caption = caption_diff, path = "../Manuscript/Tables/", label = paste0(species, "_", dataset, "_difference_rarefied"))
-make.xtable(results$overlaps, "bonferroni", digits = 3, caption = caption_over, path = "../Manuscript/Tables/", label = paste0(species, "_", dataset, "_overlaps_rarefied"))
+make.xtable(results$differences, "bonferroni", digits = 3, caption = caption_diff, path = "../Manuscript/Tables/", label = paste0(species, "_", dataset, "_difference_rarefied_CI100"))
+make.xtable(results$overlaps, "bonferroni", digits = 3, caption = caption_over, path = "../Manuscript/Tables/", label = paste0(species, "_", dataset, "_overlaps_rarefied_CI100"))
 ```
 
 #### Area difference
@@ -80,8 +80,8 @@ make.plots(results$overlaps, type = "Bhattacharyya Coefficient", add.p = TRUE, c
 ```
 
 ```{r, eval = TRUE, echo = FALSE, print = FALSE, results = 'hide'}
-make.plots(results$differences, type = "area difference", add.p = TRUE, correction = "bonferroni", rarefaction = TRUE, rare.level = results$rarefaction, path = paste0("../Manuscript/Figures/", species, "_", dataset, "_difference_rarefied.pdf"))
-make.plots(results$overlaps, type = "Bhattacharyya Coefficient", add.p = TRUE, correction = "bonferroni", rarefaction = TRUE, rare.level = results$rarefaction, path = paste0("../Manuscript/Figures/", species, "_", dataset, "_overlaps_rarefied.pdf"))
+make.plots(results$differences, type = "area difference", add.p = TRUE, correction = "bonferroni", rarefaction = TRUE, rare.level = results$rarefaction, path = paste0("../Manuscript/Figures/", species, "_", dataset, "_difference_rarefied_CI100.pdf"))
+make.plots(results$overlaps, type = "Bhattacharyya Coefficient", add.p = TRUE, correction = "bonferroni", rarefaction = TRUE, rare.level = results$rarefaction, path = paste0("../Manuscript/Figures/", species, "_", dataset, "_overlaps_rarefied_CI100.pdf"))
 ```
 
 ### Mandible
@@ -89,11 +89,11 @@ make.plots(results$overlaps, type = "Bhattacharyya Coefficient", add.p = TRUE, c
 ```{r, echo = FALSE, message = FALSE}
 species <- "Wombat_ursinus"
 dataset <- "mandible"
-results <- pipeline.test(species, dataset, "../Data/Processed/", verbose = TRUE, rarefaction = TRUE)
-save(results, file = paste0("../Data/Results/", species, "_", dataset, "rarefied.Rda"))
-#load(paste0("../Data/Results/", species, "_", dataset, "rarefied.Rda"))
-#load(paste0("../Data/Processed/", species, ".Rda"))
-#results$rarefaction <- min(table(land_data[[dataset]]$landmarkgroups[,2]))
+#results <- pipeline.test((species, dataset, "../Data/Processed/", verbose = TRUE, rarefaction = TRUE, CI = 1)
+#save(results, file = paste0("../Data/Results/", species, "_", dataset, "rarefied_CI100.Rda"))
+load(paste0("../Data/Results/", species, "_", dataset, "rarefied.Rda"))
+load(paste0("../Data/Processed/", species, ".Rda"))
+results$rarefaction <- min(table(land_data[[dataset]]$landmarkgroups[,2]))
 
 caption_diff <- paste0("Results of the area difference random test (rarefied - ", results$rarefaction, ") for the ", results$dataset, " of ", results$species)
 caption_over <- paste0("Results of the overlap probability random test (rarefied - ", results$rarefaction, ") for the ", results$ataset, " of ", results$species)
@@ -107,8 +107,8 @@ kable(make.table(results$overlaps, "bonferroni"), digits = 5, caption = caption_
 
 ```{r, eval = TRUE, echo = FALSE, print = FALSE, results = 'hide'}
 ## xtables for pub
-make.xtable(results$differences, "bonferroni", digits = 3, caption = caption_diff, path = "../Manuscript/Tables/", label = paste0(species, "_", dataset, "_difference_rarefied"))
-make.xtable(results$overlaps, "bonferroni", digits = 3, caption = caption_over, path = "../Manuscript/Tables/", label = paste0(species, "_", dataset, "_overlaps_rarefied"))
+make.xtable(results$differences, "bonferroni", digits = 3, caption = caption_diff, path = "../Manuscript/Tables/", label = paste0(species, "_", dataset, "_difference_rarefied_CI100"))
+make.xtable(results$overlaps, "bonferroni", digits = 3, caption = caption_over, path = "../Manuscript/Tables/", label = paste0(species, "_", dataset, "_overlaps_rarefied_CI100"))
 ```
 
 #### Area difference
@@ -124,8 +124,8 @@ make.plots(results$overlaps, type = "Bhattacharyya Coefficient", add.p = TRUE, c
 ```
 
 ```{r, eval = TRUE, echo = FALSE, print = FALSE, results = 'hide'}
-make.plots(results$differences, type = "area difference", add.p = TRUE, correction = "bonferroni", rarefaction = TRUE, rare.level = results$rarefaction, path = paste0("../Manuscript/Figures/", species, "_", dataset, "_difference_rarefied.pdf"))
-make.plots(results$overlaps, type = "Bhattacharyya Coefficient", add.p = TRUE, correction = "bonferroni", rarefaction = TRUE, rare.level = results$rarefaction, path = paste0("../Manuscript/Figures/", species, "_", dataset, "_overlaps_rarefied.pdf"))
+make.plots(results$differences, type = "area difference", add.p = TRUE, correction = "bonferroni", rarefaction = TRUE, rare.level = results$rarefaction, path = paste0("../Manuscript/Figures/", species, "_", dataset, "_difference_rarefied_CI100.pdf"))
+make.plots(results$overlaps, type = "Bhattacharyya Coefficient", add.p = TRUE, correction = "bonferroni", rarefaction = TRUE, rare.level = results$rarefaction, path = paste0("../Manuscript/Figures/", species, "_", dataset, "_overlaps_rarefied_CI100.pdf"))
 ```
 
 
@@ -148,11 +148,11 @@ make.plots(results$overlaps, type = "Bhattacharyya Coefficient", add.p = TRUE, c
 ```{r, echo = FALSE, message = FALSE}
 species <- "Wombat_krefftii"
 dataset <- "cranium"
-results <- pipeline.test(species, dataset, "../Data/Processed/", verbose = TRUE, rarefaction = TRUE)
-save(results, file = paste0("../Data/Results/", species, "_", dataset, "rarefied.Rda"))
-#load(paste0("../Data/Results/", species, "_", dataset, "rarefied.Rda"))
-#load(paste0("../Data/Processed/", species, ".Rda"))
-#results$rarefaction <- min(table(land_data[[dataset]]$landmarkgroups[,2]))
+#results <- pipeline.test((species, dataset, "../Data/Processed/", verbose = TRUE, rarefaction = TRUE, CI = 1)
+#save(results, file = paste0("../Data/Results/", species, "_", dataset, "rarefied_CI100.Rda"))
+load(paste0("../Data/Results/", species, "_", dataset, "rarefied.Rda"))
+load(paste0("../Data/Processed/", species, ".Rda"))
+results$rarefaction <- min(table(land_data[[dataset]]$landmarkgroups[,2]))
 
 caption_diff <- paste0("Results of the area difference random test (rarefied - ", results$rarefaction, ") for the ", results$dataset, " of ", results$species)
 caption_over <- paste0("Results of the overlap probability random test (rarefied - ", results$rarefaction, ") for the ", results$ataset, " of ", results$species)
@@ -166,8 +166,8 @@ kable(make.table(results$overlaps, "bonferroni"), digits = 5, caption = caption_
 
 ```{r, eval = TRUE, echo = FALSE, print = FALSE, results = 'hide'}
 ## xtables for pub
-make.xtable(results$differences, "bonferroni", digits = 3, caption = caption_diff, path = "../Manuscript/Tables/", label = paste0(species, "_", dataset, "_difference_rarefied"))
-make.xtable(results$overlaps, "bonferroni", digits = 3, caption = caption_over, path = "../Manuscript/Tables/", label = paste0(species, "_", dataset, "_overlaps_rarefied"))
+make.xtable(results$differences, "bonferroni", digits = 3, caption = caption_diff, path = "../Manuscript/Tables/", label = paste0(species, "_", dataset, "_difference_rarefied_CI100"))
+make.xtable(results$overlaps, "bonferroni", digits = 3, caption = caption_over, path = "../Manuscript/Tables/", label = paste0(species, "_", dataset, "_overlaps_rarefied_CI100"))
 ```
 
 #### Area difference
@@ -183,8 +183,8 @@ make.plots(results$overlaps, type = "Bhattacharyya Coefficient", add.p = TRUE, c
 ```
 
 ```{r, eval = TRUE, echo = FALSE, print = FALSE, results = 'hide'}
-make.plots(results$differences, type = "area difference", add.p = TRUE, correction = "bonferroni", rarefaction = TRUE, rare.level = results$rarefaction, path = paste0("../Manuscript/Figures/", species, "_", dataset, "_difference_rarefied.pdf"))
-make.plots(results$overlaps, type = "Bhattacharyya Coefficient", add.p = TRUE, correction = "bonferroni", rarefaction = TRUE, rare.level = results$rarefaction, path = paste0("../Manuscript/Figures/", species, "_", dataset, "_overlaps_rarefied.pdf"))
+make.plots(results$differences, type = "area difference", add.p = TRUE, correction = "bonferroni", rarefaction = TRUE, rare.level = results$rarefaction, path = paste0("../Manuscript/Figures/", species, "_", dataset, "_difference_rarefied_CI100.pdf"))
+make.plots(results$overlaps, type = "Bhattacharyya Coefficient", add.p = TRUE, correction = "bonferroni", rarefaction = TRUE, rare.level = results$rarefaction, path = paste0("../Manuscript/Figures/", species, "_", dataset, "_overlaps_rarefied_CI100.pdf"))
 ```
 
 ### Mandible
@@ -192,11 +192,11 @@ make.plots(results$overlaps, type = "Bhattacharyya Coefficient", add.p = TRUE, c
 ```{r, echo = FALSE, message = FALSE}
 species <- "Wombat_krefftii"
 dataset <- "mandible"
-results <- pipeline.test(species, dataset, "../Data/Processed/", verbose = TRUE, rarefaction = TRUE)
-save(results, file = paste0("../Data/Results/", species, "_", dataset, "rarefied.Rda"))
-#load(paste0("../Data/Results/", species, "_", dataset, "rarefied.Rda"))
-#load(paste0("../Data/Processed/", species, ".Rda"))
-#results$rarefaction <- min(table(land_data[[dataset]]$landmarkgroups[,2]))
+#results <- pipeline.test((species, dataset, "../Data/Processed/", verbose = TRUE, rarefaction = TRUE, CI = 1)
+#save(results, file = paste0("../Data/Results/", species, "_", dataset, "rarefied_CI100.Rda"))
+load(paste0("../Data/Results/", species, "_", dataset, "rarefied.Rda"))
+load(paste0("../Data/Processed/", species, ".Rda"))
+results$rarefaction <- min(table(land_data[[dataset]]$landmarkgroups[,2]))
 
 caption_diff <- paste0("Results of the area difference random test (rarefied - ", results$rarefaction, ") for the ", results$dataset, " of ", results$species)
 caption_over <- paste0("Results of the overlap probability random test (rarefied - ", results$rarefaction, ") for the ", results$ataset, " of ", results$species)
@@ -210,8 +210,8 @@ kable(make.table(results$overlaps, "bonferroni"), digits = 5, caption = caption_
 
 ```{r, eval = TRUE, echo = FALSE, print = FALSE, results = 'hide'}
 ## xtables for pub
-make.xtable(results$differences, "bonferroni", digits = 3, caption = caption_diff, path = "../Manuscript/Tables/", label = paste0(species, "_", dataset, "_difference_rarefied"))
-make.xtable(results$overlaps, "bonferroni", digits = 3, caption = caption_over, path = "../Manuscript/Tables/", label = paste0(species, "_", dataset, "_overlaps_rarefied"))
+make.xtable(results$differences, "bonferroni", digits = 3, caption = caption_diff, path = "../Manuscript/Tables/", label = paste0(species, "_", dataset, "_difference_rarefied_CI100"))
+make.xtable(results$overlaps, "bonferroni", digits = 3, caption = caption_over, path = "../Manuscript/Tables/", label = paste0(species, "_", dataset, "_overlaps_rarefied_CI100"))
 ```
 
 #### Area difference
@@ -227,8 +227,8 @@ make.plots(results$overlaps, type = "Bhattacharyya Coefficient", add.p = TRUE, c
 ```
 
 ```{r, eval = TRUE, echo = FALSE, print = FALSE, results = 'hide'}
-make.plots(results$differences, type = "area difference", add.p = TRUE, correction = "bonferroni", rarefaction = TRUE, rare.level = results$rarefaction, path = paste0("../Manuscript/Figures/", species, "_", dataset, "_difference_rarefied.pdf"))
-make.plots(results$overlaps, type = "Bhattacharyya Coefficient", add.p = TRUE, correction = "bonferroni", rarefaction = TRUE, rare.level = results$rarefaction, path = paste0("../Manuscript/Figures/", species, "_", dataset, "_overlaps_rarefied.pdf"))
+make.plots(results$differences, type = "area difference", add.p = TRUE, correction = "bonferroni", rarefaction = TRUE, rare.level = results$rarefaction, path = paste0("../Manuscript/Figures/", species, "_", dataset, "_difference_rarefied_CI100.pdf"))
+make.plots(results$overlaps, type = "Bhattacharyya Coefficient", add.p = TRUE, correction = "bonferroni", rarefaction = TRUE, rare.level = results$rarefaction, path = paste0("../Manuscript/Figures/", species, "_", dataset, "_overlaps_rarefied_CI100.pdf"))
 ```
 
 
@@ -251,11 +251,11 @@ make.plots(results$overlaps, type = "Bhattacharyya Coefficient", add.p = TRUE, c
 ```{r, echo = FALSE, message = FALSE}
 species <- "Wombat_latifrons"
 dataset <- "cranium"
-results <- pipeline.test(species, dataset, "../Data/Processed/", verbose = TRUE, rarefaction = TRUE)
-save(results, file = paste0("../Data/Results/", species, "_", dataset, "rarefied.Rda"))
-#load(paste0("../Data/Results/", species, "_", dataset, "rarefied.Rda"))
-#load(paste0("../Data/Processed/", species, ".Rda"))
-#results$rarefaction <- min(table(land_data[[dataset]]$landmarkgroups[,2]))
+#results <- pipeline.test((species, dataset, "../Data/Processed/", verbose = TRUE, rarefaction = TRUE, CI = 1)
+#save(results, file = paste0("../Data/Results/", species, "_", dataset, "rarefied_CI100.Rda"))
+load(paste0("../Data/Results/", species, "_", dataset, "rarefied.Rda"))
+load(paste0("../Data/Processed/", species, ".Rda"))
+results$rarefaction <- min(table(land_data[[dataset]]$landmarkgroups[,2]))
 
 caption_diff <- paste0("Results of the area difference random test (rarefied - ", results$rarefaction, ") for the ", results$dataset, " of ", results$species)
 caption_over <- paste0("Results of the overlap probability random test (rarefied - ", results$rarefaction, ") for the ", results$ataset, " of ", results$species)
@@ -269,8 +269,8 @@ kable(make.table(results$overlaps, "bonferroni"), digits = 5, caption = caption_
 
 ```{r, eval = TRUE, echo = FALSE, print = FALSE, results = 'hide'}
 ## xtables for pub
-make.xtable(results$differences, "bonferroni", digits = 3, caption = caption_diff, path = "../Manuscript/Tables/", label = paste0(species, "_", dataset, "_difference_rarefied"))
-make.xtable(results$overlaps, "bonferroni", digits = 3, caption = caption_over, path = "../Manuscript/Tables/", label = paste0(species, "_", dataset, "_overlaps_rarefied"))
+make.xtable(results$differences, "bonferroni", digits = 3, caption = caption_diff, path = "../Manuscript/Tables/", label = paste0(species, "_", dataset, "_difference_rarefied_CI100"))
+make.xtable(results$overlaps, "bonferroni", digits = 3, caption = caption_over, path = "../Manuscript/Tables/", label = paste0(species, "_", dataset, "_overlaps_rarefied_CI100"))
 ```
 
 #### Area difference
@@ -286,8 +286,8 @@ make.plots(results$overlaps, type = "Bhattacharyya Coefficient", add.p = TRUE, c
 ```
 
 ```{r, eval = TRUE, echo = FALSE, print = FALSE, results = 'hide'}
-make.plots(results$differences, type = "area difference", add.p = TRUE, correction = "bonferroni", rarefaction = TRUE, rare.level = results$rarefaction, path = paste0("../Manuscript/Figures/", species, "_", dataset, "_difference_rarefied.pdf"))
-make.plots(results$overlaps, type = "Bhattacharyya Coefficient", add.p = TRUE, correction = "bonferroni", rarefaction = TRUE, rare.level = results$rarefaction, path = paste0("../Manuscript/Figures/", species, "_", dataset, "_overlaps_rarefied.pdf"))
+make.plots(results$differences, type = "area difference", add.p = TRUE, correction = "bonferroni", rarefaction = TRUE, rare.level = results$rarefaction, path = paste0("../Manuscript/Figures/", species, "_", dataset, "_difference_rarefied_CI100.pdf"))
+make.plots(results$overlaps, type = "Bhattacharyya Coefficient", add.p = TRUE, correction = "bonferroni", rarefaction = TRUE, rare.level = results$rarefaction, path = paste0("../Manuscript/Figures/", species, "_", dataset, "_overlaps_rarefied_CI100.pdf"))
 ```
 
 ### Mandible
@@ -295,11 +295,11 @@ make.plots(results$overlaps, type = "Bhattacharyya Coefficient", add.p = TRUE, c
 ```{r, echo = FALSE, message = FALSE}
 species <- "Wombat_latifrons"
 dataset <- "mandible"
-results <- pipeline.test(species, dataset, "../Data/Processed/", verbose = TRUE, rarefaction = TRUE)
-save(results, file = paste0("../Data/Results/", species, "_", dataset, "rarefied.Rda"))
-#load(paste0("../Data/Results/", species, "_", dataset, "rarefied.Rda"))
-#load(paste0("../Data/Processed/", species, ".Rda"))
-#results$rarefaction <- min(table(land_data[[dataset]]$landmarkgroups[,2]))
+#results <- pipeline.test((species, dataset, "../Data/Processed/", verbose = TRUE, rarefaction = TRUE, CI = 1)
+#save(results, file = paste0("../Data/Results/", species, "_", dataset, "rarefied_CI100.Rda"))
+load(paste0("../Data/Results/", species, "_", dataset, "rarefied.Rda"))
+load(paste0("../Data/Processed/", species, ".Rda"))
+results$rarefaction <- min(table(land_data[[dataset]]$landmarkgroups[,2]))
 
 caption_diff <- paste0("Results of the area difference random test (rarefied - ", results$rarefaction, ") for the ", results$dataset, " of ", results$species)
 caption_over <- paste0("Results of the overlap probability random test (rarefied - ", results$rarefaction, ") for the ", results$ataset, " of ", results$species)
@@ -313,8 +313,8 @@ kable(make.table(results$overlaps, "bonferroni"), digits = 5, caption = caption_
 
 ```{r, eval = TRUE, echo = FALSE, print = FALSE, results = 'hide'}
 ## xtables for pub
-make.xtable(results$differences, "bonferroni", digits = 3, caption = caption_diff, path = "../Manuscript/Tables/", label = paste0(species, "_", dataset, "_difference_rarefied"))
-make.xtable(results$overlaps, "bonferroni", digits = 3, caption = caption_over, path = "../Manuscript/Tables/", label = paste0(species, "_", dataset, "_overlaps_rarefied"))
+make.xtable(results$differences, "bonferroni", digits = 3, caption = caption_diff, path = "../Manuscript/Tables/", label = paste0(species, "_", dataset, "_difference_rarefied_CI100"))
+make.xtable(results$overlaps, "bonferroni", digits = 3, caption = caption_over, path = "../Manuscript/Tables/", label = paste0(species, "_", dataset, "_overlaps_rarefied_CI100"))
 ```
 
 #### Area difference
@@ -330,8 +330,8 @@ make.plots(results$overlaps, type = "Bhattacharyya Coefficient", add.p = TRUE, c
 ```
 
 ```{r, eval = TRUE, echo = FALSE, print = FALSE, results = 'hide'}
-make.plots(results$differences, type = "area difference", add.p = TRUE, correction = "bonferroni", rarefaction = TRUE, rare.level = results$rarefaction, path = paste0("../Manuscript/Figures/", species, "_", dataset, "_difference_rarefied.pdf"))
-make.plots(results$overlaps, type = "Bhattacharyya Coefficient", add.p = TRUE, correction = "bonferroni", rarefaction = TRUE, rare.level = results$rarefaction, path = paste0("../Manuscript/Figures/", species, "_", dataset, "_overlaps_rarefied.pdf"))
+make.plots(results$differences, type = "area difference", add.p = TRUE, correction = "bonferroni", rarefaction = TRUE, rare.level = results$rarefaction, path = paste0("../Manuscript/Figures/", species, "_", dataset, "_difference_rarefied_CI100.pdf"))
+make.plots(results$overlaps, type = "Bhattacharyya Coefficient", add.p = TRUE, correction = "bonferroni", rarefaction = TRUE, rare.level = results$rarefaction, path = paste0("../Manuscript/Figures/", species, "_", dataset, "_overlaps_rarefied_CI100.pdf"))
 ```
 
 
@@ -354,11 +354,11 @@ make.plots(results$overlaps, type = "Bhattacharyya Coefficient", add.p = TRUE, c
 ```{r, echo = FALSE, message = FALSE}
 species <- "Wombat"
 dataset <- "cranium"
-results <- pipeline.test(species, dataset, "../Data/Processed/", verbose = TRUE, rarefaction = TRUE)
-save(results, file = paste0("../Data/Results/", species, "_", dataset, "rarefied.Rda"))
-#load(paste0("../Data/Results/", species, "_", dataset, "rarefied.Rda"))
-#load(paste0("../Data/Processed/", species, ".Rda"))
-#results$rarefaction <- min(table(land_data[[dataset]]$landmarkgroups[,2]))
+#results <- pipeline.test((species, dataset, "../Data/Processed/", verbose = TRUE, rarefaction = TRUE, CI = 1)
+#save(results, file = paste0("../Data/Results/", species, "_", dataset, "rarefied_CI100.Rda"))
+load(paste0("../Data/Results/", species, "_", dataset, "rarefied.Rda"))
+load(paste0("../Data/Processed/", species, ".Rda"))
+results$rarefaction <- min(table(land_data[[dataset]]$landmarkgroups[,2]))
 
 caption_diff <- paste0("Results of the area difference random test (rarefied - ", results$rarefaction, ") for the ", results$dataset, " of ", results$species)
 caption_over <- paste0("Results of the overlap probability random test (rarefied - ", results$rarefaction, ") for the ", results$ataset, " of ", results$species)
@@ -372,8 +372,8 @@ kable(make.table(results$overlaps, "bonferroni"), digits = 5, caption = caption_
 
 ```{r, eval = TRUE, echo = FALSE, print = FALSE, results = 'hide'}
 ## xtables for pub
-make.xtable(results$differences, "bonferroni", digits = 3, caption = caption_diff, path = "../Manuscript/Tables/", label = paste0(species, "_", dataset, "_difference_rarefied"))
-make.xtable(results$overlaps, "bonferroni", digits = 3, caption = caption_over, path = "../Manuscript/Tables/", label = paste0(species, "_", dataset, "_overlaps_rarefied"))
+make.xtable(results$differences, "bonferroni", digits = 3, caption = caption_diff, path = "../Manuscript/Tables/", label = paste0(species, "_", dataset, "_difference_rarefied_CI100"))
+make.xtable(results$overlaps, "bonferroni", digits = 3, caption = caption_over, path = "../Manuscript/Tables/", label = paste0(species, "_", dataset, "_overlaps_rarefied_CI100"))
 ```
 
 #### Area difference
@@ -389,8 +389,8 @@ make.plots(results$overlaps, type = "Bhattacharyya Coefficient", add.p = TRUE, c
 ```
 
 ```{r, eval = TRUE, echo = FALSE, print = FALSE, results = 'hide'}
-make.plots(results$differences, type = "area difference", add.p = TRUE, correction = "bonferroni", rarefaction = TRUE, rare.level = results$rarefaction, path = paste0("../Manuscript/Figures/", species, "_", dataset, "_difference_rarefied.pdf"))
-make.plots(results$overlaps, type = "Bhattacharyya Coefficient", add.p = TRUE, correction = "bonferroni", rarefaction = TRUE, rare.level = results$rarefaction, path = paste0("../Manuscript/Figures/", species, "_", dataset, "_overlaps_rarefied.pdf"))
+make.plots(results$differences, type = "area difference", add.p = TRUE, correction = "bonferroni", rarefaction = TRUE, rare.level = results$rarefaction, path = paste0("../Manuscript/Figures/", species, "_", dataset, "_difference_rarefied_CI100.pdf"))
+make.plots(results$overlaps, type = "Bhattacharyya Coefficient", add.p = TRUE, correction = "bonferroni", rarefaction = TRUE, rare.level = results$rarefaction, path = paste0("../Manuscript/Figures/", species, "_", dataset, "_overlaps_rarefied_CI100.pdf"))
 ```
 
 ### Mandible
@@ -398,11 +398,11 @@ make.plots(results$overlaps, type = "Bhattacharyya Coefficient", add.p = TRUE, c
 ```{r, echo = FALSE, message = FALSE}
 species <- "Wombat"
 dataset <- "mandible"
-results <- pipeline.test(species, dataset, "../Data/Processed/", verbose = TRUE, rarefaction = TRUE)
-save(results, file = paste0("../Data/Results/", species, "_", dataset, "rarefied.Rda"))
-#load(paste0("../Data/Results/", species, "_", dataset, "rarefied.Rda"))
-#load(paste0("../Data/Processed/", species, ".Rda"))
-#results$rarefaction <- min(table(land_data[[dataset]]$landmarkgroups[,2]))
+#results <- pipeline.test((species, dataset, "../Data/Processed/", verbose = TRUE, rarefaction = TRUE, CI = 1)
+#save(results, file = paste0("../Data/Results/", species, "_", dataset, "rarefied_CI100.Rda"))
+load(paste0("../Data/Results/", species, "_", dataset, "rarefied.Rda"))
+load(paste0("../Data/Processed/", species, ".Rda"))
+results$rarefaction <- min(table(land_data[[dataset]]$landmarkgroups[,2]))
 
 caption_diff <- paste0("Results of the area difference random test (rarefied - ", results$rarefaction, ") for the ", results$dataset, " of ", results$species)
 caption_over <- paste0("Results of the overlap probability random test (rarefied - ", results$rarefaction, ") for the ", results$ataset, " of ", results$species)
@@ -416,8 +416,8 @@ kable(make.table(results$overlaps, "bonferroni"), digits = 5, caption = caption_
 
 ```{r, eval = TRUE, echo = FALSE, print = FALSE, results = 'hide'}
 ## xtables for pub
-make.xtable(results$differences, "bonferroni", digits = 3, caption = caption_diff, path = "../Manuscript/Tables/", label = paste0(species, "_", dataset, "_difference_rarefied"))
-make.xtable(results$overlaps, "bonferroni", digits = 3, caption = caption_over, path = "../Manuscript/Tables/", label = paste0(species, "_", dataset, "_overlaps_rarefied"))
+make.xtable(results$differences, "bonferroni", digits = 3, caption = caption_diff, path = "../Manuscript/Tables/", label = paste0(species, "_", dataset, "_difference_rarefied_CI100"))
+make.xtable(results$overlaps, "bonferroni", digits = 3, caption = caption_over, path = "../Manuscript/Tables/", label = paste0(species, "_", dataset, "_overlaps_rarefied_CI100"))
 ```
 
 #### Area difference
@@ -433,8 +433,8 @@ make.plots(results$overlaps, type = "Bhattacharyya Coefficient", add.p = TRUE, c
 ```
 
 ```{r, eval = TRUE, echo = FALSE, print = FALSE, results = 'hide'}
-make.plots(results$differences, type = "area difference", add.p = TRUE, correction = "bonferroni", rarefaction = TRUE, rare.level = results$rarefaction, path = paste0("../Manuscript/Figures/", species, "_", dataset, "_difference_rarefied.pdf"))
-make.plots(results$overlaps, type = "Bhattacharyya Coefficient", add.p = TRUE, correction = "bonferroni", rarefaction = TRUE, rare.level = results$rarefaction, path = paste0("../Manuscript/Figures/", species, "_", dataset, "_overlaps_rarefied.pdf"))
+make.plots(results$differences, type = "area difference", add.p = TRUE, correction = "bonferroni", rarefaction = TRUE, rare.level = results$rarefaction, path = paste0("../Manuscript/Figures/", species, "_", dataset, "_difference_rarefied_CI100.pdf"))
+make.plots(results$overlaps, type = "Bhattacharyya Coefficient", add.p = TRUE, correction = "bonferroni", rarefaction = TRUE, rare.level = results$rarefaction, path = paste0("../Manuscript/Figures/", species, "_", dataset, "_overlaps_rarefied_CI100.pdf"))
 ```
 
 
@@ -457,11 +457,11 @@ make.plots(results$overlaps, type = "Bhattacharyya Coefficient", add.p = TRUE, c
 ```{r, echo = FALSE, message = FALSE}
 species <- "Wombat_lasiorhinus"
 dataset <- "cranium"
-results <- pipeline.test(species, dataset, "../Data/Processed/", verbose = TRUE, rarefaction = TRUE)
-save(results, file = paste0("../Data/Results/", species, "_", dataset, "rarefied.Rda"))
-##load(paste0("../Data/Results/", species, "_", dataset, "rarefied.Rda"))
-#load(paste0("../Data/Processed/", species, ".Rda"))
-#results$rarefaction <- min(table(land_data[[dataset]]$landmarkgroups[,2]))
+#results <- pipeline.test((species, dataset, "../Data/Processed/", verbose = TRUE, rarefaction = TRUE, CI = 1)
+#save(results, file = paste0("../Data/Results/", species, "_", dataset, "rarefied_CI100.Rda"))
+#load(paste0("../Data/Results/", species, "_", dataset, "rarefied.Rda"))
+load(paste0("../Data/Processed/", species, ".Rda"))
+results$rarefaction <- min(table(land_data[[dataset]]$landmarkgroups[,2]))
 
 caption_diff <- paste0("Results of the area difference random test (rarefied - ", results$rarefaction, ") for the ", results$dataset, " of ", results$species)
 caption_over <- paste0("Results of the overlap probability random test (rarefied - ", results$rarefaction, ") for the ", results$ataset, " of ", results$species)
@@ -475,8 +475,8 @@ kable(make.table(results$overlaps, "bonferroni"), digits = 5, caption = caption_
 
 ```{r, eval = TRUE, echo = FALSE, print = FALSE, results = 'hide'}
 ## xtables for pub
-make.xtable(results$differences, "bonferroni", digits = 3, caption = caption_diff, path = "../Manuscript/Tables/", label = paste0(species, "_", dataset, "_difference_rarefied"))
-make.xtable(results$overlaps, "bonferroni", digits = 3, caption = caption_over, path = "../Manuscript/Tables/", label = paste0(species, "_", dataset, "_overlaps_rarefied"))
+make.xtable(results$differences, "bonferroni", digits = 3, caption = caption_diff, path = "../Manuscript/Tables/", label = paste0(species, "_", dataset, "_difference_rarefied_CI100"))
+make.xtable(results$overlaps, "bonferroni", digits = 3, caption = caption_over, path = "../Manuscript/Tables/", label = paste0(species, "_", dataset, "_overlaps_rarefied_CI100"))
 ```
 
 #### Area difference
@@ -492,8 +492,8 @@ make.plots(results$overlaps, type = "Bhattacharyya Coefficient", add.p = TRUE, c
 ```
 
 ```{r, eval = TRUE, echo = FALSE, print = FALSE, results = 'hide'}
-make.plots(results$differences, type = "area difference", add.p = TRUE, correction = "bonferroni", rarefaction = TRUE, rare.level = results$rarefaction, path = paste0("../Manuscript/Figures/", species, "_", dataset, "_difference_rarefied.pdf"))
-make.plots(results$overlaps, type = "Bhattacharyya Coefficient", add.p = TRUE, correction = "bonferroni", rarefaction = TRUE, rare.level = results$rarefaction, path = paste0("../Manuscript/Figures/", species, "_", dataset, "_overlaps_rarefied.pdf"))
+make.plots(results$differences, type = "area difference", add.p = TRUE, correction = "bonferroni", rarefaction = TRUE, rare.level = results$rarefaction, path = paste0("../Manuscript/Figures/", species, "_", dataset, "_difference_rarefied_CI100.pdf"))
+make.plots(results$overlaps, type = "Bhattacharyya Coefficient", add.p = TRUE, correction = "bonferroni", rarefaction = TRUE, rare.level = results$rarefaction, path = paste0("../Manuscript/Figures/", species, "_", dataset, "_overlaps_rarefied_CI100.pdf"))
 ```
 
 ### Mandible
@@ -501,11 +501,11 @@ make.plots(results$overlaps, type = "Bhattacharyya Coefficient", add.p = TRUE, c
 ```{r, echo = FALSE, message = FALSE}
 species <- "Wombat_lasiorhinus"
 dataset <- "mandible"
-results <- pipeline.test(species, dataset, "../Data/Processed/", verbose = TRUE, rarefaction = TRUE)
-save(results, file = paste0("../Data/Results/", species, "_", dataset, "rarefied.Rda"))
-##load(paste0("../Data/Results/", species, "_", dataset, "rarefied.Rda"))
-#load(paste0("../Data/Processed/", species, ".Rda"))
-#results$rarefaction <- min(table(land_data[[dataset]]$landmarkgroups[,2]))
+#results <- pipeline.test((species, dataset, "../Data/Processed/", verbose = TRUE, rarefaction = TRUE, CI = 1)
+#save(results, file = paste0("../Data/Results/", species, "_", dataset, "rarefied_CI100.Rda"))
+#load(paste0("../Data/Results/", species, "_", dataset, "rarefied.Rda"))
+load(paste0("../Data/Processed/", species, ".Rda"))
+results$rarefaction <- min(table(land_data[[dataset]]$landmarkgroups[,2]))
 
 caption_diff <- paste0("Results of the area difference random test (rarefied - ", results$rarefaction, ") for the ", results$dataset, " of ", results$species)
 caption_over <- paste0("Results of the overlap probability random test (rarefied - ", results$rarefaction, ") for the ", results$ataset, " of ", results$species)
@@ -519,8 +519,8 @@ kable(make.table(results$overlaps, "bonferroni"), digits = 5, caption = caption_
 
 ```{r, eval = TRUE, echo = FALSE, print = FALSE, results = 'hide'}
 ## xtables for pub
-make.xtable(results$differences, "bonferroni", digits = 3, caption = caption_diff, path = "../Manuscript/Tables/", label = paste0(species, "_", dataset, "_difference_rarefied"))
-make.xtable(results$overlaps, "bonferroni", digits = 3, caption = caption_over, path = "../Manuscript/Tables/", label = paste0(species, "_", dataset, "_overlaps_rarefied"))
+make.xtable(results$differences, "bonferroni", digits = 3, caption = caption_diff, path = "../Manuscript/Tables/", label = paste0(species, "_", dataset, "_difference_rarefied_CI100"))
+make.xtable(results$overlaps, "bonferroni", digits = 3, caption = caption_over, path = "../Manuscript/Tables/", label = paste0(species, "_", dataset, "_overlaps_rarefied_CI100"))
 ```
 
 #### Area difference
@@ -536,6 +536,6 @@ make.plots(results$overlaps, type = "Bhattacharyya Coefficient", add.p = TRUE, c
 ```
 
 ```{r, eval = TRUE, echo = FALSE, print = FALSE, results = 'hide'}
-make.plots(results$differences, type = "area difference", add.p = TRUE, correction = "bonferroni", rarefaction = TRUE, rare.level = results$rarefaction, path = paste0("../Manuscript/Figures/", species, "_", dataset, "_difference_rarefied.pdf"))
-make.plots(results$overlaps, type = "Bhattacharyya Coefficient", add.p = TRUE, correction = "bonferroni", rarefaction = TRUE, rare.level = results$rarefaction, path = paste0("../Manuscript/Figures/", species, "_", dataset, "_overlaps_rarefied.pdf"))
+make.plots(results$differences, type = "area difference", add.p = TRUE, correction = "bonferroni", rarefaction = TRUE, rare.level = results$rarefaction, path = paste0("../Manuscript/Figures/", species, "_", dataset, "_difference_rarefied_CI100.pdf"))
+make.plots(results$overlaps, type = "Bhattacharyya Coefficient", add.p = TRUE, correction = "bonferroni", rarefaction = TRUE, rare.level = results$rarefaction, path = paste0("../Manuscript/Figures/", species, "_", dataset, "_overlaps_rarefied_CI100.pdf"))
 ```
