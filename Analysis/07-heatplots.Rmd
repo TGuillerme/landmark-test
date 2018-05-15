@@ -38,6 +38,7 @@ load("../Data/Processed/wombat_latifrons.Rda")
 SHNW<-land_data
 load("../Data/Processed/wombat_ursinus.Rda")
 CW<-land_data
+source("../Functions/utilities.R")
 
 ```
 
@@ -45,6 +46,7 @@ The "maximum" and "minimum" specimen:
 
 ```{r}
 ## Procrustes variation ranges
+cranium=SHNW$cranium
 variation <- variation.range(cranium$procrustes, return.ID = TRUE, CI = 0.5)
 specimens_min_max <- variation$min.max
 procrustes_var <- variation$range[,1]
@@ -55,7 +57,7 @@ gridPar = gridPar(pt.bg = "white", pt.size = 0.5)
 open3d()
 plotRefToTarget.heat(cranium$procruste$coords[, , specimens_min_max[2]],
                      cranium$procruste$coords[, , specimens_min_max[1]],
-                     col = heat.colors, pt.size = 1, col.val = procrustes_var,
+                     col = heat.colors, pt.size = 0.3, col.val = procrustes_var,
                      plotRefToTarget.args = list(mag = 1))
 ```
 
