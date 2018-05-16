@@ -51,7 +51,20 @@ for(chain in chains) {
         ## Read the landmarks groups
         land_data[[dataset]][[1]] <- read.csv(paste0("../Data/Raw/landmarkgroups_", dataset, "_",
                                                 chain, ".csv"))
-        
+
+        ## Translating the landmark groups names
+        if(dataset == "cranium") {
+            land_data[[dataset]][[1]][,2] <- gsub(1, "zygomatic", land_data[[dataset]][[1]][,2])
+            land_data[[dataset]][[1]][,2] <- gsub(2, "rest", land_data[[dataset]][[1]][,2])
+            land_data[[dataset]][[1]][,2] <- gsub(3, "snout", land_data[[dataset]][[1]][,2])
+        }
+
+        if(dataset == "mandible") {
+            land_data[[dataset]][[1]][,2] <- gsub(1, "back", land_data[[dataset]][[1]][,2])
+            land_data[[dataset]][[1]][,2] <- gsub(2, "front", land_data[[dataset]][[1]][,2])
+            land_data[[dataset]][[1]][,2] <- gsub(3, "rest", land_data[[dataset]][[1]][,2])
+        }
+
         ## Read the landmarks
         landmarks  <- t(read.csv(paste0("../Data/Raw/landmarkdata_", dataset, "_", chain, ".csv"),
                                  header = TRUE, row.names = 1))
@@ -113,6 +126,19 @@ for(sp in 1:length(species)) {
         ## Read the landmarks groups
         land_data[[dataset]][[1]] <- read.csv(paste0("../Data/Raw/landmarkgroups_", dataset, "_",
                                                 chain, ".csv"))
+
+        ## Translating the landmark groups names
+        if(dataset == "cranium") {
+            land_data[[dataset]][[1]][,2] <- gsub(1, "zygomatic", land_data[[dataset]][[1]][,2])
+            land_data[[dataset]][[1]][,2] <- gsub(2, "rest", land_data[[dataset]][[1]][,2])
+            land_data[[dataset]][[1]][,2] <- gsub(3, "snout", land_data[[dataset]][[1]][,2])
+        }
+
+        if(dataset == "mandible") {
+            land_data[[dataset]][[1]][,2] <- gsub(1, "back", land_data[[dataset]][[1]][,2])
+            land_data[[dataset]][[1]][,2] <- gsub(2, "front", land_data[[dataset]][[1]][,2])
+            land_data[[dataset]][[1]][,2] <- gsub(3, "rest", land_data[[dataset]][[1]][,2])
+        }
 
         ## Read the landmarks
         landmarks  <- t(read.csv(paste0("../Data/Raw/landmarkdata_", dataset, "_", chain, ".csv"),
