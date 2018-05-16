@@ -130,23 +130,6 @@ plotOutliers(SHNW$mandible$procrustes$coords)#No outliers
 
 ```
 
-#Shape disparity comparison
-
-```{r, message = FALSE, warning = FALSE}
-
-
-#Create gdfs with species for the data frames
-Cr_gdf<-geomorph.data.frame(coords=AllWombats$cranium$procrustes$coords, Csize=AllWombats$cranium$procrustes$Csize, species=as.factor(cranium$Species))
-Mand_gdf<-geomorph.data.frame(coords=AllWombats$mandible$procrustes$coords, Csize=AllWombats$mandible$procrustes$Csize, species=as.factor(mandible$Species))
-
-#run analyses using the gdfs
-CraniumDisparity <- morphol.disparity(coords~species, groups=~species, iter = 1000, seed = 42, data = Cr_gdf, print.progress = TRUE) # Disparity within groups compared to that group's mean
-summary(CraniumDisparity)
-
-MandibleDisparity <- morphol.disparity(coords~species, groups=~species, iter = 1000, seed = 42, data = Mand_gdf, print.progress = TRUE) # Disparity within groups compared to that group's mean
-summary(MandibleDisparity)
-
-```
 #Assessing range of Centroid sizes
 ```{r, message = FALSE, warning = FALSE}
 #separate out centroid sizes
@@ -373,6 +356,25 @@ Sex_procD_outputs
 
 
 ```
+
+#Shape disparity comparison
+
+```{r, message = FALSE, warning = FALSE}
+
+
+#Create gdfs with species for the data frames
+Cr_gdf<-geomorph.data.frame(coords=AllWombats$cranium$procrustes$coords, Csize=AllWombats$cranium$procrustes$Csize, species=as.factor(cranium$Species))
+Mand_gdf<-geomorph.data.frame(coords=AllWombats$mandible$procrustes$coords, Csize=AllWombats$mandible$procrustes$Csize, species=as.factor(mandible$Species))
+
+#run analyses using the gdfs
+CraniumDisparity <- morphol.disparity(coords~species, groups=~species, iter = 1000, seed = 42, data = Cr_gdf, print.progress = TRUE) # Disparity within groups compared to that group's mean
+summary(CraniumDisparity)
+
+MandibleDisparity <- morphol.disparity(coords~species, groups=~species, iter = 1000, seed = 42, data = Mand_gdf, print.progress = TRUE) # Disparity within groups compared to that group's mean
+summary(MandibleDisparity)
+
+```
+
 #2-Block Partial Least Squares analysis
 ##reduce coordinate datasets to only those that have mandibles and crania
 
