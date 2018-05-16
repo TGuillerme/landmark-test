@@ -140,10 +140,10 @@ Cr_gdf<-geomorph.data.frame(coords=AllWombats$cranium$procrustes$coords, Csize=A
 Mand_gdf<-geomorph.data.frame(coords=AllWombats$mandible$procrustes$coords, Csize=AllWombats$mandible$procrustes$Csize, species=as.factor(mandible$Species))
 
 #run analyses using the gdfs
-CraniumDisparity <- morphol.disparity(coords~species, groups=~species, iter = 9999, seed = 42, data = Cr_gdf, print.progress = TRUE) # Disparity within groups compared to that group's mean
+CraniumDisparity <- morphol.disparity(coords~species, groups=~species, iter = 1000, seed = 42, data = Cr_gdf, print.progress = TRUE) # Disparity within groups compared to that group's mean
 summary(CraniumDisparity)
 
-MandibleDisparity <- morphol.disparity(coords~species, groups=~species, iter = 9999, seed = 42, data = Mand_gdf, print.progress = TRUE) # Disparity within groups compared to that group's mean
+MandibleDisparity <- morphol.disparity(coords~species, groups=~species, iter = 1000, seed = 42, data = Mand_gdf, print.progress = TRUE) # Disparity within groups compared to that group's mean
 summary(MandibleDisparity)
 
 ```

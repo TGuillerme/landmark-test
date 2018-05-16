@@ -252,7 +252,7 @@ plot.partitions<-function(land_data_partition, PartNames){
   ##colours the spheres for each partitin
   open3d()
   for (i in 1:length(PartLevels)){
-    spheres3d(WomCrRef[Part[[i]],1], WomCrRef[Part[[i]],2], WomCrRef[Part[[i]],3], col=Colours[i], lit=TRUE,radius = 0.0001, asp=F)
+    spheres3d(WomCrRef[Part[[i]],1], WomCrRef[Part[[i]],2], WomCrRef[Part[[i]],3], col=Colours[i], lit=TRUE,radius = 0.001, asp=F)
     
   }
   
