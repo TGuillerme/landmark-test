@@ -1,5 +1,5 @@
 ---
-title: "Landmark region difference"
+title: "Testing the variation of landmark regions within and between specie"
 author: "Thomas Guillerme"
 bibliography: references.bib
 date: "`r Sys.Date()`"
@@ -9,48 +9,160 @@ output:
     fig_height: 6
 ---
 
+To understand among and between species variation, we tested whether some landmark regions (e.g. the landmarks on the zygomatic arch) varied significantly more or less than the rest of the skull within and between each species.
+Here we detail the applied "landmark partition test" testing whether the maximum variation between landmarks position in a set of landmarks is significantly different than any random same size set of landmarks.
+This test is a sort of permutation test testing $H_{0}: \Theta_{0} = \Theta$ (the tested sample is equal to the whole population) with a two-sided alternative $H_{1}: \Theta_{0} \neq \Theta$  (the tested sample is _not_ equal to the whole population).
+If $H_{0}$ can be rejected it means that the statistic measured from the set of landmarks (see below) is different than the overall statistic from the population of landmarks (in other words: the landmark set is different than the all the landmarks combined).
+
+We measured two statistic, the overall difference in landmark size (area difference - see below) and the probability of size overlap between two landmarks sets (Bhattacharyya Coefficient - see below).
+These two statistics were measured between the two most extreme specimens selected on the range of variation between the specimens landmarks coordinates (see below).
+We tested the differences for three cranium partitions (the zygomatic arch, the tip of the snout and the rest of the skull) and three mandible ones (the tip of the mandible, the back of the mandible and the rest of the mandible) for each species (_Vombatus ursinus_, _Lasiorhinus krefftii_ and _Lasiorhinus latifrons_), for the _Lasiorhinus_ genus combined and for the three species combined.
+To account for type I error due to multiple testing and for the number of replicates involved in the landmark partition tests, we adjusted the _p_-values using a Bonferonni-Holm [@holm1979simple] correction and lowered our _p_-value rejection threshold to 0.01 (see below).
+The whole procedure, including the landmark variation is described in details below and implemented in `R` [here](https://github.com/TGuillerme/landmark-test).
+
+
+## Selecting the range of landmark variation {#varalgorithm}
+
+One approach for selecting the range of landmark variation is based on a specific axis of an ordination matrix.
+This approach has several advantages namely (1) its intuitiveness and (2) the fact that the selected range is based on a specific axis of variation (e.g. the range on the first ordination axis is based on first axis of variance/covariance in the dataset).
+However, this approach suffers also from several statistical drawbacks namely (1) that not all the variance/covariance is taken into account (even if based on an ordination axis that contain a great amount of the datasets' variance) and that (2) the resulting range of landmark variation is based on the ordination of the variance and not directly on the range of the actual variation _per se_ (i.e. in an Euclidean space).
+
+Here we propose a an approach based directly on the Procrustes superimposed landmarks' differences rather than their ordination (i.e. we compare the two skulls or mandibles with the most different landmark positions).
+We calculate this difference as the length of the radius in spherical coordinates between a pair of homologuous landmarks.
+Spherical coordinates are a coordinate system measured in a sphere and are expressed by three parameters: (1) the radius ($\rho$, the euclidean distance between the two landmarks); (2) the azimuth angle ($\phi$, the angle on the equatorial plan); and (3) the polar angle ($\theta$, the angle measured on the polar plan).
+Since we are only interested in the _magnitude_ of difference ($\rho$) regardless of the direction ($\phi$ and $\theta$) we will use only the radius below.
+
+To calculate the maximum range of landmark variation (the two individuals with the most different radii) we use the following algorithm:
+
+ 1. Calculate the radii for all _n_ landmarks between the mean Procrustes superimposition and each specimen's superimposition.
+ 2. Rank each set of _n_ radii and measure the area under the resulting curve (see [below](#areadiff)).
+ 3. Select the specimen with the highest _n_ radii area. This is now the "maximum" Procrustes (i.e. the specimen with the most different shape compared to the mean).
+ 4. Calculate the radii for all _n_ landmarks between the "maximum" Procrustes and the remaining individual ones.
+ 5. Repeat step 2 and 3. The resulting specimen with the highest _n_ radii area is now the "minimum" Procrustes (i.e. the specimen with the most different shape compared to the "maximum" Procrustes).
+
+These two "maximum" and "minimum" Procrustes superimpositions are not the biggest/smallest, widest/narowest, etc. skulls or mandibles _per se_ but rather the two extremes of the overall distribution of landmark variation ($\rho$).
+Because of the multidimensionality aspect of the problem, it is probably impossible to even determine which one of the two selected "maximum" and "minimum" craniums/mandibles has actually the most variation.
+However, since we are not interest in _direction_ of difference, these two selected craniums/mandibles are sufficient to give us the magnitude of differences between specimens (while taking into account _all_ the landmarks the three dimensions).
+
+## Difference statistic between partitions
+
+As mentioned above, we will use two different statistics between to compare the partitions to the rest of the cranium/mandible: (1) the overall difference in landmark size between the "maximum" and "minimum" cranium/mandible (this statistic is a proxy for length difference between landmarks ranges); (2) the probability of overlap between the size differences (between the "maximum" and "minimum") in the partition and the rest of the cranium/mandible (this statistic is a proxy for measuring whether both partitions comes from the same distribution).
+
+### Overall difference in landmark size (area difference) {#areadiff}
+
+To measure the overall differences in the length of the radii, we can calculate the area difference as follows:
+
+##### Area difference
+
+$\Delta_{area} = \int_{0}^{n-1} (f_{x} - f_{y})d(x,y)$
+
+Where _n_ is minimum number of comparable landmarks and $f_{x}$ and $f_{y}$ are ranked functions (i.e. $f_{0} \geq f_{1} \geq f_{2} ...$) for the landmarks in the partition and all the landmarks respectively.
+If one of the functions $f_{x}$ or $f_{y}$ have _m_ elements (with $m > n$) $f^{*}_{z}$, a rarefied estimated of the function with _m_ elements is used instead.
+
+$\int_{0}^{n-1}f^*_{z}d(z) = \frac{\sum_1^p\int f^*_{zi}}{s}$
+
+
+Where _s_ is the number of rarefaction replicates.
+_s_ is chosen based on the Silverman's rule of thumb for choosing the bandwidth of a Gaussian kernel density estimator multiplied by 1000 with a result forced to be 100 $\leq p \leq$ 1000 [@silverman1986density].
+
+##### Silverman's rule {#silverman}
+
+$p=\left(\frac{0.9\times \sigma_{m} }{1.34n}\right)^{-1/5}$
+
+With $\sigma_{m}$ being the minimum of the standard deviation and the interquartile range of the distribution.
+This allows the rarefaction algorithm to be fast but "fair" and reduces the number of re-sampling the when the distribution is more homogeneous [@silverman1986density].
+If the area difference is positive, the landmark's variation in the partition is bigger than the overall landmark's variation, if the difference is negative, the variation is smaller.
+
+## Probability of overlap between size differences (Bhattacharyya Coefficient)
+
+The Bhattacharyya Coefficient calculates the probability of overlap of two distributions [@Bhattacharyya; Guillerme2016146].
+When it is equal to zero, the probability of overlap of the distributions is also zero, and when it is equal to one, the two distributions are entirely overlapping.
+It forms an elegant and easy to compute continuous measurement of the probability of similarity between two distributions.
+The coefficient is calculated as the sum of the square root of the relative counts shared in _n_ bins among two distributions.
+
+##### Bhattacharyya Coefficient
+
+$BC=\sum_{i=1}^{n} \sqrt{{\sum{a_i}}\times{\sum{b_i}}}$
+
+Where ${a_i}$ and ${b_i}$  are the number of counts in bin _i_ for the distributions _a_ and _b_ respectively divided by the total number of counts in the distribution _a_ and _b_ respectively.
+
+_n_ was determined using the Silverman's rule of thumb (see equation [above](#silverman)).
+We consider two distributions to be significantly similar when their Bhattacharyya Coefficient is $< 0.95$.
+Conversely, they are significantly different when their Bhattacharyya Coefficient is $< 0.05$.
+Values in between these two threshold just show the probability of overlap between the distributions but are not conclusive to assess the similarity or differences between the distributions.
+
+## Random permutation test
+
+To test whether the landmarks' variation (i.e. the radii between the "maximum" and "minimum" cranium/mandible) one partition is different than the rest of the landmark's variation, we used a kind of permutation test (based on a modification from `ade4::as.randtest` [@thioulouse1997ade]).
+This is a pretty intuitive yet powerful test aiming to calculate whether the observed difference in statistic (either the area difference or the probability of overlap) is different than the same statistic drawn randomly from the same population (here, the distribution of all the landmark's variation).
+First we measured the statistic between the landmark partition of interest and all the other landmarks (including the ones from the partition).
+Second, we generated 1000 statistics by randomly sampling the same number of landmarks as in the partition in the whole distributions and compared them again to the full distribution.
+This resulted in 1000 null comparisons (i.e. assuming the null hypothesis that the statistic in the partition is the same as the statistic in the total distribution).
+We then calculated the _p_ value based on:
+
+##### Permutation _p_-value
+
+$p=\frac{\sum_1^B\left(random_{i} >= observed\right)+1}{B + 1}$
+
+Where _B_ is the number of random draws (1000 bootstrap pseudo-replicates), $random_{i}$ is the $i^{th}$ statistic from the comparison of the $i^{th}$ randomly drawn partition and the distribution and $observed$ is the observed statistic between the partition and the distribution.
+An increased number of bootstrap pseudo-replications increases the type I error.
+We therefore lowered our threshold for accepting $H_{0}$ to 0.01 instead of the commonly used 0.05.
+
+
+# Implementation example
+
+This is a running example of the step by step implementation of this test in the working `landmarktest` package.
+
 ```{r, message = FALSE, warning = FALSE}
 ## Loading the libraries (and installing if necessary)
 if(!require(devtools)) install.packages("devtools")
 if(!require(knitr)) install.packages("knitr")
 if(!require(geomorph)) install.packages("geomorph")
-if(!require(dispRity)) install.packages("dispRity");library(dispRity)
-if(!require(landmarktest)) install_github("TGuillerme/landmark-test");library(landmarktest)
+if(!require(dispRity)) install.packages("dispRity")
+if(!require(landmarktest)) install_github("TGuillerme/landmark-test")
+library(dispRity)
+library(landmarktest)
 source("../Functions/utilities.R")
-set.seed(1)
+set.seed(42)
 ```
 
-# Pipelined analysis
+## Loading some example dataset
 
+To perform the test on part of the dataset from the analysis, you can directly use the compiled data obtained by running [the data preparation script](https://github.com/TGuillerme/landmark-test/blob/master/Analysis/01-Data_preparation.Rmd).
 
-```{r}
+```{r, eval = FALSE}
 ## Loading a dataset
 load("../Data/Processed/wombat_ursinus.Rda")
 
 ## Selecting a partition
-cranium <- land_data$cranium
+data <- land_data$cranium
+
+## Procrustes data
+procrustes <- data$procrustes
+
+## Landmark classification
+landmarks_groups <- data$landmarkgroups
 ```
 
+For simplifying this example, we will use the 2D `plethodon` dataset already present in the `geomorph` package.
 
-## Selecting the two most extreme specimen (max and min)
+```{r}
+## Loading the dataset
+data(plethodon)
 
-Getting the ranges of variation for the Procrustes.
-This variation is equivalent to the range of Procrustes differences (i.e. the two skulls with the most different landmark positions in the procrustes superimposition).
-Landmark difference is calculated using the spherical coordinates between each landmark for each pair of species.
-The spherical coordinates are a coordinate system measured in a sphere composed of the radius ($\rho$, the euclidean distance between the two landmarks) the azimuth angle ($\phi$, the angle on the equatorial plan) and the polar angle ($\theta$, the angle measured on the polar plan).
-Since we are only interested in the _magnitude_ of difference ($\rho$) regardless of the direction ($\phi$ and $\theta$) we will use only the radius below.
+## Generating a Procrustes superimposition
+procrustes <- gpagen(plethodon$land, print.progress = FALSE)
 
-We calculate the to extremes (the two individuals with the most different radii) using the following simple algorithm:
+## Landmark classification
+back <- c(1,2,10,11,12)
+front <- c(1:12)[-back]
+landmarks_groups <- data.frame("landmark" = c(back, front),
+                               "group" = c(rep("back", 5), rep("front", 7)))
+```
 
- 1. Calculate the radii for all _n_ landmarks between the mean Procrustes superimposition and each individual superimposition.
- 2. Rank each set of _n_ radii and measure the area under the resulting curve.
- 3. Select the specimen with the highest _n_ radii area. This is now the "maximum" Procrustes (i.e. the specimen with the most different shape compared to the mean).
- 4. Calculate the radii for all _n_ landmarks between the "maximum" Procrustes and the remaining individual ones.
- 5. Repeat step 2 and 3. The result specimen with the highest _n_ radii area is now the "minimum" Procrustes (i.e. the specimen with the most different shape compared to the "maximum" Procrustes).
+## Selecting the range of landmark variation (max and min specimen)
 
-These two "maximum" and "minimum" Procrustes are not the biggest/smallest, widest/narowest, etc. skulls _per se_ but rather the two extremes of the overall distribution of landmark variation ($\rho$).
-Without visualisation, it actually impossible to even determine which one between the "maximum" or the "minimum" has actually the most variation.
-However, since we are not interest in direction, this is totally sufficient to give us the magnitude of differences between specimens (while taking into account _all_ the landmarks the three dimensions).
+We can select the "maximum" and "minimum" specimen and their range of variation using the algorithm detailed above (see )
 
 This procedure can be compute with the `variation.range` function:
 
@@ -99,14 +211,14 @@ To measure the overall differences in the length of the radii, we can calculate 
 
 $\text{Area difference} = \int_{0}^{n-1} (f_{x} - f_{y}) %d(x,y)$
 
-Where $n$ is minimum number of comparable landmarks and $f_{x}$ and $f_{y}$ are ranked functions (i.e. $f_{0} \geq f_{1} \geq f_{2} ...$).
-If one of the functions $f_{x}$ or $f_{y}$ have $m$ elements (with $m > n$) $f^{*}_{z}$, a rarefied estimated of the function with $m$ elements is used instead.
+Where _n_ is minimum number of comparable landmarks and $f_{x}$ and $f_{y}$ are ranked functions (i.e. $f_{0} \geq f_{1} \geq f_{2} ...$).
+If one of the functions $f_{x}$ or $f_{y}$ have _m_ elements (with $m > n$) $f^{*}_{z}$, a rarefied estimated of the function with _m_ elements is used instead.
 
 $\int_{0}^{n-1}f^*_{z}d(z) = \frac{\sum_1^p\int f^*_{zi}}{p}$
 
 
-Where $p$ is the number of rarefaction replicates.
-$p$ is chosen based on the Silverman's rule of thumb for choosing the bandwidth of a Gaussian kernel density estimator multiplied by 1000 with a result forced to be 100 $\leq p \leq$ 1000 [@silverman1986density].
+Where _p_ is the number of rarefaction replicates.
+_p_ is chosen based on the Silverman's rule of thumb for choosing the bandwidth of a Gaussian kernel density estimator multiplied by 1000 with a result forced to be 100 $\leq p \leq$ 1000 [@silverman1986density].
 
 $p=\left(\frac{0.9\times \sigma_{m} }{1.34n}\right)^{-1/5}$
 With $\sigma_{m}$ being the minimum of the standard deviation and the interquartile range of the distribution.
@@ -118,15 +230,15 @@ This allows the rarefaction algorithm to be fast but "fair" (i.e. reducing the n
 The Bhattacharyya Coefficient calculates the probability of overlap of two distributions [@Bhattacharyya; @Guillerme2016146].
 When it is equal to zero, the probability of overlap of the distributions is also zero, and when it is equal to one, the two distributions are entirely overlapping.
 It forms an elegant and easy to compute continuous measurement of the probability of similarity between two distributions.
-The coefficient is calculated as the sum of the square root of the relative counts shared in $n$ bins among two distributions.
+The coefficient is calculated as the sum of the square root of the relative counts shared in _n_ bins among two distributions.
 
 $\text{Bhattacharyya Coefficient}=\sum_{i=1}^{n} \sqrt{{\sum{a_i}}\times{\sum{b_i}}}$
 
 Where ${a_i}$ and ${b_i}$  are the number of counts in bin $i$ for the distributions $a$ and $b$ respectively divided by the total number of counts in the distribution $a$ and $b$ respectively.
 
-The precision of the Bhattacharyya Coefficient is directly related to the number of bins, $n$.
-If $n$ is low, the overlap will be overestimated and if $n$ is too high, the overlap will be underestimated.
-We determined the number of bins using Silverman's rule of thumb which states that $n$ should be 0.9 times the minimum of the standard deviation and the interquartile range of the distribution, divided by $1.34$ times the sample size of the distribution to the negative one-fifth power (`bw.nrd0()` function in R) [@silverman1986density].
+The precision of the Bhattacharyya Coefficient is directly related to the number of bins, _n_.
+If _n_ is low, the overlap will be overestimated and if _n_ is too high, the overlap will be underestimated.
+We determined the number of bins using Silverman's rule of thumb which states that _n_ should be 0.9 times the minimum of the standard deviation and the interquartile range of the distribution, divided by $1.34$ times the sample size of the distribution to the negative one-fifth power (`bw.nrd0()` function in R) [@silverman1986density].
 
 We consider two distributions to be significantly similar when their Bhattacharyya Coefficient is < 0.95.
 Conversely, we consider them to be significantly different when their Bhattacharyya Coefficient is < 0.05.
