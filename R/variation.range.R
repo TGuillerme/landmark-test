@@ -266,7 +266,7 @@ variation.range <- function(procrustes, type = "spherical", angle = "degree", wh
         variation_range <- coordinates.difference(min_coordinates, max_coordinates, type = type, angle = angle)[[1]]
 
         ## Finding the max/min specimen
-        warning("max/min specimen selection for the PCA only works on a single axis.")
+        warning("max/min coordinate configurations reflect PC minima/maxima of the PC axis specified for variation.range.")
         if(length(axis) != 1) {
             axis <- axis[1]
         }
