@@ -62,11 +62,14 @@ plotRefToTarget.heat(cranium$procruste$coords[, , specimens_min_max[2]],
 ```
 
 
-#Same but with the PCA
+#Contrasting specimens on opposite PC axes
 
 ```{r}
 ## Procrustes variation ranges
-variation_all_PC_axis <- variation.range(cranium$procrustes, return.ID = TRUE, CI = 0.5, ordination = TRUE, axis = 1)
+
+
+
+variation_all_PC_axis <- variation.range(cranium$procrustes, return.ID = TRUE, ordination = TRUE, axis = 1)
 #This does not work
 specimens_min_max <- variation_all_PC_axis$min.max
 procrustes_var <- variation_all_PC_axis$range[,1]
@@ -82,9 +85,7 @@ plotRefToTarget.heat(cranium$procruste$coords[, , specimens_min_max[2]],
 ```
 
 
-#Trying to do this using hypothetical PC min/max landmarks WHICH STILL NEEDS A WAY OF COLOURING ACCORDING TO MAGNITUDE
-
-
+#Trying to do this using hypothetical PC min/max landmarks 
 
 ```{r, eval = FALSE}
 
@@ -92,7 +93,9 @@ plotRefToTarget.heat(cranium$procruste$coords[, , specimens_min_max[2]],
 
 ## Procrustes variation ranges
 variation <- variation.range(cranium$procrustes, return.ID = TRUE, CI = 0.5)
+#this identifies specimens at opposite ends of the PC spectrum - not what I am after
 specimens_min_max <- variation$min.max
+#the below needs to be the variation range for hypothetical PC1 vs hypothetical PC2
 procrustes_var <- variation$range[,1]
 
 

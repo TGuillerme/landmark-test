@@ -26,9 +26,14 @@ set.seed(1)
 library(landmarktest)
 
 # load the data
+#for hairy-nosed wombats (needed below for PCA)
+load("../Data/Processed/wombat_lasiorhinus.Rda")
+HN<-land_data
 
 ##the below loads the Wombat.Rda from the processed data (i.e. partitions, procrustes data, and ordination results); but the object is NOT called the file name called under "load", it is "land_data"
 load("../Data/Processed/wombat.Rda")
+rawdata_cranium_wombat<-read.csv ("../Data/Raw/landmarkdata_cranium_wombat.csv")
+rawdata_mandible_wombat<-read.csv ("../Data/Raw/landmarkdata_mandible_wombat.csv")
 
 #read classifiers
 cranium<-read.csv("../Data/Raw/classifier_cranium_wombat.csv")
@@ -36,12 +41,60 @@ mandible<-read.csv("../Data/Raw/classifier_mandible_wombat.csv")
 
 
 ```
+# Pull out landmark designations. These need to be raw data because the landmark names are in the raw data
+```{r}
+  ## Create vectors of patch points, semi-landmarks, and landmarks
+  # LM point name metadata
+  
+#change "cranium" designations to "mandible" designations as needed
 
-#Visualize landmark partitions
+
+
+pt_names <-rawdata_mandible_wombat[, 1] # grabs first column of raw coords
+foo2 <- str_sub(pt_names, 3, -1) # gets rid of X, Y, Z designations
+u_pt_names <- unique(foo2)
+
+patches <- str_detect(u_pt_names, "patch") # 
+pat_num <- which(patches == TRUE)
+
+sliders <- str_detect(u_pt_names, "CUR")
+sli_num <- which(sliders == TRUE)
+
+LM <- !(sliders | patches)
+LM_num <- which(LM == TRUE)
+
+#Assign each landmark the appropriate number; Fixed is 1, semis are 2, patches are 3
+
+#using landmarkgroups as a file to fill in 
+landmarkgroups=read.csv("../Data/Raw/landmarkgroups_mandible_wombat.csv")
+
+landmark_LM_types<-landmarkgroups
+for (i in 1:length(landmark_LM_types[,1])){
+if(landmark_LM_types[i,1] %in% pat_num ==TRUE)
+landmark_LM_types[i,2]<-3
+
+else
+  
+if(landmark_LM_types[i,1] %in% sli_num ==TRUE)
+landmark_LM_types[i,2]<-2 
+
+else
+  
+if(landmark_LM_types[i,1] %in% LM_num ==TRUE)
+landmark_LM_types[i,2]<-1   
+
+}
+
+write.csv(landmark_LM_types, "../Data/Raw/landmarktypes_mandible_wombat.csv")
+
+``` 
+
+#Visualize landmark types or landmark partitions without ply file
+
 ```{r, message = FALSE, warning = FALSE}
 #separate land_data into the relevant components
 
-#Define the partitions (needs to be done individually)
+#Define the partitions (needs to be done individually); this produces a csv file that can be manually edited (see comments below)
 #LandmarkRegions=define.modules(land_data$cranium$procrustes$coords[,,5],2)
 #write.csv(LandmarkRegions, file="../Data/Results/additional_snout.csv")
 
@@ -51,19 +104,112 @@ PartNames<-c("Zyg", "Sn", "Oc", "Po", "Rest")# This is not necessary for colouri
 plot.partitions(land_data$cranium)
 plot.partitions(land_data$mandible)
 
-#The best way to fine-tune is to plot the coloured regions with the number
-plot.partitions(land_data$mandible)
-text3d(mshape(land_data$mandible$procrustes$coords), text=c(1:577))
+#Visualize partitions as colours
+plot.partitions(land_data$mandible, 0.01)
+shade3d()
+#optional - adding text helps with identifying landmarks if define.modules has not captured all landmarks of a partition. These numbers can then be manually edited in the LandmarkRegions file. 
+#text3d(mshape(land_data$mandible$procrustes$coords), text=c(1:577))
+
+```
+
+#Visualize landmark types or landmark partitions superimposed on a surface using a ply file; more involved as it requires the use of raw data
+
+```{r}
+
+#Create a ply file of the mean shape by warping the mean specimen in the PCA to the mean shape; for this, non-procrustes superimposed coordinates are required. The mean shapes are used here because they are easy to register with the landmarks.
+
+#Find mean specimen, determine mean shape to warp mean specimen to
+findMeanSpec(land_data$cranium$procrustes$coords)
+findMeanSpec(land_data$mandible$procrustes$coords)
+mshape_cranium<-mshape(land_data$cranium$procrustes$coords)
+mshape_mandible<-mshape(land_data$mandible$procrustes$coords)
+
+#Load ply file for  specimens closest to mean
+mean_specimen_mesh_cranium<-read.ply("../Data/Raw/NHNW_JM12487_Cranium.ply")
+mean_specimen_mesh_mandible<-read.ply("../Data/Raw/SHNW NR1326 Mandible.ply")
+
+#read raw data needed to register to ply files 
+WomCrData <- read.csv("../Data/Raw/landmarkdata_cranium_wombat.csv", header = T, row.names = 1) 
+WomCrData <- t(WomCrData) 
+WomCrData <- WomCrData[complete.cases(WomCrData),] 
+WomCrData <- arrayspecs(WomCrData, k=3, p=ncol(WomCrData)/3) 
+
+WomMaData <- read.csv("../Data/Raw/landmarkdata_mandible_wombat.csv", header = T, row.names = 1) 
+WomMaData <- t(WomMaData)
+WomMaData <- WomMaData[complete.cases(WomMaData),] 
+WomMaData <- arrayspecs(WomMaData, k=3, p=ncol(WomMaData)/3) 
+
+# raw coordinates of the mean specimen to register to their respective ply files
+mean_coords_cranium=WomCrData[,,38]
+mean_coords_mandible=WomMaData[,,39]
+
+# Check that ply files and raw coordinates align
+plotspec(mean_specimen_mesh_cranium,mean_coords_cranium, centered = F, asp=T) 
+plotspec(mean_specimen_mesh_mandible,mean_coords_mandible, centered = F, asp=T)
+
+#warp reference mesh to mean shape - warped ply files are already in the Data/Processed folder
+#wombat_cranium_meanwarp- warpRefMesh(mean_specimen_mesh_cranium, mean_coords_cranium, mshape_cranium, centered=F) # Warps the ref mesh to the mean shape
+#wombat_mandible_meanwarp <- warpRefMesh(mean_specimen_mesh_mandible, mean_coords_mandible, mshape_mandible, centered=F) # Warps the ref mesh to the mean shape
+
+#save mean meshes
+#open3d(); shade3d(wombat_cranium_meanwarp); writePLY("../Data/Processed/wombat_cranium_meanwarp.ply",withColors=T, format=("ascii"))#Export the warped mean specimen as a ply file; if you want to import this back into R, it needs to be formatted to ascii ply in meshlab
+#open3d(); shade3d(wombat_mandible_meanwarp); writePLY("../Data/Processed/wombat_mandible_meanwarp.ply",withColors=T, format=("ascii"))
+
+#or open meshes 
+wombat_cranium_meanwarp<-read.ply("../Data/Processed/wombat_cranium_meanwarp.ply")
+wombat_mandible_meanwarp<-read.ply("../Data/Processed/wombat_mandible_meanwarp.ply")
+
+#plotting coloured landmarks on surface mesh for partitions; change to mandible as needed
+
+PartLevels= unique(land_data$mandible$landmarkgroups[,2])
+Colours <- c("blue", "orange", "green")
+
+Part=list()
+###Subsetting the partition levels
+for(i in 1:length(PartLevels)){
+  Part[[i]]<-which (land_data$mandible$landmarkgroups[,2] == PartLevels[[i]])
+} 
+
+###plotting the spheres- if you get only white, increase the radius. Note that we are using       
+open3d()
+for (i in 1:length(PartLevels)){
+  spheres3d(mshape_mandible[Part[[i]],1], mshape_mandible[Part[[i]],2], mshape_mandible[Part[[i]],3], col=Colours[i], lit=TRUE,radius = 0.001, asp=F)
+  
+}
+
+shade3d(wombat_mandible_meanwarp)
 
 
+#plotting coloured landmarks on surface mesh
 
+lm_types_cranium=read.csv("../Data/Raw/landmarktypes_cranium_wombat.csv")
+lm_types_mandible=read.csv("../Data/Raw/landmarktypes_mandible_wombat.csv")
+
+#change from here between cranium and cranium as needed
+
+PartLevels= unique(lm_types_cranium$x)
+Colours <- c("blue", "orange", "green")
+
+Part=list()
+###Subsetting the partition levels
+for(i in 1:length(PartLevels)){
+  Part[[i]]<-which (lm_types_cranium[,3] == PartLevels[[i]])
+} 
+
+###plotting the spheres- if you get only white, increase the radius       
+open3d()
+for (i in 1:length(PartLevels)){
+  spheres3d(mshape_cranium[Part[[i]],1], mshape_cranium[Part[[i]],2], mshape_cranium[Part[[i]],3], col=Colours[i], lit=TRUE,radius = 0.001, asp=F)
+  
+}
+
+shade3d(wombat_cranium_meanwarp)
 
 ```
 
 # Visualizing shape changes between Principal component extremes
+
 ```{r, message = FALSE, warning = FALSE}
-
-
 
 
 PCA.vectors(land_data$cranium, minfirst=TRUE)
@@ -71,69 +217,75 @@ PCA.vectors(land_data$cranium, minfirst=TRUE)
 #PCA plot for Figure
 ```{r, message = FALSE, warning = FALSE}
 
-Classifiers=list("cranium"=cranium, "mandible"=mandible)
-PC=list()
+#for all wombats
 
-for (i in 1:length(Classifiers)){
-  #prep classifiers
-  names <- dimnames((land_data)[[i]]$procrustes$coords)[[3]] # Gives all IDs in data
-  Species <- as.factor(Classifiers[[i]]$Species)
-  Locality <- as.factor(Classifiers[[i]]$Locality)
-  Environment <- as.factor(Classifiers[[i]]$Environment) 
-  Sex <- as.factor(Classifiers[[i]]$Sex)
-  levels(Sex)<-c(levels(Sex),"U")  #Add the extra level to your factor
-  Sex[is.na(Sex)] <- "U"           #Change NA to "U"
-  levels(Environment)<-c(levels(Environment)," ") 
-  Environment[is.na(Environment)] <- " "           #Change NA to "U"
-  
-  #prep pc scores
-  
-  PC[[i]] <- data.frame(land_data[[i]]$ordination$x[,1], land_data[[i]]$ordination$x[,2])#Why does this not work??
-  
- }
-names(PC)<-names(Classifiers)
+wombat_cranium_PC1Scores <- land_data$cranium$ordination$x[,1]
+wombat_cranium_PC2Scores <- land_data$cranium$ordination$x[,2]
+wombat_cranium_PC <- data.frame(wombat_cranium_PC1Scores, wombat_cranium_PC2Scores)
 
-
-#outside the loop this works. I think I need to learn MUCH more about how to use selector addresses!
-PC[[1]] <- data.frame(land_data[[1]]$ordination$x[,1], land_data[[1]]$ordination$x[,2])
-PC[[2]] <- data.frame(land_data[[2]]$ordination$x[,1], land_data[[2]]$ordination$x[,2])
+wombat_mandible_PC1Scores <- land_data$mandible$ordination$x[,1]
+wombat_mandible_PC2Scores <- land_data$mandible$ordination$x[,2]
+wombat_mandible_PC <- data.frame(wombat_mandible_PC1Scores, wombat_mandible_PC2Scores)
 
 
 
 
-#The below is just sample text, I'll get rid of it when the above works
+#change between cranium,  mandible
 
-names <- dimnames(land_data$cranium$procrustes$coords)[[3]] # Gives all IDs in data
-Species <- as.factor(cranium$Species)
-Locality <- as.factor(cranium$Locality)
-Environment <- as.factor(cranium$Environment) 
-Sex <- as.factor(cranium$Sex)
-
-WomCrPC1Scores <- land_data$cranium$ordination$x[,1]
-WomCrPC2Scores <- land_data$cranium$ordination$x[,2]
-WomCrPC <- data.frame(WomCrPC1Scores, WomCrPC2Scores)
-
-WomMaPC1Scores <- land_data$mandible$ordination$x[,1]
-WomMaPC2Scores <- land_data$mandible$ordination$x[,2]
-WomMaPC <- data.frame(WomMaPC1Scores, WomMaPC2Scores)
+names <- dimnames(land_data$mandible$procrustes$coords)[[3]] # Gives all IDs in data
+Species <- as.factor(mandible$Species)
+Locality <- as.factor(mandible$Locality)
+Environment <- as.factor(mandible$Environment) 
+Sex <- as.factor(mandible$Sex)
 
 levels(Sex)<-c(levels(Sex),"U")  #Add the extra level to your factor
 Sex[is.na(Sex)] <- "U"           #Change NA to "U"
 levels(Environment)<-c(levels(Environment)," ") 
 Environment[is.na(Environment)] <- " "           #Change NA to "U"
 
-
 plot.new()
-#in the below, it doesn't work to use PC$cranium$land_data..i...ordination.x...1. and PC$cranium$land_data..i...ordination.x...2. for x and y - not sure why. It might be easier to just do the PCA manually
-ggplot(WomCrPC, aes(x=WomCrPC$WomCrPC1Scores, y=WomCrPC$WomCrPC2Scores, colour=Species, fill=Species))+
+ggplot(wombat_mandible_PC, aes(x=wombat_mandible_PC$wombat_mandible_PC1Scores, y=wombat_mandible_PC$wombat_mandible_PC2Scores, colour=Species, fill=Species))+
   geom_convexhull(alpha=.4)+
   scale_shape_manual(values = c(21, 22, 24))+
-  geom_point(aes(shape=Sex, fill=Species), color="black", size=4, stroke = 0.75)+
-  geom_text(aes(label=Environment), size=5, hjust=1.35, vjust=0.25, colour="black")+
+  
+  geom_point(aes(shape=Sex, fill=Species), color="black", size=2, stroke = 0.5)+
+  geom_text(aes(label=Environment), size=3, hjust=1.35, vjust=0.25, colour="black")+
   labs(x = "Principal component 1", y = "Principal component 2")+
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), legend.position="none",
-        axis.text=element_text(size=14), axis.title=element_text(size=16))
-theme_set(theme_bw(12))
+        axis.text=element_text(size=12), axis.title=element_text(size=12))+
+  coord_fixed(0.5)+
+  theme_set(theme_bw(12))
+
+#Saves the last plot by default
+ggsave("E:/Students/Cruise/Paper/Figures/wombat_mandible_PC.pdf",dpi = 600)
+
+#PCA of Hairy-nosed wombats
+
+HN_cranium_PC1Scores <- HN$cranium$ordination$x[,1]
+HN_cranium_PC2Scores <- HN$cranium$ordination$x[,2]
+HN_cranium_PC <- data.frame(HN_cranium_PC1Scores, HN_cranium_PC2Scores)
+
+HN_mandible_PC1Scores <- HN$mandible$ordination$x[,1]
+HN_mandible_PC2Scores <- HN$mandible$ordination$x[,2]
+HN_mandible_PC <- data.frame(HN_mandible_PC1Scores, HN_mandible_PC2Scores)
+
+names <- dimnames(HN$mandible$procrustes$coords)[[3]] # Gives all IDs in data
+Species <- as.factor(mandible$Species)
+Species<-Species[which(Species!="Common wombat")]
+
+plot.new()
+ggplot(HN_mandible_PC, aes(x=HN_mandible_PC$HN_mandible_PC1Scores, y=HN_mandible_PC$HN_mandible_PC2Scores, colour=Species, fill=Species))+
+  geom_convexhull(alpha=.4)+
+  scale_shape_manual(values = c(21, 22, 24))+
+  
+  geom_point(aes(fill=Species), color="black", size=2, stroke = 0.5)+
+  labs(x = "Principal component 1", y = "Principal component 2")+
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), legend.position="none",
+        axis.text=element_text(size=12), axis.title=element_text(size=12))+
+  coord_fixed(0.75)
+ 
+
+ggsave("E:/Students/Cruise/Paper/Figures/HN_mandible_PC.pdf",dpi = 600)
 
 
 ```

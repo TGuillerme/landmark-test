@@ -223,9 +223,10 @@ make.plots <- function(results, type, add.p = FALSE, correction, rarefaction = F
 #colouring partition spheres
 #@param land_data_partition the landmark data e.g. land_data$cranium
 #@param partnames is an optional vector with names for each partition number
+#@param PointSize is for changing the size of spheres plotted
 
 #Defining partitions using the define.module (needs individual execution)
-plot.partitions<-function(land_data_partition, PartNames){
+plot.partitions<-function(land_data_partition, PartNames, PointSize){
   ##the object with the landmarks subset according to partitions
   Part=list()
   WomCrGPA<-land_data_partition$procrustes
@@ -249,10 +250,10 @@ plot.partitions<-function(land_data_partition, PartNames){
       names(Part)[i]<-PartNames[i]
     }
   }
-  ##colours the spheres for each partitin
+  ##colours the spheres for each partition
   open3d()
   for (i in 1:length(PartLevels)){
-    spheres3d(WomCrRef[Part[[i]],1], WomCrRef[Part[[i]],2], WomCrRef[Part[[i]],3], col=Colours[i], lit=TRUE,radius = 0.001, asp=F)
+    spheres3d(WomCrRef[Part[[i]],1], WomCrRef[Part[[i]],2], WomCrRef[Part[[i]],3], col=Colours[i], lit=TRUE,radius = Pointsize, asp=F)
     
   }
   
