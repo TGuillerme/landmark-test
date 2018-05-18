@@ -15,3 +15,7 @@ Manuscript/Figures/*.pdf
 
 ## Ignore compiled files (html)
 *.html
+
+## Ignore ply and surface files
+*.ply
+*.stl
