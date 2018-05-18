@@ -32,6 +32,8 @@ set.seed(1)
 #loading the below loads objects called land_data, NOT "wombat"
 load("../Data/Processed/wombat.Rda")
 AllWombats<-land_data
+load("../Data/Processed/wombat_lasiorhinus.Rda")
+HN<-land_data
 load("../Data/Processed/wombat_krefftii.Rda")
 NHNW<-land_data
 load("../Data/Processed/wombat_latifrons.Rda")
@@ -89,36 +91,51 @@ plotRefToTarget.heat(cranium$procruste$coords[, , specimens_min_max[2]],
 
 ```{r, eval = FALSE}
 
-#@params procrustes_coords is coordinate data (e.g.CW$cranium$procrustes$coords ); I'd like to add a "required_PC" which is the PC number we want to look at but don't know how that works
-
-## Procrustes variation ranges
-variation <- variation.range(cranium$procrustes, return.ID = TRUE, CI = 0.5)
-#this identifies specimens at opposite ends of the PC spectrum - not what I am after
-specimens_min_max <- variation$min.max
-#the below needs to be the variation range for hypothetical PC1 vs hypothetical PC2
-procrustes_var <- variation$range[,1]
+#@params Species_dataset is the dataset in question (e.g.CW$cranium); 
+#@params min_or_max_first ("min", "max")is if you want min referenced to max or vice versa. this is handy if one common lm displacement pattern happens to be associated with opposite signed PC scores.
 
 
-
-heatplot_PCs<-function (Procrustes_coords){
-
-PCA=plotTangentSpace(Procrustes_coords)
+heatplot.PCs<-function (species_dataset,minfirst, PC_axis,...){
   
-gridPar = gridPar(pt.bg = "white", pt.size = 0.5)
-open3d()
-plotRefToTarget.heat(PCA$pc.shapes$PC1min,
-                     PCA$pc.shapes$PC1max,
-                     col = heat.colors, pt.size = 0.7, col.val = procrustes_var,
-                     plotRefToTarget.args = list(mag = 1))
+  ## Procrustes variation ranges for PCA; axis determines which ordination axis to use
+  variation <- variation.range(species_dataset$procrustes, return.ID = TRUE, axis=PC_axis, ordination=species_dataset$ordination)
+  
+  # identifies specimens at opposite ends of the PC spectrum
+  specimens_min_max <- variation$min.max
+ 
+   #determines range of variation between PC extremes
+    procrustes_var <- variation$range[,1]
+    
+    #runs PCA for min/max plotting
+    PCA=plotTangentSpace(species_dataset$procrustes$coords, verbose=FALSE)
+  
+  gridPar = gridPar(pt.bg = "white", pt.size = 0.5)
+  
+  if(minfirst==TRUE){
+  open3d()
+    plotRefToTarget.heat(PCA$pc.shapes$PC1min,
+                       PCA$pc.shapes$PC1max,
+                       col = heat.colors, pt.size = 0.7, col.val = procrustes_var,
+                       plotRefToTarget.args = list(mag = 1),...)}
+  else {
+    open3d()
+    plotRefToTarget.heat(PCA$pc.shapes$PC1max,
+                       PCA$pc.shapes$PC1min,
+                       col = heat.colors, pt.size = 0.7, col.val = procrustes_var,
+                       plotRefToTarget.args = list(mag = 1), ...)}
 }
 
-heatplot_PCs(CW$cranium$procrustes$coords)
-heatplot_PCs(SHNW$cranium$procrustes$coords)
-heatplot_PCs(NHNW$cranium$procrustes$coords)
+heatplot.PCs(AllWombats$cranium, minfirst=FALSE, PC_axis=1)
+heatplot.PCs(HN$cranium, minfirst=TRUE, PC_axis=1 )
+heatplot.PCs(CW$cranium)
+heatplot.PCs(SHNW$cranium, minfirst)
+heatplot.PCs(NHNW$cranium, minfirst)
 
-heatplot_PCs(CW$mandible$procrustes$coords)
-heatplot_PCs(SHNW$mandible$procrustes$coords)
-heatplot_PCs(NHNW$mandible$procrustes$coords)
+heatplot.PCs(AllWombats$mandible, minfirst=FALSE, PC_axis=1)
+heatplot.PCs(HN$mandible, minfirst=TRUE, PC_axis=1)
+heatplot.PCs(CW$mandible, minfirst=FALSE, PC_axis=1)
+heatplot.PCs(SHNW$mandible, minfirst=TRUE, PC_axis=1)
+heatplot.PCs(NHNW$mandible, minfirst=TRUE, PC_axis=1)
 
 ```
 
