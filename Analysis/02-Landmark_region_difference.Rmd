@@ -160,154 +160,96 @@ landmarks_groups <- data.frame("landmark" = c(back, front),
                                "group" = c(rep("back", 5), rep("front", 7)))
 ```
 
-## Selecting the range of landmark variation (max and min specimen)
-
-We can select the "maximum" and "minimum" specimen and their range of variation using the algorithm detailed above (see )
-
-This procedure can be compute with the `variation.range` function:
-
-
-```{r}
-## Procrustes variation ranges
-procrustes_var <- variation.range(cranium$procrustes)
-```
-<!-- ## PCA variation range
-ordination_var <- variation.range(cranium$procrustes, ordination = cranium$ordination)
-## PC1 variation range
-ordinatio1_var <- variation.range(cranium$procrustes, ordination = cranium$ordination, axis = 1)
-```
- -->
-
-## Selecting the different partitions
-
-Here we select five partitions of the landmarks, four partitions correspond to four different zones of the cranium and on corresponds the rest of cranium (minus those four partitions).
-Each one will be test blindly and noted from one to five (without _a priori_ knowledge of which is which).
+And we can select the two partitions to test
 
 ```{r}
 ## Partitions
 partitions <- list()
-for(part in unique(cranium$landmarkgroups[,2])) {
-    partitions[[part]] <- which(cranium$landmarkgroups[,2] == part)
+for(part in unique(landmarks_groups[,2])) {
+    partitions[[part]] <- which(landmarks_groups[,2] == part)
 }
 ```
 
-The hypotheses we are testing are "Are the landmarks in partition X different than the ones in the rest of the skull?".
-In mathematical phrasing: $H_{0}: \Theta_{0} = \Theta$ with a two-sided alternative $H_{1}: \Theta_{0} \neq \Theta$.
-In other words, does the partition X varies more or less than the rest of the skull.
+## Selecting the range of landmark variation (max and min specimen)
 
-
-## How to test the differences per partitions?
-
-We can then test the difference per partitions using two aspects: the size difference and the probability of overlap.
-
- * The first one ranks the radii values and measures the difference in overlap between the distribution of radii of all the landmarks (minus the subset).
- This metrics gives an idea of the differences in length between the landmarks
- * The second one measures the probability that two landmarks radii comes from the same distribution.
- If the probability of overlap between the landmarks in the subset and all the landmarks is low, it indicates that the subset of landmark is different than the other landmarks.
-
-### Size difference
-
-To measure the overall differences in the length of the radii, we can calculate the area difference:
-
-$\text{Area difference} = \int_{0}^{n-1} (f_{x} - f_{y}) %d(x,y)$
-
-Where _n_ is minimum number of comparable landmarks and $f_{x}$ and $f_{y}$ are ranked functions (i.e. $f_{0} \geq f_{1} \geq f_{2} ...$).
-If one of the functions $f_{x}$ or $f_{y}$ have _m_ elements (with $m > n$) $f^{*}_{z}$, a rarefied estimated of the function with _m_ elements is used instead.
-
-$\int_{0}^{n-1}f^*_{z}d(z) = \frac{\sum_1^p\int f^*_{zi}}{p}$
-
-
-Where _p_ is the number of rarefaction replicates.
-_p_ is chosen based on the Silverman's rule of thumb for choosing the bandwidth of a Gaussian kernel density estimator multiplied by 1000 with a result forced to be 100 $\leq p \leq$ 1000 [@silverman1986density].
-
-$p=\left(\frac{0.9\times \sigma_{m} }{1.34n}\right)^{-1/5}$
-With $\sigma_{m}$ being the minimum of the standard deviation and the interquartile range of the distribution.
-
-This allows the rarefaction algorithm to be fast but "fair" (i.e. reducing the number of re-sampling the more the distribution is homogeneous).
-
-### Probability of overlap
-
-The Bhattacharyya Coefficient calculates the probability of overlap of two distributions [@Bhattacharyya; @Guillerme2016146].
-When it is equal to zero, the probability of overlap of the distributions is also zero, and when it is equal to one, the two distributions are entirely overlapping.
-It forms an elegant and easy to compute continuous measurement of the probability of similarity between two distributions.
-The coefficient is calculated as the sum of the square root of the relative counts shared in _n_ bins among two distributions.
-
-$\text{Bhattacharyya Coefficient}=\sum_{i=1}^{n} \sqrt{{\sum{a_i}}\times{\sum{b_i}}}$
-
-Where ${a_i}$ and ${b_i}$  are the number of counts in bin $i$ for the distributions $a$ and $b$ respectively divided by the total number of counts in the distribution $a$ and $b$ respectively.
-
-The precision of the Bhattacharyya Coefficient is directly related to the number of bins, _n_.
-If _n_ is low, the overlap will be overestimated and if _n_ is too high, the overlap will be underestimated.
-We determined the number of bins using Silverman's rule of thumb which states that _n_ should be 0.9 times the minimum of the standard deviation and the interquartile range of the distribution, divided by $1.34$ times the sample size of the distribution to the negative one-fifth power (`bw.nrd0()` function in R) [@silverman1986density].
-
-We consider two distributions to be significantly similar when their Bhattacharyya Coefficient is < 0.95.
-Conversely, we consider them to be significantly different when their Bhattacharyya Coefficient is < 0.05.
-Values in between these two threshold just show the probability of overlap between the distributions but are not conclusive to assess the similarity or differences between the distributions.
-
-### Random test
-
-To test whether the landmark radii for one partition is different than the remaining ones, we can use a random test (modification from `ade4::as.randtest` [@thioulouse1997ade]).
-These tests are pretty intuitive yet powerful.
-The idea is to see whether the observed difference between a particular subsample (i.e. the partition) of a statistical population could be obtained by randomly sampling it from the same population.
-Concretely, the test compares an observed measurement from a subsample (either the area difference or the Bhattacharyya Coeffient in our case) to the same measurement calculated from random subsamples of the same size.
-It is then measure whether the observed subsample is different or not to the randomly generated ones the mean measurement (and variance) of a randomly generated sample.
-We can then calculate a _p_ value to estimate whether the sample is significantly within or without the random distribution.
-Because we measure the differences for a number of partitions, we need to adjust the calculated _p_ values.
-In this study we used a simple Bonferonni-Holm correction (multiplying the _p_ value by the number of partitions).
-
-Here is an example of what a random test would measure when creating a random partition.
-In this case we the observed measurement to fall well within the randomly sampled distribution results.
-
-```{r, fig.width = 10, fig.height = 5}
-set.seed(1)
-## Creating a random partition
-random_part <- sample(1:nrow(procrustes_var), 300)
-
-## Measuring the difference for a random partition
-random_area <- rand.test(procrustes_var[, "radius"], random_part, test = area.diff,
-                         test.parameter = TRUE)
-
-## Measuring the difference for a random overlap
-random_overlap <- rand.test(procrustes_var[, "radius"], random_part, test = bhatt.coeff,
-                            test.parameter = TRUE)
-
-## Plotting the results
-par(mfrow = c(1,2), bty = "n")
-plot(random_area, xlab = "Area difference", main = paste("Random partition"))
-legend("topleft", paste("p value", round(random_area$pvalue, 3), sep = "\n")  , bty = "n")
-plot(random_overlap, xlab = "Bhattacharyya coefficient", main = paste("Random partition"))
-legend("topleft", paste("p value", round(random_overlap$pvalue, 3), sep = "\n")  , bty = "n")
-```
-
-## Calculating the differences
+We can select the "maximum" and "minimum" specimen and their range of variation using the algorithm detailed above (see [here](#varalgorithm)).
+This procedure can be compute with the `variation.range` function:
 
 ```{r}
+## Procrustes variation ranges
+variation <- variation.range(procrustes, type = "spherical", what = "radius", return.ID = TRUE)
+
+## The range of variation
+variation$range
+
+## The two most extreme specimens' IDs
+variation$min.max
+```
+
+We can also do the same but only considering the 95% confidence interval (getting rid of any eventual outliers):
+
+
+```{r}
+## Procrustes variation ranges (95% CI)
+variation_95 <- variation.range(procrustes, type = "spherical", what = "radius", return.ID = TRUE,
+                                     CI = 0.95)
+```
+
+## Testing the overall difference in landmark size
+
+For both ranges of variation `variation` and `variation_95` we can now test whether each partitions is significantly different than the rest of the landmarks.
+We can test whether the partitions are different (`area.diff`: is the integral of the variation in partition X different than all the landmarks?) and whether they come from the same statistical population (`bhatt.coeff`: is the distribution of the variation in partition X different from the distribution of all the landmarks?).
+
+Since we are going to run the test for multiple partitions, we can wrap it in a `lapply` loop using the `area.diff` and `bhatt.coeff` functions for the tests as follows:
+
+```{r}
+## Function for applying the rand tests
+lapply.rand.test <- function(partition, data, test, ...) {
+    rand.test(data[, "radius"], partition, test = test, test.parameter = TRUE, ...)
+}
+
 ## Size differences
-differences <- lapply(partitions, lapply.rand.test, data = procrustes_var, test = area.diff)
+differences <- lapply(partitions, lapply.rand.test, data = variation$range, test = area.diff)
+differences_95 <- lapply(partitions, lapply.rand.test, data = variation_95$range, test = area.diff)
 
 ## Probabilities of overlap
-overlaps <- lapply(partitions, lapply.rand.test, data = procrustes_var, test = bhatt.coeff)
+overlaps <- lapply(partitions, lapply.rand.test, data = variation$range, test = bhatt.coeff)
+overlaps_95 <- lapply(partitions, lapply.rand.test, data = variation_95$range, test = bhatt.coeff)
+```
+
+> Note that the `area.test` function is slower than `bhatt.coeff` since it has to estimate the distribution function of the landmarks variation to calculate its integral.
+
+This is the equivalent of running the following for each element in `partition`, both the `area.diff` and `bhatt.coeff` tests and the both the `variation` and `variation_95` ranges of variation:
+
+```{r, eval = FALSE}
+## Running one test for one partition
+one_test <- rand.test(variation[, "radius"], partition[[1]],
+                      test = area.diff, test.parameter = TRUE)
 
 ```
 
-### Summarising the results
+### Interpreting the results
 
-The landmark size differences:
+We can then display the results as a normal permutation test with a _p_-value correction applied to the results (using the "bonferrroni" correction):
+
+#### The landmark size differences:
 
 ```{r, echo = FALSE}
 ## Size differences
 library(knitr)
-kable(make.table(differences, "bonferroni"), digits = 5)
+kable(make.table(differences, "bonferroni"), digits = 5, caption = "Size difference (100% CI)")
+kable(make.table(differences_95, "bonferroni"), digits = 5, caption = "Size difference (95% CI)")
 ```
 
-The probability of overlaps:
+#### The probability of overlaps:
 
 ```{r, echo = FALSE}
 ## Probability of overlap
-kable(make.table(overlaps, "bonferroni"), digits = 5)
+kable(make.table(overlaps, "bonferroni"), digits = 5, caption = "Overlap probability (100% CI)")
+kable(make.table(overlaps_95, "bonferroni"), digits = 5, caption = "Overlap probability (95% CI)")
 ```
 
-The result plots:
+#### The result plots for the 100% CI:
 
 ```{r, fig.width = 10, fig.height = 15, echo = FALSE}
 ## Plot the size differences
@@ -319,12 +261,19 @@ make.plots(differences, type = "area difference", add.p = TRUE, correction = "bo
 make.plots(overlaps, type = "Bhattacharyya Coefficient", add.p = TRUE, correction = "bonferroni")
 ```
 
-### Interpretation
+#### The result plots for the 100% CI:
 
-For these results, all the partitions are different from the overall data (i.e. the partitions are not random).
-The landmarks in partitions 1 and 3 are comparatively longer than all the other landmarks (i.e. the partitions 1 and 3 of the skull vary more than the others - see area difference figures for partition 1 and 3).
-Partition 3 is the most different than the rest of the skull (i.e. the landmarks in partition 3 are the most different to all the other landmarks - see second table observed Bhattacharyya Coeffient of 0.54).
+```{r, fig.width = 10, fig.height = 15, echo = FALSE}
+## Plot the size differences
+make.plots(differences_95, type = "area difference", add.p = TRUE, correction = "bonferroni")
+```
 
+```{r, fig.width = 10, fig.height = 15, echo = FALSE}
+## Plot the size differences
+make.plots(overlaps_95, type = "Bhattacharyya Coefficient", add.p = TRUE, correction = "bonferroni")
+```
+
+As we can see from the results on the `plethodon` dataset, the range of variation in both partitions of landmarks is not significantly different nor likely to come from an other statistical population.
 
 ## References
 
