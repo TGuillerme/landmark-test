@@ -1,0 +1,87 @@
+---
+title: "Landmark region difference"
+author: "Thomas Guillerme"
+bibliography: references.bib
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    fig_width: 12
+    fig_height: 6
+---
+
+```{r, message = FALSE, warning = FALSE}
+if(!require(knitr)) install.packages("knitr")
+if(!require(xtable)) install.packages("xtable")
+source("../Functions/utilities.R")
+```
+
+## Results summary
+
+
+The values for each species (or the genus) are the difference in area under the curve of landmarks variation length.
+When this value is positive, the partition contains longer landmark variation compared to all the other landmarks, when negative, it contains shorter variation.
+`diff` and `over` are the significance results from the random test for respectively the are difference (the value displayed) and the probability of overlap.
+`*` signifies a p-value below 0.01, `.` a p-value between 0.01 and 0.05 and no token for a p-value > 0.05.
+I am using a lower acceptance threshold for the p-values due to the amount of bootstrap replicates (1000) that inflate the type I error.
+
+If a result is significant for one test but not the other, the partition should be considered as **not** different.
+For example, if the distribution of landmarks within a partition does significantly not overlap with the distribution of all the landmarks (`over = *`) but these landmarks are not significantly longer or shorter than the other ones (`diff` has no token), we can not confidently say the partition is significantly different.
+The same argument goes if the difference is significant (`diff = *`) but not the probability of not overlapping (`over`).
+
+These results are not rarefied (i.e. I haven't had time to check the effect of the different number of landmarks in different partitions yet).
+
+
+```{r, echo = TRUE}
+## Summarising the results
+results_table_100 <- summarise.results(CI = 100, rarefaction = FALSE)
+results_table_95 <- summarise.results(CI = 95, rarefaction = FALSE)
+
+## Printing the table
+kable(results_table_100, digits = 4)
+kable(results_table_95, digits = 4)
+```
+
+```{r, eval = TRUE, echo = FALSE, print = FALSE, results = 'hide'}
+## Getting the table attributes
+path <- "../Manuscript/Tables/"
+caption_table <- "\"diff\" is the difference in landmark length between the ones from the partition and all the other. \"overlap\" is the probability of overlap between the distribution of the landmark lengths in the partitions and all the other. The p values are adjusted using a Bonferroni-Holm correction. Because of the number of bootstrap pseudo-replicates involved in the test (1000), we lowered our threshold for rejecting H0 to p <= 0.01. Signif. codes: 0 '**' 0.001 '*' 0.01 '.' 0.05 ' ' 1"
+
+label_table_100 <-  paste0("all_differences_CI", 100)
+label_table_95 <-  paste0("all_differences_CI", 95)
+
+## Saving both tables
+textable_100 <- xtable(results_table_100, caption = caption_table, label = label_table_100)
+textable_95 <- xtable(results_table_95, caption = caption_table, label = label_table_95)
+cat(print(textable), file = paste0(path, label_table_100, ".tex"))
+cat(print(textable), file = paste0(path, label_table_95, ".tex"))
+```
+
+
+
+## Rarefied results summary
+
+```{r, echo = TRUE}
+## Summarising the results
+results_table_100 <- summarise.results(CI = 100, rarefaction = TRUE)
+results_table_95 <- summarise.results(CI = 95, rarefaction = TRUE)
+
+## Printing the table
+kable(results_table_100, digits = 4)
+kable(results_table_95, digits = 4)
+```
+
+```{r, eval = TRUE, echo = FALSE, print = FALSE, results = 'hide'}
+## Getting the table attributes
+path <- "../Manuscript/Tables/"
+caption_table <- "Rarefied results. \"diff\" is the difference in landmark length between the ones from the partition and all the other. \"overlap\" is the probability of overlap between the distribution of the landmark lengths in the partitions and all the other. The p values are adjusted using a Bonferroni-Holm correction. Because of the number of bootstrap pseudo-replicates involved in the test (1000), we lowered our threshold for rejecting H0 to p <= 0.01. Signif. codes: 0 '**' 0.001 '*' 0.01 '.' 0.05 ' ' 1"
+
+label_table_100 <-  paste0("all_differences_rarefied_CI", 100)
+label_table_95 <-  paste0("all_differences_rarefied_CI", 95)
+
+## Saving both tables
+textable_100 <- xtable(results_table_100, caption = caption_table, label = label_table_100)
+textable_95 <- xtable(results_table_95, caption = caption_table, label = label_table_95)
+cat(print(textable), file = paste0(path, label_table_100, ".tex"))
+cat(print(textable), file = paste0(path, label_table_95, ".tex"))
+```
+
