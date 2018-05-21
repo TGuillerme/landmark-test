@@ -33,8 +33,8 @@ These results are not rarefied (i.e. I haven't had time to check the effect of t
 
 ```{r, echo = TRUE}
 ## Summarising the results
-results_table_100 <- summarise.results(CI = 100, rarefaction = FALSE)
-results_table_95 <- summarise.results(CI = 95, rarefaction = FALSE)
+results_table_100 <- summarise.results(CI = 100, rarefaction = FALSE, print.token = TRUE)
+results_table_95 <- summarise.results(CI = 95, rarefaction = FALSE, print.token = TRUE)
 
 ## Printing the table
 kable(results_table_100, digits = 4)
@@ -58,16 +58,16 @@ cat(print(textable), file = paste0(path, label_table_95, ".tex"))
 
 
 
-## Rarefied results summary
+### Rarefied results summary
 
 ```{r, echo = TRUE}
 ## Summarising the results
-results_table_100 <- summarise.results(CI = 100, rarefaction = TRUE)
-results_table_95 <- summarise.results(CI = 95, rarefaction = TRUE)
+results_table_rar_100 <- summarise.results(CI = 100, rarefaction = TRUE, print.token = TRUE)
+results_table_rar_95 <- summarise.results(CI = 95, rarefaction = TRUE, print.token = TRUE)
 
 ## Printing the table
-kable(results_table_100, digits = 4)
-kable(results_table_95, digits = 4)
+kable(results_table_rar_100, digits = 4)
+kable(results_table_rar_95, digits = 4)
 ```
 
 ```{r, eval = TRUE, echo = FALSE, print = FALSE, results = 'hide'}
@@ -79,9 +79,14 @@ label_table_100 <-  paste0("all_differences_rarefied_CI", 100)
 label_table_95 <-  paste0("all_differences_rarefied_CI", 95)
 
 ## Saving both tables
-textable_100 <- xtable(results_table_100, caption = caption_table, label = label_table_100)
-textable_95 <- xtable(results_table_95, caption = caption_table, label = label_table_95)
+textable_100 <- xtable(results_table_rar_100, caption = caption_table, label = label_table_100)
+textable_95 <- xtable(results_table_rar_95, caption = caption_table, label = label_table_95)
 cat(print(textable), file = paste0(path, label_table_100, ".tex"))
 cat(print(textable), file = paste0(path, label_table_95, ".tex"))
 ```
+
+
+
+# Plotting the results
+
 
