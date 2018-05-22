@@ -94,8 +94,45 @@ lapply.bootstrap.test <- function(partition, data, statistic, ...) {
 }
 
 
+## Function for translating the names in the datasets into the actual species names
+translate.name <- function(name) {
+    names <- c("All species", "Lasiorhinus", "Lasiorhinus krefftii", "Lasiorhinus latifrons", "Vombatus ursinus")
+
+    if(name == "Wombat_ursinus") {
+        return(names[5])
+    }
+    if(name == "Wombat") {
+        return(names[1])
+    }
+    if(name == "Wombat_lasiorhinus") {
+        return(names[2])
+    }
+    if(name == "Wombat_krefftii") {
+        return(names[3])
+    }
+    if(name == "Wombat_latifrons") {
+        return(names[4])
+    }
+    return(name)
+}
+
+## Function for getting the partition order and names
+get.partition.args <- function(partition) {
+    if(partition == "cranium") {
+        return(list("partitions" = c("Zygomatic Arch", "Tip of snout", "Remainder"), "partitions.order" = c(1, 3, 2)))
+    }
+    if(partition == "mandible") {
+        return(list("partitions" = c("Masticatory insertions", "Symphyseal area", "Remainder"), "partitions.order" = c(1, 2, 3)))
+    }
+    return(list(NULL))
+}
+
 ## Function for plotting the test results
-make.table <- function(results, correction) {
+make.table <- function(results, correction, partition.args) {
+
+    if(missing(partition.args)) {
+        partition.args <- list(NULL)
+    }
 
     ## Extract the values
     values <- lapply(results, function(X) return(c(X$obs, X$expvar, X$pvalue)))
@@ -112,16 +149,27 @@ make.table <- function(results, correction) {
         p_name <- "p value"
     }
 
+    ## Adding the partitions names
+    if(!is.null(partition.args$partitions)) {
+        summary_table <- data.frame(summary_table)
+        summary_table[,1] <- partition.args$partitions
+    }
+
     ## Adding the colnames
     colnames(summary_table)[c(1,2,6)] <- c("Partition", "Observed", p_name)
+
+    ## Re-ordering partitions (if not missing)
+    if(!is.null(partition.args$order.partitions)) {
+        summary_table <- summary_table[, partition.args$order.partitions]
+    }
 
     return(summary_table)
 }
 
-make.xtable <- function(results, correction, digits = 3, caption, label, longtable = FALSE, path) {
+make.xtable <- function(results, correction, partition.args, digits = 3, caption, label, longtable = FALSE, path) {
 
     ## Make the results table
-    results_table <- make.table(results, correction = correction)
+    results_table <- make.table(results, correction = correction, partition.args)
 
     ## Rounding
     results_table[, c(2,3,6)] <- round(results_table[, c(2,3,6)], digits = digits)
