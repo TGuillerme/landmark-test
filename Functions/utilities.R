@@ -337,8 +337,10 @@ reduce.check<-function(AllData, AllClassifiers){
 #@param path: the path to the results
 #@param species: the list of species as written in the results
 #@param datasets: the names of the datasets as written in the results
-#@param partitions: optional, the name of the landmark partitions
-summarise.results <- function(CI, rarefaction, print.token = FALSE, rounding = 3, path = "../Data/Results/", species = c("Wombat", "Wombat_krefftii", "Wombat_latifrons", "Wombat_ursinus", "Wombat_lasiorhinus"), datasets = c("cranium", "mandible"), partitions = c("zygom", "restC", "snout", "back", "front", "restM")) {
+#@param partitions.order: optional, reordering the partition names
+#@param partitions: optional, the name of the landmark partitions columns
+#@param species.names: the names of species to display
+summarise.results <- function(CI, rarefaction, print.token = FALSE, rounding = 3, path = "../Data/Results/", species = c("Wombat", "Wombat_lasiorhinus", "Wombat_krefftii", "Wombat_latifrons", "Wombat_ursinus"), datasets = c("cranium", "mandible"), partitions.order = c(1, 3, 2, 4, 5, 6), partitions, species.names) {
 
     ## Printing significance tokens
     get.token <- function(p) {
@@ -412,191 +414,132 @@ summarise.results <- function(CI, rarefaction, print.token = FALSE, rounding = 3
         rownames(results_table) <- c("test", paste("Cranium", c(1,2,3)), paste("Mandible", c(1,2,3)))
     }
     results_table[1,] <- rep(c("diff", "p", "overlap", "p"), length(species))
-    colnames(results_table) <- names(unlist(sapply(species, rep, 4, simplify = FALSE)))
+    if(!missing(species.names)) {
+        colnames(results_table) <- names(unlist(sapply(species.names, rep, 4, simplify = FALSE)))
+    } else {
+        colnames(results_table) <- names(unlist(sapply(species, rep, 4, simplify = FALSE)))
+    }
 
     ## Flip the table
     return(t(results_table))
 
 }
 
+#@param data: the non-rarefied summarised data
+#@param rarefaction: the rarefied summarised data
+#@param no.rar: optional, which columns to highlight as not rarefied (e.g. cranium 3 and mandible 1: no.rar = c(3,4))
+#@param ignore.non.signif: whether to ignore the non-significant results for rarefaction highlights (TRUE) or not (FALSE).
+#@pram partitions: the names of the partitions (c("cranium", "mandible"))
+#@param cols: a vector of three colours for each pixel, the first one is non-significant results, the second one is when the difference is significant but not the overlap and the third one is when everything is significant
+#@param threshold: the significance threshold (default = 0.01)
+#@param ylabs: the labels for the y axis ("all_data", "Vombatus", etc). If missing the ones from data are used.
+#@param xlabs: the labels for the x axis ("cranium1", etc). If missing the ones from data are used.
+plot.test.results <- function(data, rarefaction, no.rar, ignore.non.signif = TRUE, partitions = c(expression(bold("Cranium")), expression(bold("Mandible"))), cols = c("grey", "magenta", "green"), ylabs, xlabs) {
 
+    ## Making the x and y labels (if needed)
+    if(missing(ylabs)) {
+        ylabs <- gsub("1", "", rownames(data)[seq(from = 1, to = nrow(data), by = 4)])
+    }
+    if(missing(xlabs)) {
+        xlabs <- colnames(data[, -1])
+    }
 
-# plot.test.results <- function(data, rarefaction, cols = c("grey", "green", "magenta"), ...) {
+    ## Converting the matrix in to numeric blocks
+    make.blocks <- function(col) {
+        from <- as.list(seq(from = 1, to = length(col), by = 4))
+        to <- as.list(seq(from = 0, to = length(col), by = 4)[-1])
+        return(mapply(function(from, to, col) return(col[from:to]), from, to, MoreArgs = list(col = col), SIMPLIFY = FALSE))
+    }
+    blocks <- apply(apply(data[,-1], 2, as.numeric), 2, make.blocks)
 
-#     ## Returning significance
-#     get.token <- function(p) {
-#         if(p > 0.05) {
-#             return(FALSE)
-#         }
-#         if(p < 0.05 && p > 0.01) {
-#             return(FALSE)
-#         }
-#         if(p < 0.01 && p > 0.001) {
-#             return(TRUE)
-#         }
-#         if(p < 0.001) {
-#             return(TRUE)
-#         }
-#     }
+    ## Selecting the threshold level
+    level.selector <- function(block, threshold = 0.01) {
+        return(ifelse(block[2] > threshold, 1, ifelse(block[4] > threshold, 2, 3)))
+    }
+    ## Transform the list of blocks in an image matrix
+    image_matrix <- matrix(unlist(lapply(blocks, lapply, level.selector)), ncol = ncol(data[, -1]), byrow = FALSE)
 
-# CI <- 95
+    ## Plot the main image
+    par(mar = c(2, max(nchar(ylabs))/2, 4, 2)) #c(bottom, left, top, right)
+    #image(t(image_matrix[nrow(image_matrix):1,]), col = cols, xaxt = "n", yaxt = "n", ...)
+    image(t(image_matrix[nrow(image_matrix):1,]), col = cols, xaxt = "n", yaxt = "n")
 
-# species <- c("Wombat", "Wombat_krefftii", "Wombat_latifrons", "Wombat_ursinus", "Wombat_lasiorhinus")
-# datasets <- c("cranium", "mandible")
+    ## Adding the y labels
+    axis(2, at = seq(from = 0, to = 1, length.out = nrow(image_matrix)), las = 2, label = rev(ylabs), tick = FALSE)
 
-# rounding = 3
+    ## Add the x labels
+    if(length(grep("\\n", xlabs) > 0)) {
+        padj <- 0.5
+    } else {
+        padj <- 1
+    }
 
-# results_table <- data.frame(matrix(NA, ncol = length(species)*4, nrow = 6+1))
+    axis(3, at = seq(from = 0, to = 1, length.out = ncol(image_matrix)), label = xlabs, tick = FALSE, padj = padj)
+    axis(3, at = c(0.25, 0.75), label = partitions, tick = FALSE, padj = -2)
 
-# for(sp in 1:length(species)) {
+    ## Adding the values
+    value_to_plot <- ifelse(image_matrix != 1, TRUE, FALSE)
+    rownames(value_to_plot) <- rev(seq(from = 0, to = 1, length.out = nrow(value_to_plot)))
+    colnames(value_to_plot) <- seq(from = 0, to = 1, length.out = ncol(value_to_plot))
 
-#     for(ds in 1:length(datasets)) {
+    ## Getting the list of blocks coordinates from a named TRUE/FALSE matrix
+    get.coords <- function(list_coords) {
+        list_blocks_x <- as.numeric(t(apply(list_coords, 1, function(x) names(x))))
+        list_blocks_y <- as.numeric(apply(list_coords, 2, function(x) names(x)))
+        coords_x <- list_blocks_x[list_coords]
+        coords_y <- list_blocks_y[list_coords]
+        return(list(coords_x, coords_y))
+    }
 
-#         ## Extract the results
-#         load(paste0("../Data/Results/", species[sp], "_", datasets[ds], "_CI", CI, ".Rda"))
+    values_coords <- get.coords(value_to_plot)
+    values <- unlist(lapply(blocks, lapply, function(x) return(x[1])))[value_to_plot]
+    text(x = values_coords[[1]], y = values_coords[[2]], labels = values)
 
-#         ## Summarise the results
-#         difference <- make.table(results$difference, correction = "bonferroni")
-#         overlap <- make.table(results$overlaps, correction = "bonferroni")
+    ## Adding the rarefaction (square the pixel if equal)
+    blocks <- apply(apply(rarefaction[,-1], 2, as.numeric), 2, make.blocks)
+    ## Transform the list of blocks in an image matrix
+    image_rar <- matrix(unlist(lapply(blocks, lapply, level.selector)), ncol = ncol(rarefaction[, -1]), byrow = FALSE)
+    ## Getting the rarefaction coordinates
+    if(ignore.non.signif) {
+        rar_coords <- image_rar == ifelse(image_matrix == 1, 0, image_matrix)
+    } else {
+        rar_coords <- image_rar == image_matrix
+    }
+    rownames(rar_coords) <- rev(seq(from = 0, to = 1, length.out = nrow(image_matrix)))
+    colnames(rar_coords) <- seq(from = 0, to = 1, length.out = ncol(image_matrix))
 
-#         ## Fill the table
-#         if(ds == 1) {
-#             ## Values
-#             results_table[2:4, 1+(4*(sp-1))] <- round(difference[,2], digits = rounding)
-#             results_table[2:4, 3+(4*(sp-1))] <- round(overlap[,2], digits = rounding-1)
-#             ## Signif
-#             results_table[2:4, 2+(4*(sp-1))] <- paste0(round(difference[,6], digits = rounding),  sapply(difference[,6], get.token)) # Remove the first component of the paste if only tokens needed
-#             results_table[2:4, 4+(4*(sp-1))] <- paste0(round(overlap[,6], digits = rounding),  sapply(overlap[,6], get.token))
+    ## Removing no.rar columns if not missing
+    if(!missing(no.rar)) {
+        rar_coords[,no.rar] <- FALSE
+    }
 
-#         } else {
-#             ## Values
-#             results_table[5:7, 1+(4*(sp-1))] <- round(difference[,2], digits = rounding)
-#             results_table[5:7, 3+(4*(sp-1))] <- round(overlap[,2], digits = rounding-1)
-#             ## Signif
-#             results_table[5:7, 2+(4*(sp-1))] <- paste0(round(difference[,6], digits = rounding),  sapply(difference[,6], get.token))
-#             results_table[5:7, 4+(4*(sp-1))] <- paste0(round(overlap[,6], digits = rounding),  sapply(overlap[,6], get.token))
-#         }
-#     }
-# }
+    ## Getting the list of blocks coordinates that are the same between rar and normal
+    rar_coords <- get.coords(rar_coords)
 
-# ## Renaming the table elements
-# rownames(results_table) <- c("test", paste("Cranium", c(1,2,3)), paste("Mandible", c(1,2,3)))
-# results_table[1,] <- rep(c("diff", "p", "overlap", "p"), length(species))
-# colnames(results_table) <- names(unlist(sapply(species, rep, 4, simplify = FALSE)))
+    ## Getting the polygon coordinates
+    get.polygon.coordinates <- function(block_x, block_y, image_matrix, lwd) {
+        ## Get the size of the pixels
+        x_size <- diff(seq(from = 0, to = 1, length.out = ncol(image_matrix)))[1]
+        y_size <- diff(seq(from = 0, to = 1, length.out = nrow(image_matrix)))[1]
 
-# ## Flip the table
-# results_table <- t(results_table)
+        if(!missing(lwd)) {
+            x_size <- x_size - lwd/1000
+            y_size <- y_size - lwd/1000
+        }
 
+        x_coords <- c(block_x-x_size/2, block_x-x_size/2, block_x+x_size/2, block_x+x_size/2)
+        y_coords <- c(block_y-y_size/2, block_y+y_size/2, block_y+y_size/2, block_y-y_size/2)
 
-# ##
-# kable(results_table, digits = 4)
+        return(list(x_coords, y_coords))
+    }
 
+    ## Adding the polygons
+    for(poly in 1:length(rar_coords[[1]])) {
+        block_polygon <- get.polygon.coordinates(rar_coords[[1]][poly], rar_coords[[2]][poly], image_matrix)
+        polygon(x = block_polygon[[1]], y = block_polygon[[2]], lwd = 3)
+    }
 
-
-
-#     ## Formatting data data as a matrix for image
-#     age_rows <- list(c(1:7), c(8:14), c(15:21))
-#     epoch_rows <- list(c(22:28), c(29:35), c(36:42))
-#     signif_columns <- c(10:12)
-
-#     ## Combining the age matrix
-#     if(type == "age") {
-#         data_matrix <- as.matrix(do.call(cbind, lapply(age_rows, function(rows, cols, data) return(data[rows, cols]), cols = signif_columns, data = data)))
-#     } else {
-#         data_matrix <- as.matrix(do.call(cbind, lapply(epoch_rows, function(rows, cols, data) return(data[rows, cols]), cols = signif_columns, data = data)))
-#     }
-
-#     ## Convert into binary
-#     data_matrix <- ifelse(data_matrix, 1, 0)
-#     data_matrix <- ifelse(is.na(data_matrix), 0.5, data_matrix)
-
-#     ## Colours equivalent
-#     request_colors <- length(unique(as.vector(data_matrix)))
-#     if(request_colors == 3) {
-#         ## Reorder colours (damn image()!)
-#         cols <- cols[c(2,3,1)]
-#     }
-
-#     colours_table <- matrix(c(1,0,0.5), ncol = 1, dimnames = list(cols))
-#     num_cols <- na.omit(sort(match(unique(as.vector(data_matrix)), colours_table)))
-
-#     ## Selecting the colours
-#     colours <- rownames(colours_table)[num_cols]
-
-#     ## Plot the matrix
-#     image(t(data_matrix[7:1,]), col = rev(colours), xaxt = "n", yaxt = "n", main = main, ...)
-#     # image(t(data_matrix[7:1,]), col = rev(cols), xaxt = "n", yaxt = "n", main = main)
-#     ## Add the lines
-#     abline(v = c(0.3125, 0.6875), lty = 2)
-#     ## Add the y axis
-#     if(yaxis) axis(2, at = seq(from = 0, to = 1, by = 1/6), las = 2, label = rev(data$model[age_rows[[1]]]), tick = FALSE)
-#     ## Add the x axis
-#     if(xaxis) axis(1, at = c(0.125, 0.5, 0.85), label = c("stratigraphy", "duration", "number"), tick = FALSE)
-#     ## Add the upper x axis
-#     if(xaxis2) axis(3, at = c(seq(from = 0, to = 1, by = 1/8)), label = rep(c("e:1", "e:2", "e:3"), 3), tick = FALSE, padj = 1.5, cex = 0.8)
-#     ## Add the right y axis
-#     if(yaxis2) axis(4, at = 0.5, tick = FALSE, labels = type)
-# }
-
-
-# multi.plot.extinction <- function(data, type, cols = c("blue", "orange", "white"), main = "", data.names, ...) {
-
-#     ## Check how many types
-#     if(length(type) == 1) {
-
-#         ## Setting up plot layout
-#         plot_layout <- layout(matrix(c(1:length(data)), 1, length(data), byrow = TRUE), rep(1, length(data)), rep(1, length(data)), FALSE)
-#         #layout.show(plot_layout)
-
-#         ## First plot
-#         par(mar = c(4, 6, 4, 0)) #c(bottom, left, top, right)
-#         plot.extinction(data[[1]], type = type, col = cols, xaxis = TRUE, yaxis = TRUE, xaxis2 = TRUE, main = data.names[[1]], ...)
-
-#         ## Other plots
-#         for(slug in 2:length(data)) {
-#             par(mar = c(4, 0, 4, 0)) #c(bottom, left, top, right)
-#             plot.extinction(data[[slug]], type = type, col = cols, main = data.names[[slug]], xaxis = TRUE, xaxis2 = TRUE, ...)
-#         }
-#     } else {
-
-#         ## Setting up plot layout
-#         plot_layout <- layout(matrix(c(1:(length(data)*2)), 2, length(data), byrow = TRUE), rep(1, length(data)*2), rep(1, length(data)*2), FALSE)
-#         #layout.show(plot_layout)
-
-#         ## First plot (first row)
-#         par(mar = c(0, 6, 4, 0)) #c(bottom, left, top, right)
-#         plot.extinction(data[[1]], type = type[1], col = cols, yaxis = TRUE, xaxis2 = TRUE, main = data.names[[1]], ...)
-
-#         # ## Other plots (first row)
-#         # for(slug in 2:(length(data)-1)) {
-#         #     par(mar = c(0, 0, 4, 0)) #c(bottom, left, top, right)
-#         #     plot.extinction(data[[slug]], type = type[1], col = cols, main = data.names[[slug]], xaxis2 = TRUE, ...)
-#         # }
-
-#         ## Last plot (first row)
-#         par(mar = c(0, 0, 4, 3)) #c(bottom, left, top, right)
-#         plot.extinction(data[[length(data)]], type = type[1], col = cols, main = data.names[[length(data)]], xaxis2 = TRUE, yaxis2 = TRUE, ...)
-
-#         ## First plot (second row)
-#         par(mar = c(4, 6, 0, 0)) #c(bottom, left, top, right)
-#         plot.extinction(data[[1]], type = type[2], col = cols, yaxis = TRUE, xaxis = TRUE, ...)
-
-#         # ## Other plots (second row)
-#         # for(slug in 2:(length(data)-1)) {
-#         #     par(mar = c(4, 0, 0, 0)) #c(bottom, left, top, right)
-#         #     plot.extinction(data[[slug]], type = type[2], col = cols, xaxis = TRUE, ...)
-#         # }
-
-#         ## Last plot (first row)
-#         par(mar = c(4, 0, 0, 3)) #c(bottom, left, top, right)
-#         plot.extinction(data[[length(data)]], type = type[2], col = cols, xaxis = TRUE, yaxis2 = TRUE, ...)
-#     }
-# }
-
-
-
-
-
-
-
+    ## Separator
+    abline(v = 0.5, lty = 2)
+}
 

@@ -5,8 +5,8 @@ bibliography: references.bib
 date: "`r Sys.Date()`"
 output:
   pdf_document:
-    fig_width: 12
-    fig_height: 6
+    fig_width: 8
+    fig_height: 4
 ---
 
 To understand among and between species variation, we tested whether some landmark regions (e.g. the landmarks on the zygomatic arch) varied significantly more or less than the rest of the skull within and between each species.
@@ -251,24 +251,24 @@ kable(make.table(overlaps_95, "bonferroni"), digits = 5, caption = "Overlap prob
 
 #### The result plots for the 100% CI:
 
-```{r, fig.width = 10, fig.height = 15, echo = FALSE}
+```{r, fig.width = 6, fig.height = 9, echo = FALSE}
 ## Plot the size differences
 make.plots(differences, type = "area difference", add.p = TRUE, correction = "bonferroni")
 ```
 
-```{r, fig.width = 10, fig.height = 15, echo = FALSE}
+```{r, fig.width = 6, fig.height = 9, echo = FALSE}
 ## Plot the size differences
 make.plots(overlaps, type = "Bhattacharyya Coefficient", add.p = TRUE, correction = "bonferroni")
 ```
 
 #### The result plots for the 100% CI:
 
-```{r, fig.width = 10, fig.height = 15, echo = FALSE}
+```{r, fig.width = 6, fig.height = 9, echo = FALSE}
 ## Plot the size differences
 make.plots(differences_95, type = "area difference", add.p = TRUE, correction = "bonferroni")
 ```
 
-```{r, fig.width = 10, fig.height = 15, echo = FALSE}
+```{r, fig.width = 6, fig.height = 9, echo = FALSE}
 ## Plot the size differences
 make.plots(overlaps_95, type = "Bhattacharyya Coefficient", add.p = TRUE, correction = "bonferroni")
 ```

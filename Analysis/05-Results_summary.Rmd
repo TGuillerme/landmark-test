@@ -32,9 +32,15 @@ These results are not rarefied (i.e. I haven't had time to check the effect of t
 
 
 ```{r, echo = TRUE}
+## Partition names
+partitions <- c("Zygomatic Arch", "Tip of snout", "Remainder(C)", "Masticatory insertions", "Symphyseal area", "Remainder(M)")
+
+## Species names
+species.names <- c("All species", "Lasiorhinus", "Lasiorhinus krefftii", "Lasiorhinus latifrons", "Vombatus usrinus")
+
 ## Summarising the results
-results_table_100 <- summarise.results(CI = 100, rarefaction = FALSE, print.token = TRUE)
-results_table_95 <- summarise.results(CI = 95, rarefaction = FALSE, print.token = TRUE)
+results_table_100 <- summarise.results(CI = 100, rarefaction = FALSE, print.token = TRUE, partitions = partitions, species.names = species.names)
+results_table_95 <- summarise.results(CI = 95, rarefaction = FALSE, print.token = TRUE, partitions = partitions, species.names = species.names)
 
 ## Printing the table
 kable(results_table_100, digits = 4)
@@ -52,8 +58,8 @@ label_table_95 <-  paste0("all_differences_CI", 95)
 ## Saving both tables
 textable_100 <- xtable(results_table_100, caption = caption_table, label = label_table_100)
 textable_95 <- xtable(results_table_95, caption = caption_table, label = label_table_95)
-cat(print(textable), file = paste0(path, label_table_100, ".tex"))
-cat(print(textable), file = paste0(path, label_table_95, ".tex"))
+cat(print(textable_100), file = paste0(path, label_table_100, ".tex"))
+cat(print(textable_95), file = paste0(path, label_table_95, ".tex"))
 ```
 
 
@@ -62,8 +68,8 @@ cat(print(textable), file = paste0(path, label_table_95, ".tex"))
 
 ```{r, echo = TRUE}
 ## Summarising the results
-results_table_rar_100 <- summarise.results(CI = 100, rarefaction = TRUE, print.token = TRUE)
-results_table_rar_95 <- summarise.results(CI = 95, rarefaction = TRUE, print.token = TRUE)
+results_table_rar_100 <- summarise.results(CI = 100, rarefaction = TRUE, print.token = TRUE, partitions = partitions, species.names = species.names)
+results_table_rar_95 <- summarise.results(CI = 95, rarefaction = TRUE, print.token = TRUE, partitions = partitions, species.names = species.names)
 
 ## Printing the table
 kable(results_table_rar_100, digits = 4)
@@ -81,12 +87,54 @@ label_table_95 <-  paste0("all_differences_rarefied_CI", 95)
 ## Saving both tables
 textable_100 <- xtable(results_table_rar_100, caption = caption_table, label = label_table_100)
 textable_95 <- xtable(results_table_rar_95, caption = caption_table, label = label_table_95)
-cat(print(textable), file = paste0(path, label_table_100, ".tex"))
-cat(print(textable), file = paste0(path, label_table_95, ".tex"))
+cat(print(textable_100), file = paste0(path, label_table_100, ".tex"))
+cat(print(textable_95), file = paste0(path, label_table_95, ".tex"))
 ```
-
 
 
 # Plotting the results
 
+```{r}
+## Summarising the results for the CI 100
+data_100 <- summarise.results(CI = 100, rarefaction = FALSE)
+rare_100 <- summarise.results(CI = 100, rarefaction = TRUE)
 
+## Summarising the results for the CI 95
+data_95 <- summarise.results(CI = 95, rarefaction = FALSE)
+rare_95 <- summarise.results(CI = 95, rarefaction = TRUE)
+
+## Get the y/x labels
+xlabs <- c("Zygomatic Arch", "Tip of snout", "Remainder", "Masticatory\ninsertions", "Symphyseal\narea", "Remainder")
+ylabs <- c("All species", expression(italic("Lasiorhinus")), expression(italic("Lasiorhinus krefftii")), expression(italic("Lasiorhinus latifrons")), expression(italic("Vombatus usrinus")))
+```
+
+### Results for the full dataset
+
+```{r,  fig.width = 10, fig.height = 6}
+plot.test.results(data_100, rare_100, no.rar = c(3,6), xlabs = xlabs, ylabs = ylabs)
+```
+
+```{r, echo= FALSE}
+## Saving the table
+pdf(file = "../Manuscript/Figures/landmark_test_results_100.pdf", width = 10, height = 6)
+plot.test.results(data_100, rare_100, no.rar = c(3,6), xlabs = xlabs, ylabs = ylabs)
+dev.off()
+```
+
+Non-significant differences are in grey; significant differences that could not be distinguished from the full statistical population (Bhattacharrya Coefficient test _p_-value > 0.01) are in purple; significant differences that are also from a significant statistical population are in green. Squared cells have the same significance levels when rarefied. The displayed values are the difference in landmark variation area in the partition compared to the whole cranium or mandible.
+
+
+### Results for the 95% confidence interval
+
+```{r,  fig.width = 10, fig.height = 6}
+plot.test.results(data_95, rare_95, no.rar = c(3,4), xlabs = xlabs, ylabs = ylabs)
+```
+
+```{r, echo= FALSE}
+## Saving the table
+pdf(file = "../Manuscript/Figures/landmark_test_results_95.pdf", width = 10, height = 6)
+plot.test.results(data_95, rare_95, no.rar = c(3,6), xlabs = xlabs, ylabs = ylabs)
+dev.off()
+```
+
+Non-significant differences are in grey; significant differences that could not be distinguished from the full statistical population (Bhattacharrya Coefficient test _p_-value > 0.01) are in purple; significant differences that are also from a significant statistical population are in green. Squared cells have the same significance levels when rarefied. The displayed values are the difference in landmark variation area in the partition compared to the whole cranium or mandible.
