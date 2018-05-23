@@ -124,10 +124,10 @@ plot.partitions(land_data$cranium, PointSize = 0.001)
 plot.partitions(land_data$mandible, PointSize = 0.001)
 
 #Visualize partitions as colours
-plot.partitions(land_data$mandible, PointSize = 0.01)
+plot.partitions(land_data$cranium, PointSize = 0.001)
 shade3d()
 #optional - adding text helps with identifying landmarks if define.modules has not captured all landmarks of a partition. These numbers can then be manually edited in the LandmarkRegions file. 
-#text3d(mshape(land_data$mandible$procrustes$coords), text=c(1:577), adj = 1, cex = 0.5)
+#text3d(mshape(land_data$cranium$procrustes$coords), text=c(1:826), adj = 2, cex = 0.8)
 
 ```
 

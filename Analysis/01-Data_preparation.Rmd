@@ -27,6 +27,31 @@ landmarkgroups | mandible | wombat |.csv
 curveslide|cranium|wombat|.csv
 
 
+## Partitions
+
+### Cranium
+
+
+![Cranium partitions](cranium_example.png)
+
+Partition name | Colour | ID in landmarkgroups | default order in test | Name in publication
+---|---|---|---|---
+zygomatic | blue | 1 | 1 | Zygomatic arch
+rest | orange | 2 | 2 | Remainders
+snout | green | 3 | 3 | Tip of snout
+
+
+### Mandible
+
+
+![Mandible partitions](mandible_example.png)
+
+Partition name | Colour | ID in landmarkgroups | default order in test | Name in publication
+---|---|---|---|---
+back | green | 1 | 3 | Masticatory insertions
+front | blue | 2 | 1 | Symphyseal area
+rest | orange | 3 | 2 | Remainders
+
 
 ### Data per genus
 

@@ -111,13 +111,13 @@ ylabs <- c("All species", expression(italic("Lasiorhinus")), expression(italic("
 ### Results for the full dataset
 
 ```{r,  fig.width = 10, fig.height = 6}
-plot.test.results(data_100, rare_100, no.rar = c(3,6), xlabs = xlabs, ylabs = ylabs)
+plot.test.results(data_100, rare_100, no.rar = c(2,5), xlabs = xlabs, ylabs = ylabs)
 ```
 
 ```{r, echo= FALSE}
 ## Saving the table
 pdf(file = "../Manuscript/Figures/landmark_test_results_100.pdf", width = 12, height = 7.5)
-plot.test.results(data_100, rare_100, no.rar = c(3,6), xlabs = xlabs, ylabs = ylabs)
+plot.test.results(data_100, rare_100, no.rar = c(2,5), xlabs = xlabs, ylabs = ylabs)
 dev.off()
 ```
 
@@ -127,13 +127,13 @@ Non-significant differences are in grey; significant differences that could not 
 ### Results for the 95% confidence interval
 
 ```{r,  fig.width = 10, fig.height = 6}
-plot.test.results(data_95, rare_95, no.rar = c(3,4), xlabs = xlabs, ylabs = ylabs)
+plot.test.results(data_95, rare_95, no.rar = c(2,5), xlabs = xlabs, ylabs = ylabs)
 ```
 
 ```{r, echo= FALSE}
 ## Saving the table
 pdf(file = "../Manuscript/Figures/landmark_test_results_95.pdf", width = 12, height = 7.5)
-plot.test.results(data_95, rare_95, no.rar = c(3,6), xlabs = xlabs, ylabs = ylabs)
+plot.test.results(data_95, rare_95, no.rar = c(2,5), xlabs = xlabs, ylabs = ylabs)
 dev.off()
 ```
 
