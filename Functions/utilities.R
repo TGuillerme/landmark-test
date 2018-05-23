@@ -122,7 +122,7 @@ get.partition.args <- function(partition) {
         return(list("partitions" = c("Zygomatic Arch", "Tip of snout", "Remainder"), "partitions.order" = c(1, 3, 2)))
     }
     if(partition == "mandible") {
-        return(list("partitions" = c("Masticatory insertions", "Symphyseal area", "Remainder"), "partitions.order" = c(1, 2, 3)))
+        return(list("partitions" = c("Masticatory insertions", "Symphyseal area", "Remainder"), "partitions.order" = c(3, 1, 2)))
     }
     return(list(NULL))
 }
@@ -301,7 +301,7 @@ plot.partitions<-function(land_data_partition, PartNames, PointSize){
   ##colours the spheres for each partition
   open3d()
   for (i in 1:length(PartLevels)){
-    spheres3d(WomCrRef[Part[[i]],1], WomCrRef[Part[[i]],2], WomCrRef[Part[[i]],3], col=Colours[i], lit=TRUE,radius = Pointsize, asp=F)
+    spheres3d(WomCrRef[Part[[i]],1], WomCrRef[Part[[i]],2], WomCrRef[Part[[i]],3], col=Colours[i], lit=TRUE,radius = PointSize, asp=F)
     
   }
   
@@ -388,7 +388,7 @@ reduce.check<-function(AllData, AllClassifiers){
 #@param partitions.order: optional, reordering the partition names
 #@param partitions: optional, the name of the landmark partitions columns
 #@param species.names: the names of species to display
-summarise.results <- function(CI, rarefaction, print.token = FALSE, rounding = 3, path = "../Data/Results/", species = c("Wombat", "Wombat_lasiorhinus", "Wombat_krefftii", "Wombat_latifrons", "Wombat_ursinus"), datasets = c("cranium", "mandible"), partitions.order = c(1, 3, 2, 4, 5, 6), partitions, species.names) {
+summarise.results <- function(CI, rarefaction, print.token = FALSE, rounding = 3, path = "../Data/Results/", species = c("Wombat", "Wombat_lasiorhinus", "Wombat_krefftii", "Wombat_latifrons", "Wombat_ursinus"), datasets = c("cranium", "mandible"), partitions.order = c(1, 3, 2, 6, 4, 5), partitions, species.names) {
 
     ## Printing significance tokens
     get.token <- function(p) {
@@ -454,6 +454,9 @@ summarise.results <- function(CI, rarefaction, print.token = FALSE, rounding = 3
             }
         }
     }
+
+    ## Reordering the rows (future columns)
+    results_table[2:7,] <- results_table[(partitions.order+1),]
 
     ## Renaming the table elements
     if(!missing(partitions)) {
