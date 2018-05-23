@@ -42,7 +42,12 @@ mandible<-read.csv("../Data/Raw/classifier_mandible_wombat.csv")
 
 ```
 # Pull out landmark designations. These need to be raw data because the landmark names are in the raw data
+
+
+
 ```{r}
+
+
   ## Create vectors of patch points, semi-landmarks, and landmarks
   # LM point name metadata
   
@@ -55,7 +60,15 @@ foo2 <- str_sub(pt_names, 3, -1) # gets rid of X, Y, Z designations
 u_pt_names <- unique(foo2)
 
 patches <- str_detect(u_pt_names, "patch") # 
+
+#~~~~~~~
+#
+# TG: object 'pat_num' not found
+#
+#~~~~~~~
+
 pat_num <- which(patches == TRUE)
+
 
 sliders <- str_detect(u_pt_names, "CUR")
 sli_num <- which(sliders == TRUE)
@@ -87,6 +100,12 @@ landmark_LM_types[i,2]<-1
 
 write.csv(landmark_LM_types, "../Data/Raw/landmarktypes_mandible_wombat.csv")
 
+#~~~~~~~
+#
+# TG: why is this bit writing in the raw landmark bit?
+#
+#~~~~~~~
+
 ``` 
 
 #Visualize landmark types or landmark partitions without ply file
@@ -101,14 +120,14 @@ write.csv(landmark_LM_types, "../Data/Raw/landmarktypes_mandible_wombat.csv")
 #Optional:
 PartNames<-c("Zyg", "Sn", "Oc", "Po", "Rest")# This is not necessary for colouring the cranium AND needs to be separately accessed, but helps in identifying the partitionss
 
-plot.partitions(land_data$cranium)
-plot.partitions(land_data$mandible)
+plot.partitions(land_data$cranium, PointSize = 0.001)
+plot.partitions(land_data$mandible, PointSize = 0.001)
 
 #Visualize partitions as colours
-plot.partitions(land_data$mandible, 0.01)
+plot.partitions(land_data$mandible, PointSize = 0.01)
 shade3d()
 #optional - adding text helps with identifying landmarks if define.modules has not captured all landmarks of a partition. These numbers can then be manually edited in the LandmarkRegions file. 
-#text3d(mshape(land_data$mandible$procrustes$coords), text=c(1:577))
+#text3d(mshape(land_data$mandible$procrustes$coords), text=c(1:577), adj = 1, cex = 0.5)
 
 ```
 
