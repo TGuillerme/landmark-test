@@ -6,7 +6,9 @@
 #' @param subset A \code{numeric} vector of the elements of the distribution to test.
 #' @param statistic The statistic to measure from the distribution (a \code{function}).
 #' @param replicates A \code{numeric} value for the number of replicates (\code{default = 100}).
+#' @param rarefaction \code{logical}, whether to reduce the size of the distribution to be equal to the subset (\code{TRUE}) or not (\code{FALSE}; default).
 #' @param alternative Optional, if the parameter is tested, what is the alternative hypothesis. Can be \code{"two-sided"} (default), \code{"greater"} or \code{"lesser"}.
+#' @param abs \code{logical}, whether to use absolute difference (\code{TRUE}) or not (\code{FALSE}; default).
 #' @param ... Any optional arguments to be passed to \code{test}.
 #' 
 #' @details First, the subset of the distribution is compared to the whole distribution (observed difference).
@@ -52,7 +54,8 @@
 #' @importFrom stats sd var
 #' @importFrom graphics hist
 
-bootstrap.test <- function(distribution, subset, statistic = mean, replicates = 100, alternative = "two-sided", ...) {
+bootstrap.test <- function(distribution, subset, statistic = mean, replicates = 100, rarefaction = FALSE, alternative = "two-sided", abs = FALSE, ...) {
+
 
     match_call <- match.call()
 
@@ -76,6 +79,12 @@ bootstrap.test <- function(distribution, subset, statistic = mean, replicates = 
 
     ## p-value
     check.method(alternative, c("two-sided", "greater", "lesser"), msg = "alternative")
+
+    ## abs
+    check.class(abs, "logical")
+
+    ## rarefaction
+    check.class(rarefaction, "logical")    
     
     ## Set p-value function
     if(alternative == "two-sided") {
@@ -103,23 +112,47 @@ bootstrap.test <- function(distribution, subset, statistic = mean, replicates = 
 
     ## Calculate the observed statistic
     statistic_subset <- statistic(distribution[subset])
-    statistic_distri <- statistic(distribution[-subset])
-    t_statistic <- abs(statistic_subset - statistic_distri)
+    if(!rarefaction) {
+        statistic_subset <- statistic(distribution[subset])
+        statistic_distri <- statistic(distribution[-subset])
+        t_statistic <- ifelse(abs, abs(statistic_subset - statistic_distri), statistic_subset - statistic_distri)
+    } else {
+        statistic_subset <- statistic(distribution[subset])
+        statistic_distri <- replicate(replicates, statistic(sample(distribution[-subset], length(subset))))
+        if(abs){
+            t_statistic <- abs(statistic_subset - statistic_distri)
+        } else {
+            t_statistic <- statistic_subset - statistic_distri
+        }
+
+    }
 
     ## Bootstrap the data
     boostrap_subset <- replicate(replicates, distribution[sample(1:length(distribution), length(subset))], simplify = FALSE)
-    boostrap_distri <- replicate(replicates, distribution[sample(1:length(distribution), length(distribution)-length(subset))], simplify = FALSE)
+    if(!rarefaction) {
+        boostrap_distri <- replicate(replicates, distribution[sample(1:length(distribution), length(distribution)-length(subset))], simplify = FALSE)
+    } else {
+        boostrap_distri <- replicate(replicates, distribution[sample(1:length(distribution), length(subset))], simplify = FALSE)
+    }
 
     ## Calculate the statistics
     bs_stat_subset <- unlist(lapply(boostrap_subset, statistic))
     bs_stat_distri <- unlist(lapply(boostrap_distri, statistic))
-    bs_t_statistic <- abs(bs_stat_subset - bs_stat_distri)
+    if(abs) {
+        bs_t_statistic <- abs(bs_stat_subset - bs_stat_distri)
+    } else {
+        bs_t_statistic <- bs_stat_subset - bs_stat_distri
+    }
 
     ## Calculate the p-value
     p_value <- get.p.value(bs_t_statistic, t_statistic, replicates)
 
     ## Get the test results
-    test_results <- c("Residuals" = (t_statistic - mean(bs_t_statistic)) / stats::sd(bs_t_statistic), "Bootstrap mean" = mean(bs_t_statistic), "Bootstrap variance" = stats::var(bs_t_statistic))
+    if(!rarefaction) {
+        test_results <- c("Residuals" = (t_statistic - mean(bs_t_statistic)) / stats::sd(bs_t_statistic), "Bootstrap mean" = mean(bs_t_statistic), "Bootstrap variance" = stats::var(bs_t_statistic))
+    } else {
+        test_results <- c("Residuals" = mean(t_statistic - bs_t_statistic) / stats::sd(bs_t_statistic), "Bootstrap mean" = mean(bs_t_statistic), "Bootstrap variance" = stats::var(bs_t_statistic))
+    }
 
     ## Making the results into a randtest object
     res <- list()
@@ -130,7 +163,12 @@ bootstrap.test <- function(distribution, subset, statistic = mean, replicates = 
 
     ## Adding the data
     res$sim <- bs_t_statistic
-    res$obs <- t_statistic
+    if(!rarefaction) {
+        res$obs <- t_statistic
+    } else {
+        res$obs <- mean(t_statistic)
+        res$observed <- t_statistic
+    }
 
     ## Adding the plot options (modified from ade4::as.randtest)
     r0 <- c(bs_t_statistic, t_statistic)
