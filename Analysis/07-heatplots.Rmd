@@ -20,7 +20,7 @@ if(!require(devtools)) install.packages("devtools")
 if(!require(geomorph)) install.packages("geomorph")
 if(!require(dispRity)) install_github("TGuillerme/dispRity")
 if(!require(landmarktest)) install_github("TGuillerme/landmark-test")
-set.seed(1)
+set.seed(42)
 ```
 
 
@@ -87,13 +87,13 @@ plotRefToTarget.heat(cranium$procruste$coords[, , specimens_min_max[2]],
 ```
 
 
-#Trying to do this using hypothetical PC min/max landmarks 
+#Trying to do this using hypothetical PC min/max landmarks. T
 
 ```{r, eval = FALSE}
 
+#Heatplot code for hypothetical PC shapes; requires landmarktest to be loaded
 #@params Species_dataset is the dataset in question (e.g.CW$cranium); 
 #@params min_or_max_first ("min", "max")is if you want min referenced to max or vice versa. this is handy if one common lm displacement pattern happens to be associated with opposite signed PC scores.
-
 
 heatplot.PCs<-function (species_dataset,minfirst, PC_axis,...){
   
@@ -102,40 +102,45 @@ heatplot.PCs<-function (species_dataset,minfirst, PC_axis,...){
   
   # identifies specimens at opposite ends of the PC spectrum
   specimens_min_max <- variation$min.max
- 
-   #determines range of variation between PC extremes
-    procrustes_var <- variation$range[,1]
-    
-    #runs PCA for min/max plotting
-    PCA=plotTangentSpace(species_dataset$procrustes$coords, verbose=FALSE)
+  
+  #determines range of variation between PC extremes
+  procrustes_var <- variation$range[,1]
+  
+  #runs PCA for min/max plotting
+  PCA=plotTangentSpace(species_dataset$procrustes$coords, verbose=FALSE)
   
   gridPar = gridPar(pt.bg = "white", pt.size = 0.5)
   
+  
   if(minfirst==TRUE){
-  open3d()
-    plotRefToTarget.heat(PCA$pc.shapes$PC1min,
-                       PCA$pc.shapes$PC1max,
-                       col = heat.colors, pt.size = 0.7, col.val = procrustes_var,
-                       plotRefToTarget.args = list(mag = 1),...)}
+    open3d()
+    plotRefToTarget.heat(PCA$pc.shapes$PC2min,
+                         PCA$pc.shapes$PC2max,
+                         col = heat.colors, pt.size = 0.7, col.val = procrustes_var,
+                         plotRefToTarget.args = list(mag = 1),...)}
   else {
     open3d()
-    plotRefToTarget.heat(PCA$pc.shapes$PC1max,
-                       PCA$pc.shapes$PC1min,
-                       col = heat.colors, pt.size = 0.7, col.val = procrustes_var,
-                       plotRefToTarget.args = list(mag = 1), ...)}
+    plotRefToTarget.heat(PCA$pc.shapes$PC2max,
+                         PCA$pc.shapes$PC2min,
+                         col = heat.colors, pt.size = 0.7, col.val = procrustes_var,
+                         plotRefToTarget.args = list(mag = 1), ...)}
 }
 
-heatplot.PCs(AllWombats$cranium, minfirst=FALSE, PC_axis=1)
-heatplot.PCs(HN$cranium, minfirst=TRUE, PC_axis=1 )
-heatplot.PCs(CW$cranium)
-heatplot.PCs(SHNW$cranium, minfirst)
-heatplot.PCs(NHNW$cranium, minfirst)
 
-heatplot.PCs(AllWombats$mandible, minfirst=FALSE, PC_axis=1)
-heatplot.PCs(HN$mandible, minfirst=TRUE, PC_axis=1)
-heatplot.PCs(CW$mandible, minfirst=FALSE, PC_axis=1)
-heatplot.PCs(SHNW$mandible, minfirst=TRUE, PC_axis=1)
-heatplot.PCs(NHNW$mandible, minfirst=TRUE, PC_axis=1)
+heatplot.PCs(AllWombats$cranium, minfirst=FALSE, )
+heatplot.PCs(HN$cranium, minfirst=TRUE  )
+heatplot.PCs(CW$cranium, minfirst=TRUE)
+heatplot.PCs(SHNW$cranium, minfirst=TRUE)
+heatplot.PCs(NHNW$cranium, minfirst=TRUE)
+
+
+heatplot.PCs(AllWombats$mandible, minfirst=FALSE, )
+heatplot.PCs(HN$mandible, minfirst=TRUE )
+heatplot.PCs(CW$mandible, minfirst=FALSE)
+heatplot.PCs(SHNW$mandible, minfirst=TRUE)
+heatplot.PCs(NHNW$mandible, minfirst=TRUE)
+
+
 
 ```
 
