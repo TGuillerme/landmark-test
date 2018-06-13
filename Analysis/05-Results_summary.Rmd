@@ -105,7 +105,7 @@ rare_95 <- summarise.results(CI = 95, rarefaction = TRUE)
 
 ## Get the y/x labels
 xlabs <- c("Zygomatic Arch", "Tip of snout", "Remainder", "Masticatory\ninsertions", "Symphyseal\narea", "Remainder")
-ylabs <- c("All species", expression(italic("Lasiorhinus")), expression(italic("Lasiorhinus krefftii")), expression(italic("Lasiorhinus latifrons")), expression(italic("Vombatus usrinus")))
+ylabs <- c("All species", expression(italic("Lasiorhinus")), expression(italic("Lasiorhinus krefftii")), expression(italic("Lasiorhinus latifrons")), expression(italic("Vombatus ursinus")))
 ```
 
 ### Results for the full dataset
