@@ -1,0 +1,86 @@
+Session info ---------------------------------------------------------------------------
+ setting  value                       
+ version  R version 3.5.0 (2018-04-23)
+ system   x86_64, darwin15.6.0        
+ ui       AQUA                        
+ language (EN)                        
+ collate  en_GB.UTF-8                 
+ tz       Australia/Brisbane          
+ date     2018-06-15                  
+
+Packages -------------------------------------------------------------------------------
+ package           * version  date       source                              
+ abind               1.4-5    2016-07-21 CRAN (R 3.5.0)                      
+ ade4                1.7-11   2018-04-05 CRAN (R 3.5.0)                      
+ animation           2.5      2017-03-30 CRAN (R 3.5.0)                      
+ ape                 5.1      2018-04-04 CRAN (R 3.5.0)                      
+ base              * 3.5.0    2018-04-24 local                               
+ checkpoint        * 0.4.3    2017-12-19 CRAN (R 3.5.0)                      
+ cluster             2.0.7-1  2018-04-13 CRAN (R 3.5.0)                      
+ clusterGeneration   1.3.4    2015-02-18 CRAN (R 3.5.0)                      
+ coda                0.19-1   2016-12-08 CRAN (R 3.5.0)                      
+ combinat            0.0-8    2012-10-29 CRAN (R 3.5.0)                      
+ compiler            3.5.0    2018-04-24 local                               
+ crosstalk           1.0.0    2016-12-21 cran (@1.0.0)                       
+ datasets          * 3.5.0    2018-04-24 local                               
+ deSolve             1.20     2017-07-14 CRAN (R 3.5.0)                      
+ devtools            1.13.5   2018-02-18 CRAN (R 3.5.0)                      
+ digest              0.6.15   2018-01-28 CRAN (R 3.5.0)                      
+ expm                0.999-2  2017-03-29 CRAN (R 3.5.0)                      
+ fastmatch           1.1-0    2017-01-28 CRAN (R 3.5.0)                      
+ geiger              2.0.6    2015-09-07 CRAN (R 3.5.0)                      
+ geometry            0.3-6    2015-09-09 CRAN (R 3.5.0)                      
+ graphics          * 3.5.0    2018-04-24 local                               
+ grDevices         * 3.5.0    2018-04-24 local                               
+ grid                3.5.0    2018-04-24 local                               
+ hdrcde              3.2      2018-01-29 cran (@3.2)                         
+ highr               0.6      2016-05-09 cran (@0.6)                         
+ htmltools           0.3.6    2017-04-28 cran (@0.3.6)                       
+ htmlwidgets         1.2      2018-04-19 cran (@1.2)                         
+ httpuv              1.4.3    2018-05-10 cran (@1.4.3)                       
+ igraph              1.2.1    2018-03-10 CRAN (R 3.5.0)                      
+ jpeg                0.1-8    2014-01-23 CRAN (R 3.5.0)                      
+ jsonlite            1.5      2017-06-01 CRAN (R 3.5.0)                      
+ knitr               1.20     2018-02-20 CRAN (R 3.5.0)                      
+ later               0.7.2    2018-05-01 cran (@0.7.2)                       
+ lattice             0.20-35  2017-03-25 CRAN (R 3.5.0)                      
+ magic               1.5-8    2018-01-26 CRAN (R 3.5.0)                      
+ magrittr            1.5      2014-11-22 CRAN (R 3.5.0)                      
+ manipulateWidget    0.9.0    2018-03-26 cran (@0.9.0)                       
+ maps                3.3.0    2018-04-03 CRAN (R 3.5.0)                      
+ MASS                7.3-49   2018-02-23 CRAN (R 3.5.0)                      
+ Matrix              1.2-14   2018-04-13 CRAN (R 3.5.0)                      
+ memoise             1.1.0    2017-04-21 CRAN (R 3.5.0)                      
+ methods           * 3.5.0    2018-04-24 local                               
+ mgcv                1.8-23   2018-01-21 CRAN (R 3.5.0)                      
+ mime                0.5      2016-07-07 CRAN (R 3.5.0)                      
+ miniUI              0.1.1    2016-01-15 cran (@0.1.1)                       
+ mnormt              1.5-5    2016-10-15 CRAN (R 3.5.0)                      
+ mvtnorm             1.0-7    2018-01-26 CRAN (R 3.5.0)                      
+ nlme                3.1-137  2018-04-07 CRAN (R 3.5.0)                      
+ numDeriv            2016.8-1 2016-08-27 CRAN (R 3.5.0)                      
+ paleotree           3.0.0    2017-10-21 CRAN (R 3.5.0)                      
+ parallel            3.5.0    2018-04-24 local                               
+ permute             0.9-4    2016-09-09 CRAN (R 3.5.0)                      
+ phangorn            2.4.0    2018-02-15 CRAN (R 3.5.0)                      
+ phyclust            0.1-22   2017-12-02 CRAN (R 3.5.0)                      
+ phytools            0.6-59   2018-05-16 Github (liamrevell/phytools@2f8b549)
+ pkgconfig           2.0.1    2017-03-21 CRAN (R 3.5.0)                      
+ plotrix             3.7-1    2018-05-14 cran (@3.7-1)                       
+ promises            1.0.1    2018-04-13 cran (@1.0.1)                       
+ quadprog            1.5-5    2013-04-17 CRAN (R 3.5.0)                      
+ R6                  2.2.2    2017-06-17 CRAN (R 3.5.0)                      
+ Rcpp                0.12.17  2018-05-18 cran (@0.12.17)                     
+ rgl               * 0.99.16  2018-03-28 cran (@0.99.16)                     
+ scatterplot3d       0.3-41   2018-03-14 CRAN (R 3.5.0)                      
+ shiny               1.1.0    2018-05-17 CRAN (R 3.5.0)                      
+ stats             * 3.5.0    2018-04-24 local                               
+ stringi             1.2.2    2018-05-02 cran (@1.2.2)                       
+ stringr             1.3.1    2018-05-10 cran (@1.3.1)                       
+ subplex             1.5-4    2018-04-05 CRAN (R 3.5.0)                      
+ tools               3.5.0    2018-04-24 local                               
+ utils             * 3.5.0    2018-04-24 local                               
+ vegan               2.5-2    2018-05-17 cran (@2.5-2)                       
+ withr               2.1.2    2018-03-15 CRAN (R 3.5.0)                      
+ xtable              1.8-2    2016-02-05 cran (@1.8-2)                       
+ zoo                 1.8-1    2018-01-08 CRAN (R 3.5.0)   
