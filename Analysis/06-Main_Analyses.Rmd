@@ -485,3 +485,162 @@ kable(mandible_disparity[[2]], digits = 5, caption = "Mandible pairwise absolute
 ## Mandible disparity differences p
 kable(mandible_disparity[[3]], digits = 5, caption = "Mandible pairwise absolute differences between variances between groups (p-values).")
 ```
+
+
+# 2-Block Partial Least Squares analysis (2BPLS)
+
+
+## Reduce coordinate datasets to only those that have mandibles and crania
+
+```{r, message = FALSE, warning = FALSE}
+## Data list
+all_data <- list("NHNW" = NHNW, "SHNW" = SHNW, "CW" = CW)
+## Classifiers list
+all_classifiers <- list(
+                    "NHNW" = list("cranium" = NHNW_cranium_class, "mandible" = NHNW_mandible_class),
+                    "SHNW" = list("cranium" = SHNW_cranium_class, "mandible" = SHNW_mandible_class),
+                    "CW" = list("cranium" = CW_cranium_class, "mandible" = CW_mandible_class)
+                   )
+
+## Checking whether the cranial and mandibular coordinates datasets match
+matched_coords <- reduce.check(all_data, all_classifiers)
+expect_true(all(unlist(matched_coords[[2]])))
+```
+
+## Run 2BPLS
+
+Depending on processor speed, this can take a while, so we recommend just loading the results which are saved in the `Results` folder.
+The results can be run using the following code chunk:
+
+
+```{r, message = FALSE, warning = FALSE, eval = FALSE}
+## 2BPLS for the southern hairy nose wombats
+SHNWTBPLS <- two.b.pls(matched_coords[[1]]$SHNW$cranium ,matched_coords[[1]]$SHNW$mandible,
+                       iter = 1000) 
+save(SHNWTBPLS, file = "../Data/Results/SHNWTBLS.Rda")
+
+## 2BPLS for the northern hairy nose wombats
+NHNWTBPLS <- two.b.pls(matched_coords[[1]]$NHNW$cranium ,matched_coords[[1]]$NHNW$mandible,
+                       iter = 1000) 
+save(NHNWTBPLS, file="../Data/Results/NHNWTBLS.Rda")
+
+## 2BPLS for the common wombats
+CWTBPLS <- two.b.pls(matched_coords[[1]]$CW$cranium ,matched_coords[[1]]$CW$mandible,
+                     iter = 1000) 
+save(CWTBPLS, file="../Data/Results/CWTBLS.Rda")
+```
+
+Or directly loaded using this one:
+ 
+```{r}
+## 2BPLS for the southern hairy nose wombats
+load("../Data/Results/SHNWTBLS.Rda")
+## 2BPLS for the northern hairy nose wombats
+load("../Data/Results/CWTBLS.Rda")
+## 2BPLS for the common wombats
+load("../Data/Results/NHNWTBLS.Rda")
+```
+
+## Subseting data to run correlations of PLS score with csize and allometry
+
+```{r, message = FALSE, warning = FALSE}
+## Getting the list of 2BPLS results
+all_TBPLS <- list("NHNW" = NHNWTBPLS, "SHNW" = SHNWTBPLS, "CW" = CWTBPLS)
+
+## Placeholder lists
+pls_pca_c_size <- TBPLS_scores <- pc_scores <- centroid_size <- pls_pca <- merged_pls <- list()
+
+## Creating the subsets
+for (i in 1:length(all_data)){
+ 
+  ## Placeholder lists
+  list() -> 
+      pls_pca_c_size [[i]] ->
+      TBPLS_scores[[i]] ->
+      pc_scores[[i]] -> 
+      centroid_size[[i]] ->
+      pls_pca [[i]] ->
+      merged_pls[[i]]
+
+  ## Create data frames for subsequent merging. 
+  for (k in 1:length(all_data$NHNW)){
+
+    ## TBPLS needs to contain i(species), an address for k (x/yscores as per cranium/mandible, and a
+    ## designation of how long the first singular vector goes, i.e. the species number); the 5+k i
+    ## the "address" of cranial/mandibular scores in the TBPLS data frames
+    TBPLS_scores[[i]][[k]] <- as.data.frame(all_TBPLS[[i]][[5+k]]
+                                            [c(1:length(dimnames(all_TBPLS[[i]][[5+k]])[[1]]))],
+                                            row.names = dimnames(all_TBPLS[[i]][[5+k]])[[1]])
+    ## Get the PC scores
+    pc_scores[[i]][[k]] <- as.data.frame(all_data[[i]][[k]]$ordination$x[,1])
+
+    ## Get the centroid sizes
+    centroid_size[[i]][[k]] <- as.data.frame(all_data[[i]][[k]]$procrustes$Csize)  
+    
+    ## Combine the pls data
+    pls_pca[[i]][[k]] <- merge(TBPLS_scores[[i]][[k]], pc_scores[[i]][[k]],
+                               by = "row.names", all.x = TRUE)
+    ## Renaming the rows
+    row.names(pls_pca[[i]][[k]]) <- pls_pca[[i]][[k]]$Row.names
+
+    ## Combined the merged PLS
+    merged_pls[[i]][[k]] <- merge(pls_pca[[i]][[k]], centroid_size[[i]][[k]],
+                                  by = "row.names", all.x = TRUE)
+    ## Renaming the rows
+    row.names(merged_pls[[i]][[k]]) <- merged_pls[[i]][[k]]$Row.names
+
+    ## Remove the two first columns
+    merged_pls[[i]][[k]] <- merged_pls[[i]][[k]][,-(1:2)]
+    ## Renaming the columns
+    colnames(merged_pls[[i]][[k]]) <- c("PLS_Scores", "PC1","Csize")
+  }
+
+  ## Add the species names
+  names(merged_pls)[[i]] <- names(all_data)[[i]]
+  
+  ## Add the dataset name (cranium/mandible)
+  names(merged_pls[[i]]) <- names(all_data[[1]])
+}
+
+
+## A manual visual check if the above merger is accurate; print the below and the merged_pls
+SHNWTBPLS_mandible_Scores <- as.data.frame(SHNWTBPLS$YScores[c(1:19)],
+                                           row.names = dimnames(SHNWTBPLS$YScores)[[1]])
+
+SHNWPC1 <- as.data.frame(SHNW$mandible$ordination$x[,1])
+SHNWCsize <- as.data.frame(SHNW$mandible$procrustes$Csize)
+```
+
+# Run the analyses
+
+<!-- TG: this part I actually have no clue what's happening, I've left blank comments to fill someday -->
+
+```{r, message = FALSE, warning = FALSE}
+## Placeholder lists
+pca_pls_lm <- c_size_pls_lm <- list()
+ 
+##
+for (i in 1:length(merged_pls)){
+    ## Placeholders
+    pca_pls_lm[[i]] <- c_size_pls_lm[[i]] <- list()
+    
+    ##
+    for (k in 1: length(merged_pls[[1]])){
+        pca_pls_lm[[i]][[k]] <- list()
+        ##
+        pca_pls_lm[[i]][[k]][[1]] <- summary(lm(
+                                          merged_pls[[i]][[k]]$PLS_Scores ~ merged_pls[[i]][[k]]$PC1
+                                            ))
+        ##
+        pca_pls_lm[[i]][[k]][[2]] <- summary(lm(
+                                        merged_pls[[i]][[k]]$PLS_Scores ~ merged_pls[[i]][[k]]$Csize
+                                            ))
+       
+    }
+    ## Renaming the list elements
+    names(pca_pls_lm)[[i]] <- names(merged_pls)[[i]]
+    names(pca_pls_lm[[i]]) <- names(merged_pls[[1]])
+    names(pca_pls_lm[[i]][[k]]) <- c("pls_pca", "PLS_Csize")
+}
+```
+
