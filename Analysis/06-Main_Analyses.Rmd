@@ -370,3 +370,118 @@ names(geo_gdfs) <- names(sex_gdfs) <- names(all_data)
 expect_equal(match(dimnames(geo_gdfs$SHNW$cranium$coords)[[3]],names(geo_gdfs$SHNW$cranium$Csize)),
              seq(1:length(names(geo_gdfs$SHNW$cranium$Csize))))
 ```
+
+
+## Running procD.lm analyses
+
+We can run the three following linear models for each species and each datasets:
+
+ * coordinates ~ temperature
+ * coordinates ~ sex + centroid size
+ * centroid size ~ sex
+
+```{r, message = FALSE, warning = FALSE}
+## Results placeholder
+coord_temp_lm <- coord_sex_lm <- csize_sex_lm <- list()
+
+## Running all the linear models
+for (i in 1:length(geo_gdfs)){
+    ## Results placeholder
+    coord_temp_lm[[i]] <- coord_sex_lm[[i]] <- csize_sex_lm[[i]] <- list()
+        
+    for (k in 1:length(geo_gdfs[[2]])){
+        ## Running the coordinates ~ temperature models
+        coord_temp_lm[[i]][[k]] <- procD.lm(coords ~ Temp, print.progress = FALSE,
+                                            data = geo_gdfs[[i]][[k]], iter = 1000)
+        ## Running the coordinates ~ sex + centroid size models
+        coord_sex_lm[[i]][[k]] <- procD.lm(coords ~ Sex + Csize, print.progress = FALSE,
+                                           data = sex_gdfs[[i]][[k]], iter = 1000)
+        ## Running the centroid size ~ sex models
+        csize_sex_lm[[i]][[k]] <- procD.lm(Csize ~ Sex, print.progress = FALSE,
+                                           data = sex_gdfs[[i]][[k]], iter = 1000)
+    }
+    ## Renaming the models
+    names(geo_gdfs[[i]]) ->
+        names(coord_temp_lm[[i]]) ->
+        names(coord_sex_lm[[i]]) ->
+        names(csize_sex_lm[[i]])
+  }
+
+names(coord_temp_lm) <- names(coord_sex_lm) <- names(csize_sex_lm) <- names(geo_gdfs)
+```
+
+
+And we can display them as follows:
+
+```{r, echo = FALSE}
+## coordinates ~ temperature
+kable(coord_temp_lm[[1]][[1]]$aov.table, digits = 3,
+    caption = "Procrustes linear model for coordinates as a function of temperature for the southern hairy nose wombat's cranium.")
+kable(coord_temp_lm[[1]][[2]]$aov.table, digits = 3,
+    caption = "Procrustes linear model for coordinates as a function of temperature for the southern hairy nose wombat's mandible.")
+kable(coord_temp_lm[[2]][[1]]$aov.table, digits = 3,
+    caption = "Procrustes linear model for coordinates as a function of temperature for the common wombat's cranium.")
+kable(coord_temp_lm[[2]][[2]]$aov.table, digits = 3,
+    caption = "Procrustes linear model for coordinates as a function of temperature for the common wombat's mandible.")
+
+## coordinates ~ sex + centroid size
+kable(coord_sex_lm[[1]][[1]]$aov.table, digits = 3,
+    caption = "Procrustes linear model for coordinates as a function of sex and centroid size for the southern hairy nose wombat's cranium.")
+kable(coord_sex_lm[[1]][[2]]$aov.table, digits = 3,
+    caption = "Procrustes linear model for coordinates as a function of sex and centroid size for the southern hairy nose wombat's mandible.")
+kable(coord_sex_lm[[2]][[1]]$aov.table, digits = 3,
+    caption = "Procrustes linear model for coordinates as a function of sex and centroid size for the common wombat's cranium.")
+kable(coord_sex_lm[[2]][[2]]$aov.table, digits = 3,
+    caption = "Procrustes linear model for coordinates as a function of sex and centroid size for the common wombat's mandible.")
+
+## centroid size ~ sex 
+kable(coord_sex_lm[[1]][[1]]$aov.table, digits = 3,
+    caption = "Procrustes linear model for centroid size as a function of sex for the southern hairy nose wombat's cranium.")
+kable(coord_sex_lm[[1]][[2]]$aov.table, digits = 3,
+    caption = "Procrustes linear model for centroid size as a function of sex for the southern hairy nose wombat's mandible.")
+kable(coord_sex_lm[[2]][[1]]$aov.table, digits = 3,
+    caption = "Procrustes linear model for centroid size as a function of sex for the common wombat's cranium.")
+kable(coord_sex_lm[[2]][[2]]$aov.table, digits = 3,
+    caption = "Procrustes linear model for centroid size as a function of sex for the common wombat's mandible.")
+```
+
+# Shape disparity comparison
+
+Here we look at the disparity measured as the relative sum of the diagonal of the covariance of the ordination scores (Procrustes variance), and we measure the difference between groups using permutation tests.
+
+
+```{r, message = FALSE, warning = FALSE}
+## Create gdfs with species for the data frames
+cranium_gdf  <- geomorph.data.frame(coords = AllWombats$cranium$procrustes$coords,
+                                    Csize = AllWombats$cranium$procrustes$Csize,
+                                    species = as.factor(cranium$Species))
+mandible_gdf <- geomorph.data.frame(coords = AllWombats$mandible$procrustes$coords,
+                                    Csize = AllWombats$mandible$procrustes$Csize,
+                                    species = as.factor(mandible$Species))
+
+## Running the analyses on the gdf objects (Disparity within groups compared to that group's mean)
+cranium_disparity <- morphol.disparity(coords ~ species, groups = ~species, iter = 1000, seed = 42,
+                                       data = cranium_gdf, print.progress = FALSE)
+
+## Disparity within groups compared to that group's mean
+mandible_disparity <- morphol.disparity(coords ~ species, groups = ~species, iter = 1000, seed = 42,
+                                        data = mandible_gdf, print.progress = FALSE)
+```
+
+And we can display the results as follows:
+
+```{r, echo = FALSE}
+## Cranium disparity values
+kable(data.frame("Procrustes variance" = cranium_disparity[[1]]), digits = 5, caption = "Cranium disparity (procrustes variance) per groups.")
+## Cranium disparity differences
+kable(cranium_disparity[[2]], digits = 5, caption = "Cranium pairwise absolute differences between variances between groups.")
+## Cranium disparity differences p
+kable(cranium_disparity[[3]], digits = 5, caption = "Cranium pairwise absolute differences between variances between groups (p-values).")
+
+## Mandible disparity values
+kable(data.frame("Procrustes variance" = mandible_disparity[[1]]), digits = 5, caption = "Mandible disparity (procrustes variance) per groups.")
+## Mandible disparity differences
+kable(mandible_disparity[[2]], digits = 5, caption = "Mandible pairwise absolute differences between variances between groups.")
+## Mandible disparity differences p
+kable(mandible_disparity[[3]], digits = 5, caption = "Mandible pairwise absolute differences between variances between groups (p-values).")
+```
