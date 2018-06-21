@@ -116,7 +116,7 @@ plot.test.results(data_100, rare_100, no.rar = c(2,5), xlabs = xlabs, ylabs = yl
 
 ```{r, echo= FALSE}
 ## Saving the table
-pdf(file = "../Manuscript/Figures/landmark_test_results_100.pdf", width = 12, height = 7.5)
+pdf(file = "../Manuscript/Figures/landmark_test_results_100.pdf", width = 7.2, height = 4.5)
 plot.test.results(data_100, rare_100, no.rar = c(2,5), xlabs = xlabs, ylabs = ylabs)
 dev.off()
 ```
@@ -132,7 +132,7 @@ plot.test.results(data_95, rare_95, no.rar = c(2,5), xlabs = xlabs, ylabs = ylab
 
 ```{r, echo= FALSE}
 ## Saving the table
-pdf(file = "../Manuscript/Figures/landmark_test_results_95.pdf", width = 12, height = 7.5)
+pdf(file = "../Manuscript/Figures/landmark_test_results_95.pdf", width = 7.2, height = 4.5)
 plot.test.results(data_95, rare_95, no.rar = c(2,5), xlabs = xlabs, ylabs = ylabs)
 dev.off()
 ```
