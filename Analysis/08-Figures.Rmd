@@ -22,7 +22,7 @@ library(devtools)
 devtools::install_github("cmartin/ggConvexHull")
 library(ggConvexHull)
 source("../Functions/utilities.R")
-set.seed(1)
+set.seed(42)
 library(landmarktest)
 
 # load the data

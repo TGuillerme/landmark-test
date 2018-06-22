@@ -20,6 +20,8 @@ set.seed(42)
 ## Loading and renaming the land_data objects
 load("../Data/Processed/wombat.Rda")
 AllWombats <- land_data
+load("../Data/Processed/wombat_lasiorhinus.Rda")
+HN<-land_data
 load("../Data/Processed/wombat_krefftii.Rda")
 NHNW <- land_data
 load("../Data/Processed/wombat_latifrons.Rda")
