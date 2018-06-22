@@ -325,7 +325,6 @@ PCA.vectors<-function(x, minfirst=TRUE){
   }
 }
 
-
 #procD code (for procD.allometry and procD.lm) analysis
 
 #@param formula: a formula object (e.g. coords ~ Csize)
@@ -339,7 +338,6 @@ handle.procD.formula <- function(formula, procrustes, procD.fun = procD.allometr
   return(procD.fun(f1 = formula, data = geomorph_data_frame, ...))
 }
 
-heatplot.PCs(CW$cranium, minfirst=FALSE, PC_axis=1)
 
 #Allometry analysis (based on above handle.procD.formula)
 
