@@ -1,0 +1,495 @@
+---
+title: "Other analyses"
+author: "Vera Weisbecker"
+bibliography: references.bib
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    fig_width: 12
+    fig_height: 6
+---
+
+```{r, message = FALSE, warning = FALSE}
+## Loading the libraries (and installing if necessary)
+if(!require(knitr)) install.packages("knitr")
+if(!require(geomorph)) install.packages("geomorph")
+source("../Functions/utilities.R")
+set.seed(42)
+
+#loading the below loads objects called land_data, NOT "wombat"
+load("../Data/Processed/wombat.Rda")
+AllWombats<-land_data
+load("../Data/Processed/wombat_krefftii.Rda")
+NHNW<-land_data
+load("../Data/Processed/wombat_latifrons.Rda")
+SHNW<-land_data
+load("../Data/Processed/wombat_ursinus.Rda")
+CW<-land_data
+
+
+#read classifiers
+cranium<-read.csv("../Data/Raw/classifier_cranium_wombat.csv")
+mandible<-read.csv("../Data/Raw/classifier_mandible_wombat.csv")
+
+#Make sure classifier names match landmark file names
+
+dimnames(AllWombats$cranium$procrustes$coords)[[3]]==cranium$ID
+dimnames(AllWombats$mandible$procrustes$coords)[[3]]==mandible$ID
+
+```
+
+#Partition Classifiers according to species
+
+```{r, message = FALSE, warning = FALSE}
+
+#@params Full_Classifier_Table_ is the tables of mandibular or cranial classifiers (e.g. read.csv("../Data/Raw/classifier_cranium_wombat.csv")); spp is a vector of species (e.g. c("CW", "SHNW", "NHNW"))
+
+
+species <- c("CW", "SHNW", "NHNW")
+sp_holders <-c("Common wombat", "SHN wombat", "NHN wombat")
+
+##cranium
+for (i in 1:length(unique(cranium$Species))){
+   
+    Class = cranium[cranium$Species == sp_holders[i],]
+    
+    sp_name=paste(species[i],deparse(substitute(cranium)), "Class", sep="_")#prepare for giving names to outputs
+   
+     assign(sp_name,Class)
+    
+    }
+
+##mandible
+for (i in 1:length(unique(mandible$Species))){
+   
+    Class = mandible[mandible$Species == sp_holders[i],]
+    
+    sp_name=paste(species[i],deparse(substitute(mandible)), "Class", sep="_")#prepare for giving names to outputs
+   
+     assign(sp_name,Class)
+    
+    }
+
+
+
+```
+
+#Checking for shape outliers
+
+```{r, message = FALSE, warning = FALSE}
+
+
+#set up the gridpars for plotRefToTarget
+Points=gridPar(pt.size=0.7)
+
+#Common wombat
+
+##Cranium
+
+###plot the procrustes distances from mean for specimens to identify the ones beyone the upper/lower quartiles
+
+plotOutliers(CW$cranium$procrustes$coords)#CW_M11 (individual 14,11 are out)
+
+###use plotRefToTarget with lollipop graphs to check if outlier has landmark error; replace number according to which individuals have been identified as outliers
+open3d()
+plotRefToTarget(CW$cranium$procrustes$consensus, CW$cranium$procrustes$coords[,,14], method="vector", gridPars = Points)#No evidence of landmarking error
+
+##Mandible
+plotOutliers(CW$mandible$procrustes$coords)#20,  11 are out
+mshapeCW<-mshape(CW$mandible$procrustes$coords)
+open3d()
+plotRefToTarget(mshapeCW, CW$mandible$procrustes$coords[,,20], method="vector", gridPars = Points) # no evidence of landmarking error
+
+
+#NHN wombat
+
+##Cranium
+plotOutliers(NHNW$cranium$procrustes$coords)#NHNW_M11 (individual 21 is out)
+mshapeNHNW<-mshape(NHNW$cranium$procrustes$coords)
+open3d()
+plotRefToTarget(mshapeNHNW, NHNW$cranium$procrustes$coords[,,21], method="vector", gridPars = Points)#No evidence of landmarking error
+
+##Mandible
+plotOutliers(NHNW$mandible$procrustes$coords)#Specimen 3 is out
+mshapeNHNW<-mshape(NHNW$mandible$procrustes$coords)
+open3d()
+plotRefToTarget(mshapeNHNW, NHNW$mandible$procrustes$coords[,,3], method="vector", gridPars = Points)#No evidence of landmarking error
+
+#SHN wombat
+
+##Cranium
+plotOutliers(SHNW$cranium$procrustes$coords)#21, 20 and 5 are out
+mshapeSHNW<-mshape(SHNW$cranium$procrustes$coords)
+open3d()
+plotRefToTarget(mshapeSHNW, SHNW$cranium$procrustes$coords[,,5], method="vector", gridPars = Points)#No evidence of landmarking error
+
+
+##Mandible
+plotOutliers(SHNW$mandible$procrustes$coords)#No outliers
+
+
+```
+
+#Assessing range of Centroid sizes
+```{r, message = FALSE, warning = FALSE}
+#separate out centroid sizes
+
+CentroidSize=list()
+
+for (i in  1:length(levels(cranium$Species))){
+  CentroidSize[[i]]=list()
+CentroidSize[[i]]<-AllWombats$cranium$procrustes$Csize[cranium$Species==levels(cranium$Species)[i]]
+}
+names(CentroidSize)=(levels(cranium$Species))#ARgh how od I get rid of the upticks??
+
+max(CentroidSize$`Common wombat`)-min(CentroidSize$`Common wombat`)
+max(CentroidSize$`NHN wombat`)-min(CentroidSize$`NHN wombat`)
+max(CentroidSize$`SHN wombat`)-min(CentroidSize$`SHN wombat`)
+
+Csizes=c(CentroidSize$`Common wombat`,CentroidSize$`NHN wombat`, CentroidSize$`SHN wombat`)
+Species_Csize=as.factor(c(cranium$Species))
+plot.new()
+boxplot(Csizes~Species_Csize, names=levels(cranium$Species), range=1, ylab="Centroid Size", outline=TRUE)
+
+
+
+CSizeaov=aov(Csizes~Species_Csize)
+TukeyHSD(CSizeaov,"Species_Csize" )
+
+```
+
+
+#Allometry Analyses
+
+```{r, message = FALSE, warning = FALSE}
+
+
+AllData=list("NHNW"=NHNW, "SHNW"=SHNW, "CW"=CW)
+
+allom_output=list()
+
+
+for (i in 1:length(AllData)){
+  
+      for (k in 1:length(AllData[[1]])){
+      
+      allom_output[i][[k]]=list()
+        
+      allom_output[[i]][[k]]  <-handle.procD.formula(coords~Csize, AllData[[i]][[k]]$procrustes, procD.fun=procD.allometry, iter=1000)
+      
+    }
+
+}
+
+names(allom_output)=names(AllData)
+
+names(allom_output[[1]])=names(AllData[[1]])#I can't name "mandible" and "cranium"; this only works if I call allom_output[[1]]separately. A minor issue for later.
+
+
+
+
+```
+
+#Other procD analyses
+##subset data to geolocation and sex subsets
+```{r, message = FALSE, warning = FALSE}
+#Not using NHNWs because they do not vary in location and have no sex assigned
+AllData=list("SHNW"=SHNW, "CW"=CW)
+AllClassifiers=list("SHNW"=list("cranium"=SHNW_cranium_Class, "mandible"=SHNW_mandible_Class),"CW"=list("cranium"=CW_cranium_Class, "mandible"=CW_mandible_Class))
+
+#Geolocation subset
+
+##Coordinates for specimens with Geolocation
+coords_Geo_output=list()
+    for (i in 1:length(AllData)){
+    coords_Geo_output[[i]]=list()
+      
+      for (k in 1:length(AllClassifiers[[i]])){
+        coords_Geo_output[[i]][[k]] <- AllData [[i]][[k]]$procrustes$coords [ , ,as.character(AllClassifiers[[i]][[k]]$Geolocation) == "Yes"]
+      }
+      names(coords_Geo_output[[i]])<-names(AllData[[i]])
+    }
+
+names(coords_Geo_output)<-names(AllData)
+
+
+##Csize for specimens with Geolocation
+
+Csize_Geo_output=list()
+    for (i in 1:length(AllData)){
+      Csize_Geo_output[[i]]=list()
+      
+      for (k in 1:length(AllClassifiers[[i]])){
+        Csize_Geo_output[[i]][[k]] <- AllData [[i]][[k]]$procrustes$Csize [as.character(AllClassifiers[[i]][[k]]$Geolocation) == "Yes"]
+      }
+      names(Csize_Geo_output[[i]])<-names(AllData[[i]])
+    }
+names(Csize_Geo_output)<-names(AllData)
+
+
+##create Geomorph data frame
+#This puts the subsetted coordinates and Csizes from above together with the subsetted classifier (for which subsetting is done inside the loop)
+
+Geo_GDFs=list()
+
+  for (i in 1:length(coords_Geo_output)){
+  Geo_GDFs[[i]]=list()
+  for (k in 1:length(AllClassifiers[[i]])){
+   Geo_GDFs[[i]][[k]]<-geomorph.data.frame(coords=coords_Geo_output[[i]][[k]], Csize=Csize_Geo_output[[i]][[k]], Temp=AllClassifiers[[i]][[k]][AllClassifiers[[i]][[k]]$Geolocation=="Yes",]$Temperature, Aridity=AllClassifiers[[i]][[k]][AllClassifiers[[i]][[k]]$Geolocation=="Yes",]$Aridity) 
+
+  }
+  names(Geo_GDFs[[i]])<-names(AllData[[i]]) 
+  
+}
+
+names(Geo_GDFs)<-names(AllData) 
+
+match(dimnames(Geo_GDFs$SHNW$cranium$coords)[[3]],names(Geo_GDFs$SHNW$cranium$Csize))#this is correct; The temp data are also correct but I don't have a way of testing this other than visually confirming
+
+
+#Subsetting according to Sex
+
+##coordinates of individuals with Sex
+coords_Sex_output=list()
+    for (i in 1:length(AllData)){
+    coords_Sex_output[[i]]=list()
+      
+      for (k in 1:length(AllClassifiers[[i]])){
+        coords_Sex_output[[i]][[k]] <- AllData [[i]][[k]]$procrustes$coords [ , ,!is.na(AllClassifiers[[i]][[k]]$Sex)]
+      }
+      names(coords_Sex_output[[i]])<-names(AllData[[i]])
+    }
+names(coords_Sex_output)<-names(AllData)
+
+##For analysis of Csize and Sex
+
+##Csizes of individuals with sex
+Csize_Sex_output=list()
+    for (i in 1:length(AllData)){
+      Csize_Sex_output[[i]]=list()
+      
+      for (k in 1:length(AllClassifiers[[i]])){
+        Csize_Sex_output[[i]][[k]] <- AllData [[i]][[k]]$procrustes$Csize [!is.na(AllClassifiers[[i]][[k]]$Sex)]
+      }
+      names(Csize_Sex_output[[i]])<-names(AllData[[i]])
+    }
+names(Csize_Sex_output)<-names(AllData)
+
+
+## Merge into Sex Gdf list
+Sex_GDFs=list()
+
+for (i in 1:length(coords_Sex_output)){
+
+  Sex_GDFs[[i]]=list()
+ 
+ for (k in 1:length(AllClassifiers[[i]])){
+  
+    Sex_GDFs[[i]][[k]]<-geomorph.data.frame(coords=coords_Sex_output[[i]][[k]], Csize=Csize_Sex_output[[i]][[k]], Sex=AllClassifiers[[i]][[k]]$Sex[!is.na(AllClassifiers[[i]][[k]]$Sex)])
+  }                                       
+  names(Sex_GDFs[[i]])<-names(AllData[[i]]) 
+  
+}
+
+names(Sex_GDFs)<-names (AllData)
+
+
+```
+
+#run procD.lm analyses
+
+```{r, message = FALSE, warning = FALSE}
+
+
+#Geolocation; run separately for Temp and Aridity 
+
+Geo_procD_outputs<-list()
+
+for (i in 1:length(Geo_GDFs)){
+  Geo_procD_outputs[[i]]<-list()
+  
+    for (k in 1:length(Geo_GDFs[[2]])){
+    
+  Geo_procD_outputs[[i]][[k]] <-procD.lm(coords~Temp, data=Geo_GDFs[[i]][[k]], iter=1000)
+  
+}
+names(Geo_procD_outputs[[i]])<-names(Geo_GDFs[[i]])
+  }
+names(Geo_procD_outputs)<-names(Geo_GDFs)
+
+Geo_procD_outputs
+
+#Sex
+Sex_procD_outputs<-list()
+
+for (i in 1:length(Sex_GDFs)){
+  Sex_procD_outputs[[i]]<-list()
+  
+    for (k in 1:length(Sex_GDFs[[2]])){
+    
+  Sex_procD_outputs[[i]][[k]] <-procD.lm(coords~Sex+Csize, data=Sex_GDFs[[i]][[k]], iter=1000)
+  
+}
+names(Sex_procD_outputs[[i]])<-names(Sex_GDFs[[i]])
+  }
+names(Sex_procD_outputs)<-names(Sex_GDFs)
+
+Sex_procD_outputs
+
+#Differences between sexes in centroid size
+
+Sex_procD_outputs<-list()
+
+for (i in 1:length(Sex_GDFs)){
+  Sex_procD_outputs[[i]]<-list()
+  
+    for (k in 1:length(Sex_GDFs[[2]])){
+    
+  Sex_procD_outputs[[i]][[k]] <-procD.lm(Csize~Sex, data=Sex_GDFs[[i]][[k]], iter=1000)
+  
+}
+names(Sex_procD_outputs[[i]])<-names(Sex_GDFs[[i]])
+  }
+names(Sex_procD_outputs)<-names(Sex_GDFs)
+
+Sex_procD_outputs
+
+
+```
+
+#Shape disparity comparison
+
+```{r, message = FALSE, warning = FALSE}
+
+
+#Create gdfs with species for the data frames
+Cr_gdf<-geomorph.data.frame(coords=AllWombats$cranium$procrustes$coords, Csize=AllWombats$cranium$procrustes$Csize, species=as.factor(cranium$Species))
+Mand_gdf<-geomorph.data.frame(coords=AllWombats$mandible$procrustes$coords, Csize=AllWombats$mandible$procrustes$Csize, species=as.factor(mandible$Species))
+
+#run analyses using the gdfs
+CraniumDisparity <- morphol.disparity(coords~species, groups=~species, iter = 1000, seed = 42, data = Cr_gdf, print.progress = TRUE) # Disparity within groups compared to that group's mean
+summary(CraniumDisparity)
+
+MandibleDisparity <- morphol.disparity(coords~species, groups=~species, iter = 1000, seed = 42, data = Mand_gdf, print.progress = TRUE) # Disparity within groups compared to that group's mean
+summary(MandibleDisparity)
+
+```
+
+#2-Block Partial Least Squares analysis
+##reduce coordinate datasets to only those that have mandibles and crania
+
+```{r, message = FALSE, warning = FALSE}
+
+AllData=list("NHNW"=NHNW, "SHNW"=SHNW, "CW"=CW)
+AllClassifiers=list("NHNW"=list("cranium"=NHNW_cranium_Class, "mandible"=NHNW_mandible_Class), "SHNW"=list("cranium"=SHNW_cranium_Class, "mandible"=SHNW_mandible_Class),"CW"=list("cranium"=CW_cranium_Class, "mandible"=CW_mandible_Class))
+
+
+matched_coords<-reduce.check(AllData, AllClassifiers)
+#the below indicates whether cranial and mandibular coord datasets match
+matched_coords[[2]]
+
+```
+##run 2BPLS code - depending on processor speed, this can take a while, so recommend just loading the results which are saved in the "Results" folder
+
+```{r, message = FALSE, warning = FALSE}
+SHNWTBPLS <- two.b.pls(matched_coords[[1]]$SHNW$cranium ,matched_coords[[1]]$SHNW$mandible ,iter=1000) 
+summary(SHNWTBPLS)
+save(SHNWTBPLS, file="../Data/Results/SHNWTBLS.Rda")
+
+
+NHNWTBPLS <- two.b.pls(matched_coords[[1]]$NHNW$cranium ,matched_coords[[1]]$NHNW$mandible, iter=1000) 
+ summary(NHNWTBPLS)
+save(NHNWTBPLS, file="../Data/Results/NHNWTBLS.Rda")
+
+
+CWTBPLS <- two.b.pls(matched_coords[[1]]$CW$cranium ,matched_coords[[1]]$CW$mandible ,iter=1000) 
+ summary(CWTBPLS)
+ save(CWTBPLS, file="../Data/Results/CWTBLS.Rda")
+
+ 
+
+load("../Data/Results/SHNWTBLS.Rda")
+load("../Data/Results/CWTBLS.Rda")
+load("../Data/Results/NHNWTBLS.Rda")
+
+```
+
+##subset data to run correlations of PLS score with csize and allometry
+
+```{r, message = FALSE, warning = FALSE}
+AllData=list("NHNW"=NHNW, "SHNW"=SHNW, "CW"=CW)
+AllTBPLS=list("NHNW"=NHNWTBPLS, "SHNW"=SHNWTBPLS, "CW"=CWTBPLS)
+
+PLS_PCA_Csize<-list()
+TBPLS_Scores<-list()
+PC_Scores<-list()
+Centsize<-list()
+PLS_PCA<-list()
+Merged_PLS<-list()
+
+for (i in 1:length(AllData)){
+ 
+  PLS_PCA_Csize [[i]] <-list()
+  TBPLS_Scores[[i]]<-list()
+  PC_Scores[[i]]<-list()
+  Centsize[[i]]<-list()
+  PLS_PCA [[i]] <-list()
+  Merged_PLS[[i]]<-list()
+   # Create data frames for subsequent merging. 
+  for (k in 1:length(AllData$NHNW)){
+
+    #TBPLS needs to contain i(species), an address for k (x/yscores as per cranium/mandible, and a designation of how long the first singular vector goes, i.e. the species number); the 5+k is the "address" of cranial/mandibular scores in the TBPLS data frames
+    TBPLS_Scores[[i]][[k]] <-as.data.frame(AllTBPLS[[i]][[5+k]][c (1:length (dimnames(AllTBPLS[[i]][[5+k]])[[1]]))], row.names=dimnames(AllTBPLS[[i]][[5+k]])[[1]])
+    PC_Scores[[i]][[k]]  <-as.data.frame(AllData[[i]][[k]]$ordination$x[,1])
+    Centsize[[i]][[k]]  <- as.data.frame(AllData [[i]][[k]]$procrustes$Csize)  
+    
+    PLS_PCA[[i]][[k]]<-merge(TBPLS_Scores[[i]][[k]], PC_Scores[[i]][[k]], by="row.names",all.x=TRUE)
+    row.names(PLS_PCA[[i]][[k]])<-PLS_PCA[[i]][[k]]$Row.names
+    Merged_PLS[[i]][[k]]<-merge(PLS_PCA[[i]][[k]],Centsize[[i]][[k]], by="row.names",all.x=TRUE )
+    row.names(Merged_PLS[[i]][[k]])<-Merged_PLS[[i]][[k]]$Row.names
+    Merged_PLS[[i]][[k]]<-Merged_PLS[[i]][[k]][,-(1:2)]
+    colnames(Merged_PLS[[i]][[k]])<-c("PLS_Scores", "PC1","Csize")
+  }
+  #Species names
+  names(Merged_PLS)[[i]]<-names(AllData)[[i]]
+  #cranium/mandible
+  names(Merged_PLS[[i]])<-names(AllData[[1]])
+}
+
+
+#A manual visual check if the above merger is accurate; print the below and the Merged_PLS
+SHNWTBPLS_mandible_Scores <- as.data.frame(SHNWTBPLS$YScores[c(1:19)], row.names=dimnames(SHNWTBPLS$YScores)[[1]])
+SHNWPC1=as.data.frame(SHNW$mandible$ordination$x[,1])
+SHNWCsize=as.data.frame(SHNW$mandible$procrustes$Csize)
+
+
+
+```
+
+#Run analyses
+
+```{r, message = FALSE, warning = FALSE}
+
+PCA_PLS_LM=list()
+Csize_PLS_LM=list()
+ 
+for (i in 1:length(Merged_PLS)){
+  PCA_PLS_LM[[i]]  =list()
+  Csize_PLS_LM[[i]]=list()
+  
+  for (k in 1: length(Merged_PLS[[1]])){
+     PCA_PLS_LM[[i]][[k]]=list()
+   
+      
+    PCA_PLS_LM[[i]][[k]][[1]] =summary(lm(Merged_PLS[[i]][[k]]$PLS_Scores~Merged_PLS[[i]][[k]]$PC1))
+    PCA_PLS_LM[[i]][[k]][[2]]=summary(lm(Merged_PLS[[i]][[k]]$PLS_Scores~Merged_PLS[[i]][[k]]$Csize))
+     
+  }
+  names(PCA_PLS_LM)[[i]]<-names(Merged_PLS)[[i]]
+  names(PCA_PLS_LM[[i]])<-names(Merged_PLS[[1]])
+  names(PCA_PLS_LM[[i]][[k]])<-c("PLS_PCA", "PLS_Csize")
+}
+
+
+
+```

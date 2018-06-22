@@ -111,23 +111,28 @@ heatplot.PCs<-function (species_dataset,minfirst, PC_axis,...){
   
   gridPar = gridPar(pt.bg = "white", pt.size = 0.5)
   
+  #converting pc shape ID of PCA into column numbers so the PC number can be chosen (e.g. PC6min is PCA$pc.shapes[[11]])
+  
+  pc_IDs <- c(PC_axis*2-1, PC_axis*2)
   
   if(minfirst==TRUE){
     open3d()
-    plotRefToTarget.heat(PCA$pc.shapes$PC2min,
-                         PCA$pc.shapes$PC2max,
+    plotRefToTarget.heat(PCA$pc.shapes[[pc_IDs[1]]],
+                         PCA$pc.shapes[[pc_IDs[2]]],
                          col = heat.colors, pt.size = 0.7, col.val = procrustes_var,
                          plotRefToTarget.args = list(mag = 1),...)}
   else {
     open3d()
-    plotRefToTarget.heat(PCA$pc.shapes$PC2max,
-                         PCA$pc.shapes$PC2min,
+    plotRefToTarget.heat(PCA$pc.shapes[[pc_IDs[2]]],
+                         PCA$pc.shapes[[pc_IDs[1]]],
                          col = heat.colors, pt.size = 0.7, col.val = procrustes_var,
                          plotRefToTarget.args = list(mag = 1), ...)}
 }
 
+PCA=plotTangentSpace(species_dataset$procrustes$coords, verbose=FALSE)
 
-heatplot.PCs(AllWombats$cranium, minfirst=FALSE, )
+
+heatplot.PCs(AllWombats$cranium, minfirst=FALSE, PC_axis=1 )
 heatplot.PCs(HN$cranium, minfirst=TRUE  )
 heatplot.PCs(CW$cranium, minfirst=TRUE)
 heatplot.PCs(SHNW$cranium, minfirst=TRUE)
