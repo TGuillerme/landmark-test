@@ -251,32 +251,23 @@ wombat_mandible_PC <- data.frame(wombat_mandible_PC1Scores, wombat_mandible_PC2S
 
 #change between cranium,  mandible
 
-names <- dimnames(land_data$mandible$procrustes$coords)[[3]] # Gives all IDs in data
-Species <- as.factor(mandible$Species)
-Locality <- as.factor(mandible$Locality)
-Environment <- as.factor(mandible$Environment) 
-Sex <- as.factor(mandible$Sex)
+names <- dimnames(land_data$cranium$procrustes$coords)[[3]] # Gives all IDs in data
+Species <- as.factor(cranium$Species)
 
-levels(Sex)<-c(levels(Sex),"U")  #Add the extra level to your factor
-Sex[is.na(Sex)] <- "U"           #Change NA to "U"
-levels(Environment)<-c(levels(Environment)," ") 
-Environment[is.na(Environment)] <- " "           #Change NA to "U"
 
 plot.new()
-ggplot(wombat_mandible_PC, aes(x=wombat_mandible_PC$wombat_mandible_PC1Scores, y=wombat_mandible_PC$wombat_mandible_PC2Scores, colour=Species, fill=Species))+
+ggplot(wombat_cranium_PC, aes(x=wombat_cranium_PC$wombat_cranium_PC1Scores, y=wombat_cranium_PC$wombat_cranium_PC2Scores, colour=Species, fill=Species))+
   geom_convexhull(alpha=.4)+
   scale_shape_manual(values = c(21, 22, 24))+
   
-  geom_point(aes(shape=Sex, fill=Species), color="black", size=2, stroke = 0.5)+
-  geom_text(aes(label=Environment), size=3, hjust=1.35, vjust=0.25, colour="black")+
+  geom_point(aes(shape=Species, fill=Species), color="black", size=2, stroke = 0.5)+
   labs(x = "Principal component 1", y = "Principal component 2")+
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), legend.position="none",
         axis.text=element_text(size=12), axis.title=element_text(size=12))+
-  coord_fixed(0.5)+
-  theme_set(theme_bw(12))
+  coord_fixed(1)
 
 #Saves the last plot by default
-ggsave("E:/Students/Cruise/Paper/Figures/wombat_mandible_PC.pdf",dpi = 600)
+ggsave("E:/Students/Cruise/Paper/Figures_Tables/wombat_cranium_PC.pdf",dpi = 600)
 
 #PCA of Hairy-nosed wombats
 
