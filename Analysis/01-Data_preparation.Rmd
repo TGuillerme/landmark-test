@@ -120,6 +120,11 @@ for(chain in chains) {
         names(land_data[[dataset]]) <- c("landmarkgroups", "procrustes", "ordination")
     }
 
+    ## Check if Processed folder exists
+    if(!dir.exists("../Data/Processed")) {
+        dir.create("../Data/Processed")
+    }
+
     ## Save the file
     save(land_data, file = paste0("../Data/Processed/", chain, ".Rda"))
 }
