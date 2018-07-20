@@ -339,7 +339,7 @@ handle.procD.formula <- function(formula, procrustes, procD.fun = procD.allometr
   return(procD.fun(f1 = formula, data = geomorph_data_frame, ...))
 }
 
-heatplot.PCs(CW$cranium, minfirst=FALSE, PC_axis=1)
+# heatplot.PCs(CW$cranium, minfirst=FALSE, PC_axis=1)
 
 #Allometry analysis (based on above handle.procD.formula)
 
@@ -596,3 +596,59 @@ plot.test.results <- function(data, rarefaction, no.rar, ignore.non.signif = TRU
     abline(v = 0.5, lty = 2)
 }
 
+
+## Easy PCA plotting
+#@param ordination: the ordination data (prcomp). (e.g. cranium$ordination)
+#@param classifier: the classifier (e.g. Species, etc..)
+#@param axis: which axis to plot (default is 1 and 2)
+#@param ...: any graphical arguments for plot()
+
+plot.pca <- function(ordination, classifier, axis = c(1, 2), ...) {
+  ## The ggplot colours
+  gg.color.hue <- function(n) {
+    hues = seq(15, 375, length = n + 1)
+    hcl(h = hues, l = 65, c = 100)[1:n]
+  }
+
+  ## The data
+  data <- ordination$x[,axis]
+
+  ## The plot limits
+  plot_lim <- range(as.vector(c(data)))
+
+  ## The loadings
+  load <- summary(ordination)$importance[2,axis]*100
+
+  ## The plot
+  plot(NULL, xlim = plot_lim, ylim = plot_lim,
+       xlab = paste0("PC", axis[1], " (", load[1], "%)"),
+       ylab = paste0("PC", axis[2], " (", load[2], "%)"),
+       ...)
+
+  ## The convex hull
+  get.chulls <- function(data, classifier) {
+    ## Placeholder
+    chull_list <- list()
+
+    ## Splitting the data per classifiers
+    data_class <- mapply(cbind, split(data[,1], classifier), split(data[,2], classifier))
+
+    ## Getting the convex hull positions per classifiers
+    chull_pos <- lapply(data_class, chull)
+
+    ## Getting the chull coordinates per classifier
+    get.chull.coords <- function(pos, data) return(rbind(data[pos, ], data[pos[1], ]))
+    return(mapply(get.chull.coords, chull_pos, data_class))
+  }
+
+  ## Plotting the polygons
+  plot.one.polygon <- function(polygon, col) {
+    polygon(polygon, col = paste0(col, "50"), border = col)
+  }
+  silent <- mapply(plot.one.polygon, get.chulls(data, classifier),
+                   as.list(gg.color.hue(length(levels(classifier)))))
+
+  ## The points
+  points(data, pch = 21,
+         bg = gg.color.hue(length(levels(classifier)))[classifier])
+}
