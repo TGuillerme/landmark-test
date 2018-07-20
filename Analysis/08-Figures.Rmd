@@ -28,19 +28,40 @@ library(landmarktest)
 # load the data
 #for hairy-nosed wombats (needed below for PCA)
 load("../Data/Processed/wombat_lasiorhinus.Rda")
-HN<-land_data
+HN <- land_data
 
 ##the below loads the Wombat.Rda from the processed data (i.e. partitions, procrustes data, and ordination results); but the object is NOT called the file name called under "load", it is "land_data"
 load("../Data/Processed/wombat.Rda")
-rawdata_cranium_wombat<-read.csv ("../Data/Raw/landmarkdata_cranium_wombat.csv")
-rawdata_mandible_wombat<-read.csv ("../Data/Raw/landmarkdata_mandible_wombat.csv")
+rawdata_cranium_wombat <- read.csv ("../Data/Raw/landmarkdata_cranium_wombat.csv")
+rawdata_mandible_wombat <- read.csv ("../Data/Raw/landmarkdata_mandible_wombat.csv")
 
 #read classifiers
-cranium<-read.csv("../Data/Raw/classifier_cranium_wombat.csv")
-mandible<-read.csv("../Data/Raw/classifier_mandible_wombat.csv")
+cranium <- read.csv("../Data/Raw/classifier_cranium_wombat.csv")
+mandible <- read.csv("../Data/Raw/classifier_mandible_wombat.csv")
 
 
 ```
+
+
+# PCA plot for Figure 1
+
+```{r, message = FALSE, warning = FALSE}
+
+## Loading the data for the PCA plots
+load("../Data/Processed/wombat.Rda")
+classifier_cranium <- read.csv("../Data/Raw/classifier_cranium_wombat.csv")
+classifier_mandible <- read.csv("../Data/Raw/classifier_mandible_wombat.csv")
+
+## PCA plots
+pdf("../Manuscript/Figures/PCA_figure1.pdf", height = 6, width = 12)
+par(mfrow = c(1,2))
+plot.pca(land_data$cranium$ordination, classifier_cranium$Species)
+plot.pca(land_data$mandible$ordination, classifier_mandible$Species)
+dev.off()
+
+```
+
+
 # Pull out landmark designations. These need to be raw data because the landmark names are in the raw data
 
 
@@ -232,70 +253,4 @@ shade3d(wombat_cranium_meanwarp)
 
 
 PCA.vectors(land_data$cranium, minfirst=TRUE)
-```
-#PCA plot for Figure
-```{r, message = FALSE, warning = FALSE}
-
-#for all wombats
-
-wombat_cranium_PC1Scores <- land_data$cranium$ordination$x[,1]
-wombat_cranium_PC2Scores <- land_data$cranium$ordination$x[,2]
-wombat_cranium_PC <- data.frame(wombat_cranium_PC1Scores, wombat_cranium_PC2Scores)
-
-wombat_mandible_PC1Scores <- land_data$mandible$ordination$x[,1]
-wombat_mandible_PC2Scores <- land_data$mandible$ordination$x[,2]
-wombat_mandible_PC <- data.frame(wombat_mandible_PC1Scores, wombat_mandible_PC2Scores)
-
-
-
-
-#change between cranium,  mandible
-
-names <- dimnames(land_data$cranium$procrustes$coords)[[3]] # Gives all IDs in data
-Species <- as.factor(cranium$Species)
-
-
-plot.new()
-ggplot(wombat_cranium_PC, aes(x=wombat_cranium_PC$wombat_cranium_PC1Scores, y=wombat_cranium_PC$wombat_cranium_PC2Scores, colour=Species, fill=Species))+
-  geom_convexhull(alpha=.4)+
-  scale_shape_manual(values = c(21, 22, 24))+
-  
-  geom_point(aes(shape=Species, fill=Species), color="black", size=2, stroke = 0.5)+
-  labs(x = "Principal component 1", y = "Principal component 2")+
-  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), legend.position="none",
-        axis.text=element_text(size=12), axis.title=element_text(size=12))+
-  coord_fixed(1)
-
-#Saves the last plot by default
-ggsave("E:/Students/Cruise/Paper/Figures_Tables/wombat_cranium_PC.pdf",dpi = 600)
-
-#PCA of Hairy-nosed wombats
-
-HN_cranium_PC1Scores <- HN$cranium$ordination$x[,1]
-HN_cranium_PC2Scores <- HN$cranium$ordination$x[,2]
-HN_cranium_PC <- data.frame(HN_cranium_PC1Scores, HN_cranium_PC2Scores)
-
-HN_mandible_PC1Scores <- HN$mandible$ordination$x[,1]
-HN_mandible_PC2Scores <- HN$mandible$ordination$x[,2]
-HN_mandible_PC <- data.frame(HN_mandible_PC1Scores, HN_mandible_PC2Scores)
-
-names <- dimnames(HN$mandible$procrustes$coords)[[3]] # Gives all IDs in data
-Species <- as.factor(mandible$Species)
-Species<-Species[which(Species!="Common wombat")]
-
-plot.new()
-ggplot(HN_mandible_PC, aes(x=HN_mandible_PC$HN_mandible_PC1Scores, y=HN_mandible_PC$HN_mandible_PC2Scores, colour=Species, fill=Species))+
-  geom_convexhull(alpha=.4)+
-  scale_shape_manual(values = c(21, 22, 24))+
-  
-  geom_point(aes(fill=Species), color="black", size=2, stroke = 0.5)+
-  labs(x = "Principal component 1", y = "Principal component 2")+
-  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), legend.position="none",
-        axis.text=element_text(size=12), axis.title=element_text(size=12))+
-  coord_fixed(0.75)
- 
-
-ggsave("E:/Students/Cruise/Paper/Figures/HN_mandible_PC.pdf",dpi = 600)
-
-
 ```
