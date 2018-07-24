@@ -93,6 +93,11 @@ for(chain in chains) {
         ## Read the landmarks
         landmarks  <- t(read.csv(paste0("../Data/Raw/landmarkdata_", dataset, "_", chain, ".csv"),
                                  header = TRUE, row.names = 1))
+
+        ## Remove the juvenile NHNW_B34's mandible
+        if(dataset == "mandible") {
+            landmarks <- landmarks[-which(rownames(landmarks) == "NHNW_B34"),]
+        }
         
         ## Make into a 3D array
         landmarks <- geomorph::arrayspecs(landmarks, k = 3, p = ncol(landmarks)/3)
@@ -173,7 +178,13 @@ for(sp in 1:length(species)) {
         ## Read the landmarks
         landmarks  <- t(read.csv(paste0("../Data/Raw/landmarkdata_", dataset, "_", chain, ".csv"),
                                  header = TRUE, row.names = 1))
-        
+
+        ## Remove the juvenile NHNW_B34's mandible
+        if(dataset == "mandible") {
+            landmarks <- landmarks[-which(rownames(landmarks) == "NHNW_B34"),]
+        }
+
+
         ## Make into a 3D array
         landmarks <- geomorph::arrayspecs(landmarks, k = 3, p = ncol(landmarks)/3)
 
