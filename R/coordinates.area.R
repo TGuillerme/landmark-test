@@ -28,21 +28,21 @@
 #' @importFrom zoo rollmean
 
 
-coordinates.area <- function(data, what = "radius") {
+coordinates.area <- function(data, what = 1) {
 
     ## Sanitising
-    class_what <- class(what)
+    check.class(data, c("matrix", "data.frame"))
+
+    ## What
+    class_what <- check.class(what, c("numeric", "integer", "character"))
     if(class_what %in% c("numeric", "integer")) {
         if(what > ncol(data)) {
             stop(paste0("what argument cannot be greater than the number of columns available in data (", ncol(data) ,")."))
         }
-    } else {
-        if(class_what == "character") {
-            if(!(what %in% colnames(data))) {
-                stop(paste0(what, " not found in data column names."))
-            }
-        } else {
-            stop("what argument must be either of class 'character' or 'numeric'.")
+    }
+    if(class_what == "character") {
+        if(!(what %in% colnames(data))) {
+            stop(paste0(what, " not found in data column names."))
         }
     }
 
@@ -55,11 +55,3 @@ coordinates.area <- function(data, what = "radius") {
     ## Calculate the x~y area
     return(sum(diff(x) * zoo::rollmean(y,2)))
 }
-
-# ##### TESTS
-# test <- FALSE
-# if(test){
-
-#     context("coordinates.area")
-
-# }
