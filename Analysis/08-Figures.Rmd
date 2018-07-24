@@ -254,3 +254,13 @@ shade3d(wombat_cranium_meanwarp)
 
 PCA.vectors(land_data$cranium, minfirst=TRUE)
 ```
+
+#Supplementary Figure 3 - multivariate allometry
+```{r}
+gdf=geomorph.data.frame(coords=land_data$mandible$procrustes$coords, Csize=land_data$mandible$procrustes$Csize)
+Allom=procD.allometry(coords~Csize, data=gdf, method="RegScore")
+
+plot(Allom, method="RegScore")
+
+
+```
