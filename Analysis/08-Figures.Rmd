@@ -34,10 +34,19 @@ HN <- land_data
 load("../Data/Processed/wombat.Rda")
 rawdata_cranium_wombat <- read.csv ("../Data/Raw/landmarkdata_cranium_wombat.csv")
 rawdata_mandible_wombat <- read.csv ("../Data/Raw/landmarkdata_mandible_wombat.csv")
+## Remove juvenile
+nhnw_b34 <- which(rownames(rawdata_mandible_wombat) == "NHNW_B34")
+rawdata_mandible_wombat <- rawdata_mandible_wombat[-nhnw_b34, ]
+
+
 
 #read classifiers
 cranium <- read.csv("../Data/Raw/classifier_cranium_wombat.csv")
 mandible <- read.csv("../Data/Raw/classifier_mandible_wombat.csv")
+## Remove juvenile
+nhnw_b34 <- which(mandible[,1] == "NHNW_B34")
+mandible <- mandible[-nhnw_b34, ]
+
 
 
 ```
@@ -49,9 +58,8 @@ mandible <- read.csv("../Data/Raw/classifier_mandible_wombat.csv")
 
 ## Loading the data for the PCA plots
 load("../Data/Processed/wombat.Rda")
-classifier_cranium <- read.csv("../Data/Raw/classifier_cranium_wombat.csv")
-classifier_mandible <- read.csv("../Data/Raw/classifier_mandible_wombat.csv")
-
+classifier_cranium <- cranium
+classifier_mandible <- mandible
 ## PCA plots
 pdf("../Manuscript/Figures/PCA_figure1.pdf", height = 6, width = 12)
 par(mfrow = c(1,2))
