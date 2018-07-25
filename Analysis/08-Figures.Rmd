@@ -40,6 +40,7 @@ cranium <- read.csv("../Data/Raw/classifier_cranium_wombat.csv")
 mandible <- read.csv("../Data/Raw/classifier_mandible_wombat.csv")
 
 
+
 ```
 
 
@@ -260,7 +261,8 @@ PCA.vectors(land_data$cranium, minfirst=TRUE)
 gdf=geomorph.data.frame(coords=land_data$mandible$procrustes$coords, Csize=land_data$mandible$procrustes$Csize)
 Allom=procD.allometry(coords~Csize, data=gdf, method="RegScore")
 
-plot(Allom, method="RegScore")
+
+plot(Allom, method="RegScore", pt.col=mandible$Species, label=mandible$ID)
 
 
 ```
