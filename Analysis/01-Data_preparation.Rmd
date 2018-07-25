@@ -96,7 +96,8 @@ for(chain in chains) {
 
         ## Remove the juvenile NHNW_B34's mandible
         if(dataset == "mandible") {
-            landmarks <- landmarks[-which(rownames(landmarks) == "NHNW_B34"),]
+            nhnw_b34 <- which(rownames(landmarks) == "NHNW_B34")
+            landmarks <- landmarks[-nhnw_b34,]
         }
         
         ## Make into a 3D array
@@ -145,9 +146,9 @@ chain <- chains[1]
 species <- c("ursinus", "latifrons", "krefftii", "lasiorhinus")
 sp_holders <- c("Common wombat", "SHN wombat", "NHN wombat")
 
-land_data <- list()
-
 for(sp in 1:length(species)) {
+
+    land_data <- list()
 
     for(dataset in datasets) {
 
@@ -181,9 +182,10 @@ for(sp in 1:length(species)) {
 
         ## Remove the juvenile NHNW_B34's mandible
         if(dataset == "mandible") {
-            landmarks <- landmarks[-which(rownames(landmarks) == "NHNW_B34"),]
+            nhnw_b34 <- which(rownames(landmarks) == "NHNW_B34")
+            landmarks <- landmarks[-nhnw_b34,]
+            wombat_sp <- wombat_sp[-nhnw_b34,]
         }
-
 
         ## Make into a 3D array
         landmarks <- geomorph::arrayspecs(landmarks, k = 3, p = ncol(landmarks)/3)
