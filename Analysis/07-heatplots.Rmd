@@ -18,7 +18,7 @@ Some fancy plots for the maximum landmark variation.
 ## Loading the libraries (and installing if necessary)
 if(!require(devtools)) install.packages("devtools")
 if(!require(geomorph)) install.packages("geomorph")
-if(!require(dispRity)) install_github("TGuillerme/dispRity")
+if(!require(dispRity)) install.packages("dispRity")
 if(!require(landmarktest)) install_github("TGuillerme/landmark-test")
 set.seed(42)
 ```

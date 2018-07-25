@@ -32,6 +32,10 @@ CW <- land_data
 ## Read the classifiers
 cranium <- read.csv("../Data/Raw/classifier_cranium_wombat.csv")
 mandible <- read.csv("../Data/Raw/classifier_mandible_wombat.csv")
+## Remove juvenile
+nhnw_b34 <- which(mandible[,1] == "NHNW_B34")
+mandible <- mandible[-nhnw_b34, ]
+
 
 ## Make sure the classifier names match landmark file names
 expect_true(all(dimnames(AllWombats$cranium$procrustes$coords)[[3]] == cranium$ID))
