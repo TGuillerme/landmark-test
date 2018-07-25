@@ -32,7 +32,7 @@ CW <- land_data
 ## Read the classifiers
 cranium <- read.csv("../Data/Raw/classifier_cranium_wombat.csv")
 mandible <- read.csv("../Data/Raw/classifier_mandible_wombat.csv")
-## Remove juvenile
+## Remove juvenile from mandibles
 nhnw_b34 <- which(mandible[,1] == "NHNW_B34")
 mandible <- mandible[-nhnw_b34, ]
 
@@ -125,11 +125,11 @@ The cranium:
 ```{r, message = FALSE, warning = FALSE, eval = FALSE}
 ## Plotting the outliers
 plotOutliers(NHNW$cranium$procrustes$coords)
-## NHNW_M11 (individual 21 is out)
+## NHNW_JM8466 (individual 21 is out)
 
 ## Plotting the outliers
 plotRefToTarget(NHNW$cranium$procrustes$consensus, NHNW$cranium$procrustes$coords[, , 21],
-                method = "vector", gridPars = points)
+                method = "vector", gridPars=points)
 ## No evidence of landmarking error
 ```
 
@@ -138,10 +138,10 @@ The mandible:
 ```{r, message = FALSE, warning = FALSE, eval = FALSE}
 ## Plotting the outliers
 plotOutliers(NHNW$mandible$procrustes$coords)
-## Specimen 3 is out
+## Specimen 11 is out
 
 ## Plotting the outliers
-plotRefToTarget(NHNW$mandible$procrustes$consensus, NHNW$mandible$procrustes$coords[, , 3],
+plotRefToTarget(NHNW$mandible$procrustes$consensus, NHNW$mandible$procrustes$coords[, , 11],
                 method = "vector", gridPars = points)
 ## No evidence of landmarking error
 ```
@@ -619,18 +619,16 @@ SHNWCsize <- as.data.frame(SHNW$mandible$procrustes$Csize)
 
 # Run the linear models
 
-<!-- TG: this part I actually have no clue what's happening, I've left blank comments to fill someday -->
-
 ```{r, message = FALSE, warning = FALSE}
 ## Placeholder lists
 pca_pls_lm <- c_size_pls_lm <- list()
  
-##
+##correlating the pls scores with PC1 scores and centroid sizes for each species and mandible/cranium
 for (i in 1:length(merged_pls)){
     ## Placeholders
     pca_pls_lm[[i]] <- c_size_pls_lm[[i]] <- list()
     
-    ##
+    ##this runs the lm analyses for [1] PC scores and [2] Csize
     for (k in 1: length(merged_pls[[1]])){
         pca_pls_lm[[i]][[k]] <- list()
         ##

@@ -87,7 +87,7 @@ plotRefToTarget.heat(cranium$procruste$coords[, , specimens_min_max[2]],
 ```
 
 
-#Trying to do this using hypothetical PC min/max landmarks. T
+#Doing this using hypothetical PC min/max landmarks. 
 
 ```{r, eval = FALSE}
 
@@ -132,18 +132,18 @@ heatplot.PCs<-function (species_dataset,minfirst, PC_axis,...){
 PCA=plotTangentSpace(species_dataset$procrustes$coords, verbose=FALSE)
 
 
-heatplot.PCs(AllWombats$cranium, minfirst=FALSE, PC_axis=1 )
+heatplot.PCs(AllWombats$cranium, minfirst=FALSE, 1 )
 heatplot.PCs(HN$cranium, minfirst=TRUE  )
 heatplot.PCs(CW$cranium, minfirst=TRUE)
 heatplot.PCs(SHNW$cranium, minfirst=TRUE)
-heatplot.PCs(NHNW$cranium, minfirst=TRUE)
+heatplot.PCs(NHNW$cranium, minfirst=TRUE,1)
 
 
-heatplot.PCs(AllWombats$mandible, minfirst=FALSE, )
+heatplot.PCs(AllWombats$mandible, minfirst=FALSE, 1)
 heatplot.PCs(HN$mandible, minfirst=TRUE )
-heatplot.PCs(CW$mandible, minfirst=FALSE)
-heatplot.PCs(SHNW$mandible, minfirst=TRUE)
-heatplot.PCs(NHNW$mandible, minfirst=TRUE)
+heatplot.PCs(CW$mandible, minfirst=FALSE,1)
+heatplot.PCs(SHNW$mandible, minfirst=TRUE,1)
+heatplot.PCs(NHNW$mandible, minfirst=TRUE, 1)
 
 
 

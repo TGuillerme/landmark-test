@@ -266,11 +266,33 @@ PCA.vectors(land_data$cranium, minfirst=TRUE)
 
 #Supplementary Figure 3 - multivariate allometry
 ```{r}
+gdf=geomorph.data.frame(coords=land_data$cranium$procrustes$coords, Csize=land_data$cranium$procrustes$Csize)
+AllomCranium=procD.allometry(coords~Csize, data=gdf, method="RegScore")
+
 gdf=geomorph.data.frame(coords=land_data$mandible$procrustes$coords, Csize=land_data$mandible$procrustes$Csize)
-Allom=procD.allometry(coords~Csize, data=gdf, method="RegScore")
+AllomMandible=procD.allometry(coords~Csize, data=gdf, method="RegScore")
 
 
-plot(Allom, method="RegScore", pt.col=mandible$Species, label=mandible$ID)
+## Allometry plots
+
+gg.color.hue <- function(n) {
+    hues = seq(15, 375, length = n + 1)
+    hcl(h = hues, l = 65, c = 100)[1:n]
+  }
+
+
+pdf("../Manuscript/Figures/Allom_Suppfigure.pdf", height=6, width=12)
+par(mfrow = c(1,2), cex=2)
+
+gg.color.hue(length(levels(cranium$Species)))[cranium$Species]
+
+plot(AllomCranium, method="RegScore", 
+pt.col=gg.color.hue(length(levels(cranium$Species)))[cranium$Species])
+
+plot(AllomMandible, method="RegScore",
+pt.col=gg.color.hue(length(levels(mandible$Species)))[mandible$Species])
+
+dev.off()
 
 
 ```
