@@ -380,7 +380,7 @@ reduce.check<-function(AllData, AllClassifiers){
 
 
 
-#@param CI: the confidence interval level
+#@param CI: the confidence interval level or "mean" for the results of the mean comparisons
 #@param rarefaction: whether to use the rarefied results (TRUE) or not (FALSE)
 #@param print.token: whether to add the significance tokens (i.e. stars)
 #@param rounding: the number of digits to print after 0.
@@ -390,7 +390,7 @@ reduce.check<-function(AllData, AllClassifiers){
 #@param partitions.order: optional, reordering the partition names
 #@param partitions: optional, the name of the landmark partitions columns
 #@param species.names: the names of species to display
-summarise.results <- function(CI, rarefaction, print.token = FALSE, rounding = 3, path = "../Data/Results/", species = c("Wombat", "Wombat_lasiorhinus", "Wombat_krefftii", "Wombat_latifrons", "Wombat_ursinus"), datasets = c("cranium", "mandible"), partitions.order = c(1, 3, 2, 6, 4, 5), partitions, species.names) {
+summarise.results <- function(CI, rarefaction, print.token = FALSE, rounding = 4, path = "../Data/Results/", species = c("Wombat", "Wombat_lasiorhinus", "Wombat_krefftii", "Wombat_latifrons", "Wombat_ursinus"), datasets = c("cranium", "mandible"), partitions.order = c(1, 3, 2, 6, 4, 5), partitions, species.names) {
 
     ## Printing significance tokens
     get.token <- function(p) {
@@ -408,74 +408,183 @@ summarise.results <- function(CI, rarefaction, print.token = FALSE, rounding = 3
         }
     }
 
-    ## Make the empty table
-    results_table <- data.frame(matrix(NA, ncol = length(species)*4, nrow = 6+1))
+    ## Mean results reading
+    if(CI == "mean") {
+        ## Summarising the results of the pairwise mean shape comparisons
+        summarise.results.pairwise <- function(results, dataset, rounding) {
 
-    ## Loop through the datasets
-    for(sp in 1:length(species)) {
+            ## number of comparisons
+            n_comp <- length(results)
 
-        for(ds in 1:length(datasets)) {
+            ## number of paritions
+            n_part <- unique(unlist(lapply(results, length)))
 
-            ## Extract the results
-            if(rarefaction) {
-                load(paste0(path, species[sp], "_", datasets[ds], "rarefied_CI", CI, ".Rda"))
-            } else {
-                load(paste0(path, species[sp], "_", datasets[ds], "_CI", CI, ".Rda"))
+            ## Making the empty dataframe results holder
+            results_table <- data.frame(matrix(NA, ncol = n_part+1, nrow = n_comp*2))
+
+            ## Filling the table for each results first two columns
+            colnames(results_table) <- c("test", paste(dataset, c(1:n_part)))
+            rownames(results_table) <- paste0(rep(names(results), each = 2), rep(1:2))
+            results_table[, 1] <- rep(c("diff", "p"), n_comp)
+
+            ## Filling the rest of the table
+            get.one.result <- function(one_result, rounding) {
+                return(do.call(cbind, lapply(one_result, function(X) return(round(c(X$obs, X$pvalue), digits = rounding)))))
             }
+            results_table[, -1] <- do.call(rbind, lapply(results, get.one.result, rounding))
 
-            ## Summarise the results
-            difference <- make.table(results$difference, correction = "bonferroni")
-            overlap <- make.table(results$overlaps, correction = "bonferroni")
+            return(results_table)
+        }
 
-            ## Fill the table
-            if(ds == 1) {
-                ## Values
-                results_table[2:4, 1+(4*(sp-1))] <- round(difference[,2], digits = rounding)
-                results_table[2:4, 3+(4*(sp-1))] <- round(overlap[,2], digits = rounding-1)
-                ## Signif
-                if(print.token) {
-                    results_table[2:4, 2+(4*(sp-1))] <- paste0(round(difference[,6], digits = rounding),  sapply(difference[,6], get.token))
-                    results_table[2:4, 4+(4*(sp-1))] <- paste0(round(overlap[,6], digits = rounding),  sapply(overlap[,6], get.token))
+        ## Loading the means results (observed)
+        if(rarefaction == FALSE) {
+            load(paste0(path, "Group_cranium_means.Rda"))
+            load(paste0(path, "Group_mandible_means.Rda"))
+        } else {
+            load(paste0(path, "Group_craniumrarefied_means.Rda"))
+            load(paste0(path, "Group_mandiblerarefied_means.Rda"))
+        }
+
+        ## Getting the pairwise results
+        diff_cran <- summarise.results.pairwise(group_cranium$differences, "Cranium", rounding)
+        over_cran <- summarise.results.pairwise(group_cranium$overlaps, "Cranium", rounding)
+        diff_mand <- summarise.results.pairwise(group_mandible$differences, "Mandible", rounding)
+        over_mand <- summarise.results.pairwise(group_mandible$overlaps, "Mandible", rounding)
+
+        ## Changing the test name for the overlaps
+        over_cran[,1] <- gsub("diff", "overlap", over_cran[,1])
+        over_mand[,1] <- gsub("diff", "overlap", over_mand[,1])
+
+        ## Combine both tables
+        merge.table <- function(tab1, tab2) {
+            merge.row <- function(X, tab1, tab2) rbind(tab1[c(X, X+1), ], tab2[c(X, X+1), ])
+            return(do.call(rbind,
+                lapply(as.list(seq(from = 1, to = (nrow(tab1)-1), by = 2)),
+                       merge.row, tab1 = tab1, tab2 = tab2)
+                    )
+                )
+        }
+
+        ## Combine everything
+        results_table <- cbind(merge.table(diff_cran, over_cran), merge.table(diff_mand, over_mand)[, -1])
+
+        ## Order the partitions
+        results_table <- results_table[, c(1, (partitions.order+1))]
+
+        return(results_table)
+
+    } else {
+
+        ## Make the empty table
+        results_table <- data.frame(matrix(NA, ncol = length(species)*4, nrow = 6+1))
+    
+        ## Loop through the datasets
+        for(sp in 1:length(species)) {
+    
+            for(ds in 1:length(datasets)) {
+    
+                ## Extract the results
+                if(rarefaction) {
+                    load(paste0(path, species[sp], "_", datasets[ds], "rarefied_CI", CI, ".Rda"))
                 } else {
-                    results_table[2:4, 2+(4*(sp-1))] <- paste0(round(difference[,6], digits = rounding))
-                    results_table[2:4, 4+(4*(sp-1))] <- paste0(round(overlap[,6], digits = rounding))
+                    load(paste0(path, species[sp], "_", datasets[ds], "_CI", CI, ".Rda"))
                 }
-
-            } else {
-                ## Values
-                results_table[5:7, 1+(4*(sp-1))] <- round(difference[,2], digits = rounding)
-                results_table[5:7, 3+(4*(sp-1))] <- round(overlap[,2], digits = rounding-1)
-                ## Signif
-                if(print.token) {
-                    results_table[5:7, 2+(4*(sp-1))] <- paste0(round(difference[,6], digits = rounding),  sapply(difference[,6], get.token))
-                    results_table[5:7, 4+(4*(sp-1))] <- paste0(round(overlap[,6], digits = rounding),  sapply(overlap[,6], get.token))
+    
+                ## Summarise the results
+                difference <- make.table(results$difference)#, correction = "bonferroni")
+                overlap <- make.table(results$overlaps)#, correction = "bonferroni")
+    
+                ## Fill the table
+                if(ds == 1) {
+                    ## Values
+                    results_table[2:4, 1+(4*(sp-1))] <- round(difference[,2], digits = rounding)
+                    results_table[2:4, 3+(4*(sp-1))] <- round(overlap[,2], digits = rounding-1)
+                    ## Signif
+                    if(print.token) {
+                        results_table[2:4, 2+(4*(sp-1))] <- paste0(round(difference[,6], digits = rounding),  sapply(difference[,6], get.token))
+                        results_table[2:4, 4+(4*(sp-1))] <- paste0(round(overlap[,6], digits = rounding),  sapply(overlap[,6], get.token))
+                    } else {
+                        results_table[2:4, 2+(4*(sp-1))] <- round(difference[,6], digits = rounding)
+                        results_table[2:4, 4+(4*(sp-1))] <- round(overlap[,6], digits = rounding)
+                    }
+    
                 } else {
-                    results_table[5:7, 2+(4*(sp-1))] <- paste0(round(difference[,6], digits = rounding))
-                    results_table[5:7, 4+(4*(sp-1))] <- paste0(round(overlap[,6], digits = rounding))
+                    ## Values
+                    results_table[5:7, 1+(4*(sp-1))] <- round(difference[,2], digits = rounding)
+                    results_table[5:7, 3+(4*(sp-1))] <- round(overlap[,2], digits = rounding-1)
+                    ## Signif
+                    if(print.token) {
+                        results_table[5:7, 2+(4*(sp-1))] <- paste0(round(difference[,6], digits = rounding),  sapply(difference[,6], get.token))
+                        results_table[5:7, 4+(4*(sp-1))] <- paste0(round(overlap[,6], digits = rounding),  sapply(overlap[,6], get.token))
+                    } else {
+                        results_table[5:7, 2+(4*(sp-1))] <- round(difference[,6], digits = rounding)
+                        results_table[5:7, 4+(4*(sp-1))] <- round(overlap[,6], digits = rounding)
+                    }
                 }
             }
         }
+    
+        ## Reordering the rows (future columns)
+        results_table[2:7,] <- results_table[(partitions.order+1),]
+    
+        ## Renaming the table elements
+        if(!missing(partitions)) {
+            rownames(results_table) <- c("test", partitions)
+        } else {
+            rownames(results_table) <- c("test", paste("Cranium", c(1,2,3)), paste("Mandible", c(1,2,3)))
+        }
+
+        ## Transpose the table
+        results_table <- as.data.frame(t(results_table))
+
+        results_table[,1] <- rep(c("diff", "p", "overlap", "p"), length(species))
+        if(!missing(species.names)) {
+            rownames(results_table) <- names(unlist(sapply(species.names, rep, 4, simplify = FALSE)))
+        } else {
+            rownames(results_table) <- names(unlist(sapply(species, rep, 4, simplify = FALSE)))
+        }
+    
+        ## Flip the table
+        return(results_table)
+    }
+}
+
+## Exporting results in xtable format
+xtable.results <- function(results, partitions.names, test.names, path, file.name, caption, digits) {
+
+    get.token <- function(p) {
+        if(p > 0.001) {
+            return(paste0(p, ""))
+        }
+        # if(p < 0.01 && p > 0.005) {
+        #     return(paste0(p, "."))
+        # }
+        # if(p < 0.005 && p > 0.001) {
+        #     return(paste0(p, "*"))
+        # }
+        if(p <= 0.001) {
+            return(paste0(p, "*"))
+        }
     }
 
-    ## Reordering the rows (future columns)
-    results_table[2:7,] <- results_table[(partitions.order+1),]
+    ## get the p tokens
+    p_rows <- which(results[,1] == "p")
+    results[p_rows, -1] <- apply(results[p_rows, -1], c(1,2), get.token)
 
-    ## Renaming the table elements
-    if(!missing(partitions)) {
-        rownames(results_table) <- c("test", partitions)
+    ## Add the test names tables
+    results_out <- cbind(c(sapply(test.names, function(X) return(c(X, rep("", 3))), simplify = TRUE)), results)
+    colnames(results_out) <- c("", "test", partitions.names)
+
+    ## convert into xtable format
+    textable <- xtable(results_out, caption = caption, label = file.name)
+    
+    bold.cells <- function(x) gsub('BOLD(.*)', paste0('\\\\textbf{\\1', '}'), x)
+
+    if(missing(path)) {
+        print(textable, include.rownames = FALSE, sanitize.text.function = bold.cells)
     } else {
-        rownames(results_table) <- c("test", paste("Cranium", c(1,2,3)), paste("Mandible", c(1,2,3)))
+        cat(print(textable, include.rownames = FALSE, sanitize.text.function = bold.cells), file = paste0(path, file.name, ".tex"))
     }
-    results_table[1,] <- rep(c("diff", "p", "overlap", "p"), length(species))
-    if(!missing(species.names)) {
-        colnames(results_table) <- names(unlist(sapply(species.names, rep, 4, simplify = FALSE)))
-    } else {
-        colnames(results_table) <- names(unlist(sapply(species, rep, 4, simplify = FALSE)))
-    }
-
-    ## Flip the table
-    return(t(results_table))
-
 }
 
 #@param data: the non-rarefied summarised data
@@ -487,7 +596,9 @@ summarise.results <- function(CI, rarefaction, print.token = FALSE, rounding = 3
 #@param threshold: the significance threshold (default = 0.01)
 #@param ylabs: the labels for the y axis ("all_data", "Vombatus", etc). If missing the ones from data are used.
 #@param xlabs: the labels for the x axis ("cranium1", etc). If missing the ones from data are used.
-plot.test.results <- function(data, rarefaction, no.rar, ignore.non.signif = TRUE, partitions = c(expression(bold("Cranium")), expression(bold("Mandible"))), cols = c("grey", "magenta", "green"), ylabs, xlabs) {
+#@param digits: the digits to display
+
+plot.test.results <- function(data, rarefaction, p.value = 0.001, no.rar, ignore.non.signif = TRUE, partitions = c(expression(bold("Cranium")), expression(bold("Mandible"))), cols = c("grey", "magenta", "green"), ylabs, xlabs, digits) {
 
     ## Making the x and y labels (if needed)
     if(missing(ylabs)) {
@@ -506,11 +617,11 @@ plot.test.results <- function(data, rarefaction, no.rar, ignore.non.signif = TRU
     blocks <- apply(apply(data[,-1], 2, as.numeric), 2, make.blocks)
 
     ## Selecting the threshold level
-    level.selector <- function(block, threshold = 0.01) {
+    level.selector <- function(block, threshold = p.value) {
         return(ifelse(block[2] > threshold, 1, ifelse(block[4] > threshold, 2, 3)))
     }
     ## Transform the list of blocks in an image matrix
-    image_matrix <- matrix(unlist(lapply(blocks, lapply, level.selector)), ncol = ncol(data[, -1]), byrow = FALSE)
+    image_matrix <- matrix(unlist(lapply(blocks, lapply, level.selector, threshold = p.value)), ncol = ncol(data[, -1]), byrow = FALSE)
 
     ## Plot the main image
     par(mar = c(2, max(nchar(ylabs))/2, 4, 2)) #c(bottom, left, top, right)
@@ -545,13 +656,13 @@ plot.test.results <- function(data, rarefaction, no.rar, ignore.non.signif = TRU
     }
 
     values_coords <- get.coords(value_to_plot)
-    values <- unlist(lapply(blocks, lapply, function(x) return(x[1])))[value_to_plot]
+    values <- round(unlist(lapply(blocks, lapply, function(x) return(x[1])))[value_to_plot], digits = digits)
     text(x = values_coords[[1]], y = values_coords[[2]], labels = values)
 
     ## Adding the rarefaction (square the pixel if equal)
     blocks <- apply(apply(rarefaction[,-1], 2, as.numeric), 2, make.blocks)
     ## Transform the list of blocks in an image matrix
-    image_rar <- matrix(unlist(lapply(blocks, lapply, level.selector)), ncol = ncol(rarefaction[, -1]), byrow = FALSE)
+    image_rar <- matrix(unlist(lapply(blocks, lapply, level.selector, threshold = p.value)), ncol = ncol(rarefaction[, -1]), byrow = FALSE)
     ## Getting the rarefaction coordinates
     if(ignore.non.signif) {
         rar_coords <- image_rar == ifelse(image_matrix == 1, 0, image_matrix)

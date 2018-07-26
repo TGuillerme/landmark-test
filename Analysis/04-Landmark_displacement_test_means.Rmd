@@ -21,198 +21,136 @@ source("../Functions/utilities.R")
 set.seed(42)
 ```
 
-Here we test the Procrustes landmarks position variation not between the two extremes (or 95%) of the Procrustes space but between the mean Procrustes shapes in pairs of species.
+Here we test the Procrustes landmarks position variation not between the two extremes (or 95%) of the Procrustes space but between the mean Procrustes shapes between the two genera and the two species in _Lasiorhinus_.
 
-# Cranium
+# Preparing the data
+
+First we load the two GPA for either all the three species (to compare _Vombatus vs. Lasiorhinus_) or either for the two _Lasiorhinus_ species (to compare _L. krefftii vs. L. latifrons_).
 
 ```{r}
 ## Reading the full GPA data
 path <- "../Data/Processed/"
-species <- "Wombat"
-dataset <- "cranium"
+save_path <- "../Data/Results/"
 
-## The GPA for the cranium of all the taxa
-load(paste0(path, species, ".Rda"))
-data <- land_data[[dataset]]
+## The GPA for the cranium and mandible of all the taxa
+load(paste0(path, "Wombat", ".Rda"))
+all_gpa_cran <- land_data[["cranium"]]
+all_gpa_mand <- land_data[["mandible"]]
 
-## Creating the three groups
-specimens_names <- attr(data$procrustes$coords, "dimnames")[[3]]
-taxa_groups <- list("Vombatus_ursinus" = grep("CW_", specimens_names),
+## Getting the partitions
+partitions_cran <- partitions_mand <- list()
+for(part in 1:length(unique(all_gpa_cran$landmarkgroups[,2]))) {
+    partitions_cran[[part]] <- which(
+            all_gpa_cran$landmarkgroups[,2] == unique(all_gpa_cran$landmarkgroups[,2])[part])
+    partitions_mand[[part]] <- which(
+            all_gpa_mand$landmarkgroups[,2] == unique(all_gpa_mand$landmarkgroups[,2])[part])
+}
+
+## Thee GPA for the cranium and mandible for the Lasiorhinus
+load(paste0(path, "wombat_lasiorhinus", ".Rda"))
+las_gpa_cran <- land_data[["cranium"]]
+las_gpa_mand <- land_data[["mandible"]]
+
+## Creating the groups
+## All species
+specimens_names <- attr(all_gpa_cran$procrustes$coords, "dimnames")[[3]]
+all_groups_cran <- list("Vombatus_ursinus" = grep("CW_", specimens_names),
+                "Lasiorhinus" = c(grep("SHNW_", specimens_names), grep("NHNW_", specimens_names)))
+specimens_names <- attr(all_gpa_mand$procrustes$coords, "dimnames")[[3]]
+all_groups_mand <- list("Vombatus_ursinus" = grep("CW_", specimens_names),
                 "Lasiorhinus" = c(grep("SHNW_", specimens_names), grep("NHNW_", specimens_names)))
 
-## Getting the mean specimens for each group
-taxa_means <- select.procrustes(data$procrustes, factors = taxa_groups)
-
-## Coordinates differences between pairs of species
-differences_list <- list(
-    "vomba_lasio" = coordinates.difference(type = "spherical",
-                                taxa_means$Vombatus_ursinus, taxa_means$Lasiorhinus),
-    "vomba_latif" = coordinates.difference(type = "spherical",
-                                taxa_means$Vombatus_ursinus, taxa_means$Lasiorhinus_latifrons),
-    "vomba_kreft" = coordinates.difference(type = "spherical",
-                                taxa_means$Vombatus_ursinus, taxa_means$Lasiorhinus_krefftii),
-    "lasio_kreft" = coordinates.difference(type = "spherical",
-                                taxa_means$Lasiorhinus, taxa_means$Lasiorhinus_latifrons),
-    "lasio_latif" = coordinates.difference(type = "spherical",
-                                taxa_means$Lasiorhinus, taxa_means$Lasiorhinus_krefftii),
-    "latif_kreft" = coordinates.difference(type = "spherical",
-                                taxa_means$Lasiorhinus_latifrons, taxa_means$Lasiorhinus_krefftii))
-
-## Getting the partitions
-partitions <- list()
-for(part in 1:length(unique(data$landmarkgroups[,2]))) {
-    partitions[[part]] <- which(data$landmarkgroups[,2] == unique(data$landmarkgroups[,2])[part])
-}
-
-## Test wrapper
-wrap.rand.test <- function(procrustes_var, partitions, test) {
-    message("Running test...")
-    return(lapply(partitions, lapply.rand.test, data = procrustes_var[[1]], test = test,
-           replicates = 1000, resample = FALSE))
-}
-
-# differences <- lapply(differences_list, wrap.rand.test, partitions = partitions, test = area.diff)
-# overlaps <- lapply(differences_list, wrap.rand.test, partitions = partitions, test = bhatt.coeff)
-
-## Saving the results
-# save_path <- "../Data/Results/"
-# save(differences, file = paste0(save_path, "mean_differences_", dataset, ".Rda"))
-# save(overlaps, file = paste0(save_path, "mean_overlaps_", dataset, ".Rda"))
-```
-
-# Mandible
-
-```{r}
-## Reading the full GPA data
-path <- "../Data/Processed/"
-species <- "Wombat"
-dataset <- "mandible"
-
-## The GPA for the mandible of all the taxa
-load(paste0(path, species, ".Rda"))
-data <- land_data[[dataset]]
-
-## Creating the three groups
-specimens_names <- attr(data$procrustes$coords, "dimnames")[[3]]
-taxa_groups <- list("Vombatus_ursinus" = grep("CW_", specimens_names),
-                    "Lasiorhinus" = c(grep("SHNW_", specimens_names), grep("NHNW_", specimens_names)),
-                    "Lasiorhinus_latifrons" = grep("SHNW_", specimens_names),
+## Lasiorhinus only
+specimens_names <- attr(las_gpa_cran$procrustes$coords, "dimnames")[[3]]
+las_groups_cran <- list("Lasiorhinus_latifrons" = grep("SHNW_", specimens_names),
                     "Lasiorhinus_krefftii" = grep("NHNW_", specimens_names))
 
+specimens_names <- attr(las_gpa_mand$procrustes$coords, "dimnames")[[3]]
+las_groups_mand <- list("Lasiorhinus_latifrons" = grep("SHNW_", specimens_names),
+                    "Lasiorhinus_krefftii" = grep("NHNW_", specimens_names))
+
+```
+
+We can then get the coordinates differences (spherical) between the two pairs of taxa for the cranium and the mandible.
+
+
+```{r}
 ## Getting the mean specimens for each group
-taxa_means <- select.procrustes(data$procrustes, factors = taxa_groups)
+all_means_cran <- select.procrustes(all_gpa_cran$procrustes, factors = all_groups_cran)
+all_means_mand <- select.procrustes(all_gpa_mand$procrustes, factors = all_groups_mand)
+las_means_cran <- select.procrustes(las_gpa_cran$procrustes, factors = las_groups_cran)
+las_means_mand <- select.procrustes(las_gpa_mand$procrustes, factors = las_groups_mand)
+
 
 ## Coordinates differences between pairs of species
-differences_list <- list(
+differences_list_cran <- list(
     "vomba_lasio" = coordinates.difference(type = "spherical",
-                                taxa_means$Vombatus_ursinus, taxa_means$Lasiorhinus),
-    "vomba_latif" = coordinates.difference(type = "spherical",
-                                taxa_means$Vombatus_ursinus, taxa_means$Lasiorhinus_latifrons),
-    "vomba_kreft" = coordinates.difference(type = "spherical",
-                                taxa_means$Vombatus_ursinus, taxa_means$Lasiorhinus_krefftii),
-    "lasio_kreft" = coordinates.difference(type = "spherical",
-                                taxa_means$Lasiorhinus, taxa_means$Lasiorhinus_latifrons),
-    "lasio_latif" = coordinates.difference(type = "spherical",
-                                taxa_means$Lasiorhinus, taxa_means$Lasiorhinus_krefftii),
+                        all_means_cran$Vombatus_ursinus, all_means_cran$Lasiorhinus),
     "latif_kreft" = coordinates.difference(type = "spherical",
-                                taxa_means$Lasiorhinus_latifrons, taxa_means$Lasiorhinus_krefftii))
+                        las_means_cran$Lasiorhinus_latifrons, las_means_cran$Lasiorhinus_krefftii))
+differences_list_mand <- list(
+    "vomba_lasio" = coordinates.difference(type = "spherical",
+                        all_means_mand$Vombatus_ursinus, all_means_mand$Lasiorhinus),
+    "latif_kreft" = coordinates.difference(type = "spherical",
+                        las_means_mand$Lasiorhinus_latifrons, las_means_mand$Lasiorhinus_krefftii))
 
-## Getting the partitions
-partitions <- list()
-for(part in 1:length(unique(data$landmarkgroups[,2]))) {
-    partitions[[part]] <- which(data$landmarkgroups[,2] == unique(data$landmarkgroups[,2])[part])
-}
+```
 
+
+# Running the Procrustes coordinates variation tests
+
+We can then test whether the partitions in each dataset (cranium or mandible) differ in terms of coordinates magnitude change between the two groups (_Vombatus vs. Lasiorhinus_ and _L. krefftii vs. L. latifrons_):
+
+```{r}
 ## Test wrapper
-# differences <- lapply(differences_list, wrap.rand.test, partitions = partitions, test = area.diff)
-# overlaps <- lapply(differences_list, wrap.rand.test, partitions = partitions, test = bhatt.coeff)
-
-## Saving the results
-# save_path <- "../Data/Results/"
-# save(differences, file = paste0(save_path, "mean_differences_", dataset, ".Rda"))
-# save(overlaps, file = paste0(save_path, "mean_overlaps_", dataset, ".Rda"))
-```
-
-# Summarising the results
-
-## Loading the results
-
-```{r, eval = FALSE}
-save_path <- "../Data/Results/"
-dataset <- "cranium"
-## Loading the results
-load(paste0(save_path, "mean_differences_", dataset, ".Rda"))
-load(paste0(save_path, "mean_overlaps_", dataset, ".Rda"))
-differences_cranium <- differences
-overlaps_cranium <- overlaps
-
-dataset <- "mandible"
-## Loading the results
-load(paste0(save_path, "mean_differences_", dataset, ".Rda"))
-load(paste0(save_path, "mean_overlaps_", dataset, ".Rda"))
-differences_mandible <- differences
-overlaps_mandible <- overlaps
-```
-
-##
-
-```{r, eval = FALSE}
-
-## Summarising the results of the pairwise mean shape comparisons
-summarise.results.pairwise <- function(results, partitions, partitions.order = c(1, 3, 2)) {
-
-    ## number of comparisons
-    n_comp <- length(results)
-
-    ## number of paritions
-    n_part <- unique(unlist(lapply(results, length)))
-
-    ## Making the empty dataframe results holder
-    results_table <- data.frame(matrix(NA, ncol = n_part+2, nrow = n_comp*2))
-
-    ## Filling the table for each results first two columns
-    if(!missing(partitions)) colnames(results_table) <- c("comparison", "test", partitions)
-
-    results_table[, 1] <- rep(names(results), each = 2)
-    results_table[, 2] <- rep(c("diff", "p"), n_comp)
-
-    ## Filling the rest of the table
-    get.one.result <- function(one_result, partitions.order) {
-        return(do.call(cbind, lapply(one_result, function(X) return(c(X$observed, X$pvalue))))[, partitions.order])
+wrap.rand.test <- function(procrustes_var, partitions, test, rarefaction, verbose = TRUE) {
+    if(verbose) message("Running test...")
+    if(rarefaction != FALSE) {
+        rarefaction <- min(unlist(lapply(partitions, length)))
+        test_out <- lapply(partitions, lapply.rand.test, data = procrustes_var[[1]], test = test,
+           replicates = 1000, resample = FALSE, rarefaction = rarefaction)
+    } else {
+        test_out <- lapply(partitions, lapply.rand.test, data = procrustes_var[[1]], test = test,
+           replicates = 1000, resample = FALSE)
     }
-    results_table[, -c(1,2)] <- do.call(rbind, lapply(results, get.one.result, partitions.order))
-
-    return(results_table)
+    if(verbose) message("Done.\n")
+    return(test_out)
 }
 
-## Combining the results into a table in the same format as the extremes tests
-partitions <- c("Zygomatic Arch", "Tip of snout", "Remainder(C)")
-diff_cran <- summarise.results.pairwise(differences_cranium, partitions, c(1, 3, 2))
-over_cran <- summarise.results.pairwise(overlaps_cranium, partitions, c(1, 3, 2))
-partitions <- c("Masticatory insertions", "Symphyseal area", "Remainder(M)")
-diff_mand <- summarise.results.pairwise(differences_mandible, partitions, c(3, 1, 2))
-over_mand <- summarise.results.pairwise(overlaps_mandible, partitions, c(3, 1, 2))
+## Running the tests (no rarefaction)
+differences_cran <- lapply(differences_list_cran, wrap.rand.test, partitions = partitions_cran,
+                           test = area.diff, rarefaction = FALSE)
+differences_mand <- lapply(differences_list_mand, wrap.rand.test, partitions = partitions_mand,
+                           test = area.diff, rarefaction = FALSE)
+overlaps_cran <- lapply(differences_list_cran, wrap.rand.test, partitions = partitions_cran,
+                       test = bhatt.coeff, rarefaction = FALSE)
+overlaps_mand <- lapply(differences_list_mand, wrap.rand.test, partitions = partitions_mand,
+                        test = bhatt.coeff, rarefaction = FALSE)
 
-## Changing the test name for the overlaps
-over_cran[,2] <- gsub("diff", "overlap", over_cran[,2])
-over_mand[,2] <- gsub("diff", "overlap", over_mand[,2])
+group_cranium <- list("differences" = differences_cran, "overlaps" = overlaps_cran)
+group_mandible <- list("differences" = differences_mand, "overlaps" = overlaps_mand)
 
-## Combine both tables
-merge.table <- function(tab1, tab2) {
-    merge.row <- function(X, tab1, tab2) rbind(tab1[c(X, X+1), ], tab2[c(X, X+1), ])
-    return(do.call(rbind,
-        lapply(as.list(seq(from = 1, to = (nrow(tab1)-1), by = 2)),
-               merge.row, tab1 = tab1, tab2 = tab2)
-            )
-        )
-}
-results_table_100 <- cbind(merge.table(diff_cran, over_cran), merge.table(diff_mand, over_mand)[, -c(1,2)])
 
-## P-adjustment
-p_rows <- seq(from = 2, to = nrow(results_table_100), by = 2)
-results_table_100[p_rows, -c(1,2)] <- t(apply(results_table_100[p_rows, -c(1,2)], 1,
-                                p.adjust, method = "bonferroni", n = length(differences_cranium)))
+## Saving the test results
+save(group_cranium, file = paste0(save_path, "Group_cranium_means.Rda"))
+save(group_mandible, file = paste0(save_path, "Group_mandible_means.Rda"))
 
-## Print in Rmd
-kable(results_table_100, digits = 4)
+
+## Running the tests (no rarefaction)
+differences_cran <- lapply(differences_list_cran, wrap.rand.test, partitions = partitions_cran,
+                           test = area.diff, rarefaction = TRUE)
+differences_mand <- lapply(differences_list_mand, wrap.rand.test, partitions = partitions_mand,
+                           test = area.diff, rarefaction = TRUE)
+overlaps_cran <- lapply(differences_list_cran, wrap.rand.test, partitions = partitions_cran,
+                       test = bhatt.coeff, rarefaction = TRUE)
+overlaps_mand <- lapply(differences_list_mand, wrap.rand.test, partitions = partitions_mand,
+                        test = bhatt.coeff, rarefaction = TRUE)
+
+group_cranium <- list("differences" = differences_cran, "overlaps" = overlaps_cran)
+group_mandible <- list("differences" = differences_mand, "overlaps" = overlaps_mand)
+
+
+## Saving the test results
+save(group_cranium, file = paste0(save_path, "Group_craniumrarefied_means.Rda"))
+save(group_mandible, file = paste0(save_path, "Group_mandiblerarefied_means.Rda"))
 ```

@@ -1100,6 +1100,3 @@ make.plots(results$overlaps, type = "Bhattacharyya Coefficient", add.p = TRUE, c
 make.plots(results$differences, type = "area difference", add.p = TRUE, correction = "bonferroni", rarefaction = TRUE, rare.level = results$rarefaction, path = paste0("../Manuscript/Figures/", species, "_", dataset, "_difference_rarefied_CI100.pdf"))
 make.plots(results$overlaps, type = "Bhattacharyya Coefficient", add.p = TRUE, correction = "bonferroni", rarefaction = TRUE, rare.level = results$rarefaction, path = paste0("../Manuscript/Figures/", species, "_", dataset, "_overlaps_rarefied_CI100.pdf"))
 ```
-
-
-
