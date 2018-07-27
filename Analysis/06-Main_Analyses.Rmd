@@ -170,60 +170,7 @@ plotOutliers(SHNW$mandible$procrustes$coords)
 ```
 
 
-# Assessing range of Centroid sizes
 
-Here we look at the effect of species on the centroid sizes (i.e. are the centroid sizes different within each species?):
-
-```{r, message = FALSE, warning = FALSE, fig.height = 6, fig.width = 6}
-## Placeholder list
-centroid_size <- list()
-
-## separating the centroid sizes
-for (i in 1:length(levels(cranium$Species))) {
-    centroid_size[[i]] <- list()
-    centroid_size[[i]] <- AllWombats$cranium$procrustes$Csize[
-                              cranium$Species == levels(cranium$Species)[i] ]
-}
-
-## Naming the centroid sizes
-names(centroid_size) = levels(cranium$Species)
-
-## Centroid size ranges
-max(centroid_size$`Common wombat`) - min(centroid_size$`Common wombat`)
-max(centroid_size$`NHN wombat`) - min(centroid_size$`NHN wombat`)
-max(centroid_size$`SHN wombat`) - min(centroid_size$`SHN wombat`)
-
-## Getting all the centroid sizes
-c_sizes <- c(centroid_size$`Common wombat`, centroid_size$`NHN wombat`, centroid_size$`SHN wombat`)
-## Assigning each one to a species factor
-species_c_size <- as.factor(c(cranium$Species))
-
-## Plotting the results
-boxplot(c_sizes ~ species_c_size, names = levels(cranium$Species), range = 1, ylab = "Centroid Size")
-
-## Running the anova
-c_size_aov <- aov(c_sizes ~ species_c_size)
-c_size_tukey <- TukeyHSD(c_size_aov, "species_c_size")
-```
-
-We can summarise these results as follows:
-
-```{r}
-## Renaming the factors for the tukey results
-tukey_results <- c_size_tukey$species_c_size
-rownames(tukey_results) <- gsub("1", names(centroid_size)[1], rownames(tukey_results))
-rownames(tukey_results) <- gsub("2", names(centroid_size)[2], rownames(tukey_results))
-rownames(tukey_results) <- gsub("3", names(centroid_size)[3], rownames(tukey_results))
-
-## The anova results
-kable(summary(c_size_aov)[[1]], digits = 3, caption = "anova results from centroid size ~ species")
-
-## The posthoc differences
-kable(tukey_results, digits = 3,
-      caption = "Posthoc differences from the Tukey HSD test (centroid size ~ species)")
-```
-
-There is a significant difference in centroid size between the southern hairy nose wombat's centroid size and the other wombats (common and northern hairy nose).
 
 # Allometry Analyses
 
@@ -273,223 +220,6 @@ kable(allom_output[[3]][[1]]$aov.table, digits = 3,
               caption = "Procrustes ANOVA for size (allometry) for the common wombat's cranium.")
 kable(allom_output[[3]][[2]]$aov.table, digits = 3,
               caption = "Procrustes ANOVA for size (allometry) for the common wombat's mandible.")
-```
-
-
-# Other procD analyses
-
-## Make the geolocation and sex subsets
-
-The following analysis don't contain the northern hairy nose wombats because there is no variation in location and no sex assignment in the dataset.
-
-```{r, message = FALSE, warning = FALSE}
-## Making the classifiers list
-all_data <- list("SHNW" = SHNW, "CW" = CW)
-all_classifiers <- list("SHNW" = list("cranium" = SHNW_cranium_class,
-                                      "mandible" = SHNW_mandible_class),
-                          "CW" = list("cranium" = CW_cranium_class,
-                                      "mandible" = CW_mandible_class)
-                        )
-```
-
-Creating the geolocation subsets and the centroid size per geolocation subsets:
-
-```{r}
-## Results placeholder
-coords_geo_output <- c_size_geo_output <- coords_sex_output <- c_size_sex_output <- list()
-
-## Getting the coordinates for specimens with Geolocation
-for (i in 1:length(all_data)){
-    ## Result placeholder
-    list() ->
-        coords_geo_output[[i]] ->
-        c_size_geo_output[[i]] ->
-        coords_sex_output[[i]] ->
-        c_size_sex_output[[i]]
-
-    ## Getting the coordinates for each classifier
-    for (k in 1:length(all_classifiers[[i]])){
-        ## Geolocation coordinates
-        coords_geo_output[[i]][[k]] <- all_data[[i]][[k]]$procrustes$coords[, ,
-                                       as.character(all_classifiers[[i]][[k]]$Geolocation) == "Yes"]
-        ## Geolocation centroid size
-        c_size_geo_output[[i]][[k]] <- all_data[[i]][[k]]$procrustes$Csize[
-                                       as.character(all_classifiers[[i]][[k]]$Geolocation) == "Yes"]
-        ## Sex coordinates
-        coords_sex_output[[i]][[k]] <- all_data[[i]][[k]]$procrustes$coords[ , ,
-                                       !is.na(all_classifiers[[i]][[k]]$Sex)]
-        ## Sex centroid size
-        c_size_sex_output[[i]][[k]] <- all_data[[i]][[k]]$procrustes$Csize[
-                                       !is.na(all_classifiers[[i]][[k]]$Sex)]
-
-    }
-    ## Naming the element
-    names(all_data[[i]]) ->
-      names(coords_geo_output[[i]]) ->
-      names(c_size_geo_output[[i]]) ->
-      names(coords_sex_output[[i]]) ->
-      names(c_size_sex_output[[i]])
-}
-
-names(all_data) ->
-  names(coords_geo_output) ->
-  names(c_size_geo_output) ->
-  names(coords_sex_output) ->
-  names(c_size_sex_output)  
-```
-
-Creating the coordinates subsets and the centroid size subsets for geolocation and sex:
-
-```{r}
-## Results placeholder
-geo_gdfs <- list()
-sex_gdfs <- list()
-
-## Creating the geomorph dataframe for both species and datasets
-for (i in 1:length(coords_geo_output)){
-    ## Results placeholder
-    geo_gdfs[[i]] <- list()
-    sex_gdfs[[i]] <- list()
-    
-    for (k in 1:length(all_classifiers[[i]])){
-      ## Geolocation data frame object
-      geo_gdfs[[i]][[k]] <- geomorph.data.frame(
-        coords = coords_geo_output[[i]][[k]],
-        Csize = c_size_geo_output[[i]][[k]],
-        Temp = all_classifiers[[i]][[k]][all_classifiers[[i]][[k]]$Geolocation=="Yes",]$Temperature,
-        Aridity=all_classifiers[[i]][[k]][all_classifiers[[i]][[k]]$Geolocation=="Yes",]$Aridity
-        )
-
-      ## Sex data frame object
-      sex_gdfs[[i]][[k]] <- geomorph.data.frame(
-                          coords = coords_sex_output[[i]][[k]],
-                          Csize = c_size_sex_output[[i]][[k]],
-                          Sex= all_classifiers[[i]][[k]]$Sex[!is.na(all_classifiers[[i]][[k]]$Sex)]
-                          )
-  }
-  ## Naming the elements
-  names(geo_gdfs[[i]]) <- names(sex_gdfs[[i]]) <- names(all_data[[i]])
-}
-names(geo_gdfs) <- names(sex_gdfs) <- names(all_data) 
-
-## Making sure the dimension names are correct
-expect_equal(match(dimnames(geo_gdfs$SHNW$cranium$coords)[[3]],names(geo_gdfs$SHNW$cranium$Csize)),
-             seq(1:length(names(geo_gdfs$SHNW$cranium$Csize))))
-```
-
-
-## Running procD.lm analyses
-
-We can run the three following linear models for each species and each datasets:
-
- * coordinates ~ temperature
- * coordinates ~ sex + centroid size
- * centroid size ~ sex
-
-```{r, message = FALSE, warning = FALSE}
-## Results placeholder
-coord_temp_lm <- coord_sex_lm <- csize_sex_lm <- list()
-
-## Running all the linear models
-for (i in 1:length(geo_gdfs)){
-    ## Results placeholder
-    coord_temp_lm[[i]] <- coord_sex_lm[[i]] <- csize_sex_lm[[i]] <- list()
-        
-    for (k in 1:length(geo_gdfs[[2]])){
-        ## Running the coordinates ~ temperature models
-        coord_temp_lm[[i]][[k]] <- procD.lm(coords ~ Temp, print.progress = FALSE,
-                                            data = geo_gdfs[[i]][[k]], iter = 1000)
-        ## Running the coordinates ~ sex + centroid size models
-        coord_sex_lm[[i]][[k]] <- procD.lm(coords ~ Sex + Csize, print.progress = FALSE,
-                                           data = sex_gdfs[[i]][[k]], iter = 1000)
-        ## Running the centroid size ~ sex models
-        csize_sex_lm[[i]][[k]] <- procD.lm(Csize ~ Sex, print.progress = FALSE,
-                                           data = sex_gdfs[[i]][[k]], iter = 1000)
-    }
-    ## Renaming the models
-    names(geo_gdfs[[i]]) ->
-        names(coord_temp_lm[[i]]) ->
-        names(coord_sex_lm[[i]]) ->
-        names(csize_sex_lm[[i]])
-  }
-
-names(coord_temp_lm) <- names(coord_sex_lm) <- names(csize_sex_lm) <- names(geo_gdfs)
-```
-
-
-And we can display them as follows:
-
-```{r, echo = FALSE}
-## coordinates ~ temperature
-kable(coord_temp_lm[[1]][[1]]$aov.table, digits = 3,
-    caption = "Procrustes linear model for coordinates as a function of temperature for the southern hairy nose wombat's cranium.")
-kable(coord_temp_lm[[1]][[2]]$aov.table, digits = 3,
-    caption = "Procrustes linear model for coordinates as a function of temperature for the southern hairy nose wombat's mandible.")
-kable(coord_temp_lm[[2]][[1]]$aov.table, digits = 3,
-    caption = "Procrustes linear model for coordinates as a function of temperature for the common wombat's cranium.")
-kable(coord_temp_lm[[2]][[2]]$aov.table, digits = 3,
-    caption = "Procrustes linear model for coordinates as a function of temperature for the common wombat's mandible.")
-
-## coordinates ~ sex + centroid size
-kable(coord_sex_lm[[1]][[1]]$aov.table, digits = 3,
-    caption = "Procrustes linear model for coordinates as a function of sex and centroid size for the southern hairy nose wombat's cranium.")
-kable(coord_sex_lm[[1]][[2]]$aov.table, digits = 3,
-    caption = "Procrustes linear model for coordinates as a function of sex and centroid size for the southern hairy nose wombat's mandible.")
-kable(coord_sex_lm[[2]][[1]]$aov.table, digits = 3,
-    caption = "Procrustes linear model for coordinates as a function of sex and centroid size for the common wombat's cranium.")
-kable(coord_sex_lm[[2]][[2]]$aov.table, digits = 3,
-    caption = "Procrustes linear model for coordinates as a function of sex and centroid size for the common wombat's mandible.")
-
-## centroid size ~ sex 
-kable(coord_sex_lm[[1]][[1]]$aov.table, digits = 3,
-    caption = "Procrustes linear model for centroid size as a function of sex for the southern hairy nose wombat's cranium.")
-kable(coord_sex_lm[[1]][[2]]$aov.table, digits = 3,
-    caption = "Procrustes linear model for centroid size as a function of sex for the southern hairy nose wombat's mandible.")
-kable(coord_sex_lm[[2]][[1]]$aov.table, digits = 3,
-    caption = "Procrustes linear model for centroid size as a function of sex for the common wombat's cranium.")
-kable(coord_sex_lm[[2]][[2]]$aov.table, digits = 3,
-    caption = "Procrustes linear model for centroid size as a function of sex for the common wombat's mandible.")
-```
-
-# Shape disparity comparison
-
-Here we look at the disparity measured as the relative sum of the diagonal of the covariance of the ordination scores (Procrustes variance), and we measure the difference between groups using permutation tests.
-
-
-```{r, message = FALSE, warning = FALSE}
-## Create gdfs with species for the data frames
-cranium_gdf  <- geomorph.data.frame(coords = AllWombats$cranium$procrustes$coords,
-                                    Csize = AllWombats$cranium$procrustes$Csize,
-                                    species = as.factor(cranium$Species))
-mandible_gdf <- geomorph.data.frame(coords = AllWombats$mandible$procrustes$coords,
-                                    Csize = AllWombats$mandible$procrustes$Csize,
-                                    species = as.factor(mandible$Species))
-
-## Running the analyses on the gdf objects (Disparity within groups compared to that group's mean)
-cranium_disparity <- morphol.disparity(coords ~ species, groups = ~species, iter = 1000, seed = 42,
-                                       data = cranium_gdf, print.progress = FALSE)
-
-## Disparity within groups compared to that group's mean
-mandible_disparity <- morphol.disparity(coords ~ species, groups = ~species, iter = 1000, seed = 42,
-                                        data = mandible_gdf, print.progress = FALSE)
-```
-
-And we can display the results as follows:
-
-```{r, echo = FALSE}
-## Cranium disparity values
-kable(data.frame("Procrustes variance" = cranium_disparity[[1]]), digits = 5, caption = "Cranium disparity (procrustes variance) per groups.")
-## Cranium disparity differences
-kable(cranium_disparity[[2]], digits = 5, caption = "Cranium pairwise absolute differences between variances between groups.")
-## Cranium disparity differences p
-kable(cranium_disparity[[3]], digits = 5, caption = "Cranium pairwise absolute differences between variances between groups (p-values).")
-
-## Mandible disparity values
-kable(data.frame("Procrustes variance" = mandible_disparity[[1]]), digits = 5, caption = "Mandible disparity (procrustes variance) per groups.")
-## Mandible disparity differences
-kable(mandible_disparity[[2]], digits = 5, caption = "Mandible pairwise absolute differences between variances between groups.")
-## Mandible disparity differences p
-kable(mandible_disparity[[3]], digits = 5, caption = "Mandible pairwise absolute differences between variances between groups (p-values).")
 ```
 
 
@@ -547,7 +277,7 @@ load("../Data/Results/CWTBLS.Rda")
 load("../Data/Results/NHNWTBLS.Rda")
 ```
 
-## Subseting data to run correlations of PLS score with csize and allometry
+## Subsetting data to run correlations of PLS score with csize and allometry
 
 ```{r, message = FALSE, warning = FALSE}
 ## Getting the list of 2BPLS results
@@ -617,7 +347,7 @@ SHNWPC1 <- as.data.frame(SHNW$mandible$ordination$x[,1])
 SHNWCsize <- as.data.frame(SHNW$mandible$procrustes$Csize)
 ```
 
-# Run the linear models
+# Run the linear models of PLS scores with PC1 scores and centroid size
 
 ```{r, message = FALSE, warning = FALSE}
 ## Placeholder lists
