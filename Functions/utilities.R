@@ -531,7 +531,7 @@ summarise.results <- function(CI, rarefaction, print.token = FALSE, rounding = 4
         if(!missing(partitions)) {
             rownames(results_table) <- c("test", partitions)
         } else {
-            rownames(results_table) <- c("test", paste("Cranium", c(1,2,3)), paste("Mandible", c(1,2,3)))
+            rownames(results_table) <- c("test", c(paste("Cranium", c(1,2,3)), paste("Mandible", c(1,2,3)))[partitions.order])
         }
 
         ## Transpose the table
