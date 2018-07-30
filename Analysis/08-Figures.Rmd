@@ -14,16 +14,21 @@ output:
 ```{r, message = FALSE, warning = FALSE}
 ## Loading the libraries (and installing if necessary)
 
+if(!require(devtools)) install.packages("devtools")
 if(!require(geomorph)) install.packages("geomorph")
-source("../Functions/utilities.R")
+if(!require(landmarktest)) install_github("TGuillerme/landmark-test")
+
 library(ggplot2)
+
 # Install and load ggConvexHull
-library(devtools)
 devtools::install_github("cmartin/ggConvexHull")
+
 library(ggConvexHull)
+
 source("../Functions/utilities.R")
 set.seed(42)
-library(landmarktest)
+
+
 
 # load the data
 #for hairy-nosed wombats (needed below for PCA)
@@ -269,6 +274,7 @@ PCA.vectors(land_data$cranium, minfirst=TRUE)
 gdf=geomorph.data.frame(coords=land_data$cranium$procrustes$coords, Csize=land_data$cranium$procrustes$Csize)
 AllomCranium=procD.allometry(coords~Csize, data=gdf, method="RegScore")
 
+
 gdf=geomorph.data.frame(coords=land_data$mandible$procrustes$coords, Csize=land_data$mandible$procrustes$Csize)
 AllomMandible=procD.allometry(coords~Csize, data=gdf, method="RegScore")
 
@@ -280,17 +286,10 @@ gg.color.hue <- function(n) {
     hcl(h = hues, l = 65, c = 100)[1:n]
   }
 
-
 pdf("../Manuscript/Figures/Allom_Suppfigure.pdf", height=6, width=12)
-par(mfrow = c(1,2), cex=2)
-
-gg.color.hue(length(levels(cranium$Species)))[cranium$Species]
-
-plot(AllomCranium, method="RegScore", 
-pt.col=gg.color.hue(length(levels(cranium$Species)))[cranium$Species])
-
-plot(AllomMandible, method="RegScore",
-pt.col=gg.color.hue(length(levels(mandible$Species)))[mandible$Species])
+par(mfrow = c(1,2)) 
+plot(AllomCranium$Reg.proj~AllomCranium$size,bg=gg.color.hue(length(levels(cranium$Species)))[cranium$Species], pch=21, cex=1.5, xlab="Cranium Centroid size", ylab="Regression score")
+plot(AllomMandible$Reg.proj~AllomMandible$size,bg=gg.color.hue(length(levels(mandible$Species)))[mandible$Species], pch=21, cex=1.5, xlab="Mandible Centroid size", ylab="Regression score")
 
 dev.off()
 
