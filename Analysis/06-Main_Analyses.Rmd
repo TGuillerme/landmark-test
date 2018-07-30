@@ -339,12 +339,7 @@ for (i in 1:length(all_data)){
 }
 
 
-## A manual visual check if the above merger is accurate; print the below and the merged_pls
-SHNWTBPLS_mandible_Scores <- as.data.frame(SHNWTBPLS$YScores[c(1:19)],
-                                           row.names = dimnames(SHNWTBPLS$YScores)[[1]])
 
-SHNWPC1 <- as.data.frame(SHNW$mandible$ordination$x[,1])
-SHNWCsize <- as.data.frame(SHNW$mandible$procrustes$Csize)
 ```
 
 # Run the linear models of PLS scores with PC1 scores and centroid size
@@ -376,6 +371,20 @@ for (i in 1:length(merged_pls)){
     names(pca_pls_lm[[i]]) <- names(merged_pls[[1]])
     names(pca_pls_lm[[i]][[k]]) <- c("pls_pca", "PLS_Csize")
 }
+
+## SHNW cranial PLS scores are the only ones with no significant correlation of PLS and PC1 scores. Therefore testing this correlation with PC2 as well
+#Turn cranial PLS scores and PC scores into a data frame for merging
+SHNW_cranial_scores <- as.data.frame(SHNWTBPLS$XScores[c(1:19)],
+                                           row.names = dimnames(SHNWTBPLS$XScores)[[1]])
+SHNWPC2 <- as.data.frame(SHNW$cranium$ordination$x[,2])
+
+#Merge data frames
+SHNW_PLS_PC2<-merge(SHNW_cranial_scores,SHNWPC2,by="row.names", all.x=TRUE )
+colnames(SHNW_PLS_PC2)=c("Species","PLS_Scores", "PC2")
+
+#run analysis
+summary(lm(SHNW_PLS_PC2$PLS_Scores~ SHNW_PLS_PC2$PC2))
+
 ```
 
 
