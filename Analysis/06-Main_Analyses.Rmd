@@ -222,6 +222,26 @@ kable(allom_output[[3]][[2]]$aov.table, digits = 3,
               caption = "Procrustes ANOVA for size (allometry) for the common wombat's mandible.")
 ```
 
+#Allometry between species
+
+```{r}
+#Cranium
+
+##turn into gdf frame 
+gdf=geomorph.data.frame(coords=AllWombats$cranium$procrustes$coords, Csize=AllWombats$cranium$procrustes$Csize)
+
+##run analysis
+AllomCranium=procD.allometry(coords~Csize, data=gdf, method="RegScore")
+
+#Mandible
+
+##turn into gdf frame 
+gdf=geomorph.data.frame(coords=AllWombats$mandible$procrustes$coords, Csize=AllWombats$mandible$procrustes$Csize)
+
+##run analysis
+AllomMandible=procD.allometry(coords~Csize, data=gdf, method="RegScore")
+```
+
 
 # 2-Block Partial Least Squares analysis (2BPLS)
 
