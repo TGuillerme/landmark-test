@@ -372,7 +372,11 @@ for (i in 1:length(merged_pls)){
     names(pca_pls_lm[[i]][[k]]) <- c("pls_pca", "PLS_Csize")
 }
 
+```
+
 ## SHNW cranial PLS scores are the only ones with no significant correlation of PLS and PC1 scores. Therefore testing this correlation with PC2 as well
+
+```{r}
 #Turn cranial PLS scores and PC scores into a data frame for merging
 SHNW_cranial_scores <- as.data.frame(SHNWTBPLS$XScores[c(1:19)],
                                            row.names = dimnames(SHNWTBPLS$XScores)[[1]])
