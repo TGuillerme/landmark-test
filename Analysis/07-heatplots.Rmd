@@ -140,7 +140,7 @@ heatplot.PCs(NHNW$cranium, minfirst=TRUE,1)
 
 
 heatplot.PCs(AllWombats$mandible, minfirst=FALSE, 1)
-heatplot.PCs(HN$mandible, minfirst=TRUE )
+heatplot.PCs(HN$mandible, minfirst=TRUE, 1 )
 heatplot.PCs(CW$mandible, minfirst=FALSE,1)
 heatplot.PCs(SHNW$mandible, minfirst=TRUE,1)
 heatplot.PCs(NHNW$mandible, minfirst=TRUE, 1)
