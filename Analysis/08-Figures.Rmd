@@ -14,9 +14,10 @@ output:
 ```{r, message = FALSE, warning = FALSE}
 ## Loading the libraries (and installing if necessary)
 
-if(!require(devtools)) install.packages("devtools")
-if(!require(geomorph)) install.packages("geomorph")
+if(!require(devtools)) install.packages("devtools"); library (devtools)
+if(!require(geomorph)) install.packages("geomorph"); library (geomorph)
 if(!require(landmarktest)) install_github("TGuillerme/landmark-test")
+if (!require(stringr)) install.packages("stringr"); library (stringr)
 
 library(ggplot2)
 
@@ -83,7 +84,7 @@ dev.off()
 ```{r}
 
 
-  ## Create vectors of patch points, semi-landmarks, and landmarks
+  ## Create vectors of patch points, semi-landmarks, and landmarks; this requires raw data because they contain the landmark designations.
   # LM point name metadata
   
 #change "cranium" designations to "mandible" designations as needed
@@ -95,12 +96,6 @@ foo2 <- str_sub(pt_names, 3, -1) # gets rid of X, Y, Z designations
 u_pt_names <- unique(foo2)
 
 patches <- str_detect(u_pt_names, "patch") # 
-
-#~~~~~~~
-#
-# TG: object 'pat_num' not found
-#
-#~~~~~~~
 
 pat_num <- which(patches == TRUE)
 
@@ -135,11 +130,6 @@ landmark_LM_types[i,2]<-1
 
 write.csv(landmark_LM_types, "../Data/Raw/landmarktypes_mandible_wombat.csv")
 
-#~~~~~~~
-#
-# TG: why is this bit writing in the raw landmark bit?
-#
-#~~~~~~~
 
 ``` 
 
