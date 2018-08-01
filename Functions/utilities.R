@@ -597,8 +597,9 @@ xtable.results <- function(results, partitions.names, test.names, path, file.nam
 #@param ylabs: the labels for the y axis ("all_data", "Vombatus", etc). If missing the ones from data are used.
 #@param xlabs: the labels for the x axis ("cranium1", etc). If missing the ones from data are used.
 #@param digits: the digits to display
+#@param left.pad: the space on the left for the text on the left
 
-plot.test.results <- function(data, rarefaction, p.value = 0.001, no.rar, ignore.non.signif = TRUE, partitions = c(expression(bold("Cranium")), expression(bold("Mandible"))), cols = c("grey", "magenta", "green"), ylabs, xlabs, digits) {
+plot.test.results <- function(data, rarefaction, p.value = 0.001, no.rar, ignore.non.signif = TRUE, partitions = c(expression(bold("Cranium")), expression(bold("Mandible"))), cols = c("grey", "magenta", "green"), ylabs, xlabs, digits, left.pad = 4) {
 
     ## Making the x and y labels (if needed)
     if(missing(ylabs)) {
@@ -624,7 +625,7 @@ plot.test.results <- function(data, rarefaction, p.value = 0.001, no.rar, ignore
     image_matrix <- matrix(unlist(lapply(blocks, lapply, level.selector, threshold = p.value)), ncol = ncol(data[, -1]), byrow = FALSE)
 
     ## Plot the main image
-    par(mar = c(2, max(nchar(ylabs))/2, 4, 2)) #c(bottom, left, top, right)
+    par(mar = c(2, max(nchar(ylabs))/2, 4, 2), mar = c(5, left.pad, 4, 2)) #c(bottom, left, top, right)
     #image(t(image_matrix[nrow(image_matrix):1,]), col = cols, xaxt = "n", yaxt = "n", ...)
     image(t(image_matrix[nrow(image_matrix):1,]), col = cols, xaxt = "n", yaxt = "n")
 

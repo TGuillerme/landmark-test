@@ -105,23 +105,23 @@ And the finalised fable:
 
 ```{r, width = 7.2, height = 4.5}
 ## Get the y/x labels
-xlabs <- c("Zygomatic Arch", "Tip of snout", "Remainder", "Masticatory\ninsertions", "Symphyseal\narea", "Remainder")
-ylabs <- c(expression(italic("Lasiorhinus vs. Vombatus")),
-            expression(italic("L. krefftii vs. L. latifrons")),
-            expression(paste(italic("Lasiorhinus krefftii"), "(100%)")),
-            expression(paste(italic("Lasiorhinus krefftii"), "(95%)")),
-            expression(paste(italic("Lasiorhinus latifrons"), "(100%)")),
-            expression(paste(italic("Lasiorhinus latifrons"), "(95%)")),
-            expression(paste(italic("Vombatus ursinus"), "(100%)")),
-            expression(paste(italic("Vombatus ursinus"), "(95%)")))
+xlabs <- c("Zygomatic Arch", "Tip of snout", "Remainder", "Masticatory\nmuscle insertions", "Symphyseal\narea", "Remainder")
+ylabs <- c(expression(paste(italic("Lasiorhinus vs. Vombatus"), " GPA means")),
+            expression(paste("Between ", italic("Lasiorhinus"), " GPA means")),
+            expression(paste("Within ", italic("Lasiorhinus krefftii"), "(100% GPA)")),
+            expression(paste("Within ", italic("Lasiorhinus krefftii"), "(95% GPA)")),
+            expression(paste("Within ", italic("Lasiorhinus latifrons"), "(100% GPA)")),
+            expression(paste("Within ", italic("Lasiorhinus latifrons"), "(95% GPA)")),
+            expression(paste("Within ", italic("Vombatus ursinus"), "(100% GPA)")),
+            expression(paste("Within ", italic("Vombatus ursinus"), "(95% GPA)")))
 
 plot.test.results(complete_results_obs, complete_results_rar, p.value = 0.001,
-                  no.rar = c(2,5), xlabs = xlabs, ylabs = ylabs, digits = 3)
+                  no.rar = c(2,5), xlabs = xlabs, ylabs = ylabs, digits = 3, left.pad = 16)
 ```
 
 ```{r, echo = FALSE}
-pdf(file = "../Manuscript/Figures/landmark_test_results_full.pdf", width = 12.2, height = 4.5)
-plot.test.results(complete_results_obs, complete_results_rar, p.value = 0.001, no.rar = c(2,5), xlabs = xlabs, ylabs = ylabs, digits = 3)
+pdf(file = "../Manuscript/Figures/landmark_test_results_full.pdf", width = 12, height = 4.5)
+plot.test.results(complete_results_obs, complete_results_rar, p.value = 0.001, no.rar = c(2,5), xlabs = xlabs, ylabs = ylabs, digits = 3, left.pad = 16)
 dev.off()
 ```
 
