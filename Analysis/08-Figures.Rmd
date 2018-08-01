@@ -41,8 +41,8 @@ load("../Data/Processed/wombat.Rda")
 rawdata_cranium_wombat <- read.csv ("../Data/Raw/landmarkdata_cranium_wombat.csv")
 rawdata_mandible_wombat <- read.csv ("../Data/Raw/landmarkdata_mandible_wombat.csv")
 ## Remove juvenile
-nhnw_b34 <- which(rownames(rawdata_mandible_wombat) == "NHNW_B34")
-rawdata_mandible_wombat <- rawdata_mandible_wombat[-nhnw_b34, ]
+nhnw_b34 <- which(colnames(rawdata_mandible_wombat) == "NHNW_B34")
+rawdata_mandible_wombat <- rawdata_mandible_wombat[,-nhnw_b34]
 
 
 
@@ -109,9 +109,9 @@ LM_num <- which(LM == TRUE)
 #Assign each landmark the appropriate number; Fixed is 1, semis are 2, patches are 3
 
 #using landmarkgroups as a file to fill in 
-landmarkgroups=read.csv("../Data/Raw/landmarkgroups_mandible_wombat.csv")
+landmarkgroups_for_type=read.csv("../Data/Raw/landmarkgroups_mandible_wombat.csv")
 
-landmark_LM_types<-landmarkgroups
+landmark_LM_types<-landmarkgroups_for_type
 for (i in 1:length(landmark_LM_types[,1])){
 if(landmark_LM_types[i,1] %in% pat_num ==TRUE)
 landmark_LM_types[i,2]<-3
@@ -231,23 +231,23 @@ lm_types_mandible=read.csv("../Data/Raw/landmarktypes_mandible_wombat.csv")
 
 #change from here between cranium and cranium as needed
 
-PartLevels= unique(lm_types_cranium$x)
+PartLevels= unique(lm_types_mandible$x)
 Colours <- c("blue", "orange", "green")
 
 Part=list()
 ###Subsetting the partition levels
 for(i in 1:length(PartLevels)){
-  Part[[i]]<-which (lm_types_cranium[,3] == PartLevels[[i]])
+  Part[[i]]<-which (lm_types_mandible[,3] == PartLevels[[i]])
 } 
 
 ###plotting the spheres- if you get only white, increase the radius       
 open3d()
 for (i in 1:length(PartLevels)){
-  spheres3d(mshape_cranium[Part[[i]],1], mshape_cranium[Part[[i]],2], mshape_cranium[Part[[i]],3], col=Colours[i], lit=TRUE,radius = 0.001, asp=F)
+  spheres3d(mshape_mandible[Part[[i]],1], mshape_mandible[Part[[i]],2], mshape_mandible[Part[[i]],3], col=Colours[i], lit=TRUE,radius = 0.001, asp=F)
   
 }
 
-shade3d(wombat_cranium_meanwarp)
+shade3d(wombat_mandible_meanwarp)
 
 ```
 
