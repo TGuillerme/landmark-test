@@ -120,7 +120,7 @@ plot.test.results(complete_results_obs, complete_results_rar, p.value = 0.001,
 ```
 
 ```{r, echo = FALSE}
-pdf(file = "../Manuscript/Figures/landmark_test_results_full.pdf", width = 12, height = 4.5)
+pdf(file = "../Manuscript/Figures/landmark_test_results_full.pdf", width = 11.5, height = 4.5)
 plot.test.results(complete_results_obs, complete_results_rar, p.value = 0.001, no.rar = c(2,5), xlabs = xlabs, ylabs = ylabs, digits = 3, left.pad = 16)
 dev.off()
 ```
