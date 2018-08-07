@@ -59,7 +59,7 @@ mandible <- mandible[-nhnw_b34, ]
 ```
 
 
-# PCA plot for Figure 1
+# PCA plot for Figure 1 and supplementary Figure 4
 
 ```{r, message = FALSE, warning = FALSE}
 
@@ -67,12 +67,28 @@ mandible <- mandible[-nhnw_b34, ]
 load("../Data/Processed/wombat.Rda")
 classifier_cranium <- cranium
 classifier_mandible <- mandible
-## PCA plots
+
+## PCA plots - Fig. 1
 pdf("../Manuscript/Figures/PCA_figure1.pdf", height = 6, width = 12)
 par(mfrow = c(1,2))
 plot.pca(land_data$cranium$ordination, classifier_cranium$Species)
 plot.pca(land_data$mandible$ordination, classifier_mandible$Species)
 dev.off()
+
+## PCA plots - Supplementary Fig. 4
+
+## Loading the data for the PCA plots
+load("../Data/Processed/wombat_latifrons.Rda")
+classifier_cranium_Lasio= subset(classifier_cranium, classifier_cranium$Species != "Common wombat" )
+classifier_mandible_Lasio= subset(classifier_mandible, classifier_mandible$Species != "Common wombat" )
+
+
+pdf("../Manuscript/Figures/PCA_figure4.pdf", height = 6, width = 12)
+par(mfrow = c(1,2))
+plot.pca(HN$cranium$ordination, classifier_cranium_Lasio$Species)
+plot.pca(HN$mandible$ordination, classifier_mandible_Lasio$Species)
+dev.off()
+
 
 ```
 
@@ -249,14 +265,6 @@ for (i in 1:length(PartLevels)){
 
 shade3d(wombat_mandible_meanwarp)
 
-```
-
-# Visualizing shape changes between Principal component extremes
-
-```{r, message = FALSE, warning = FALSE}
-
-
-PCA.vectors(land_data$cranium, minfirst=TRUE)
 ```
 
 #Supplementary Figure 3 - multivariate allometry
