@@ -14,7 +14,6 @@ output:
 if(!require(knitr)) install.packages("knitr"); library(knitr)
 if(!require(xtable)) install.packages("xtable"); library(xtable)
 if(!require(geomorph)) install.packages("geomorph"); library(geomorph)
-if(!require(testthat)) install.packages("testthat");library(testthat)
 if(!require(dispRity)) install.packages("dispRity");library(dispRity)
 source("../Functions/utilities.R")
 set.seed(42)
@@ -35,44 +34,10 @@ mandible <- read.csv("../Data/Raw/classifier_mandible_wombat.csv")
 ## Remove juvenile from mandibles
 nhnw_b34 <- which(mandible[,1] == "NHNW_B34")
 mandible <- mandible[-nhnw_b34, ]
-
-
-## Make sure the classifier names match landmark file names
-expect_true(all(dimnames(AllWombats$cranium$procrustes$coords)[[3]] == cranium$ID))
-expect_true(all(dimnames(AllWombats$mandible$procrustes$coords)[[3]] == mandible$ID))
 ```
 
 # Preparing the data
 
-## Partition classifiers according to species
-
-<!-- Full_classifier_Table_ is the tables of mandibular or cranial classifiers (e.g. read.csv("../Data/Raw/classifier_cranium_wombat.csv")); spp is a vector of species (e.g. c("CW", "SHNW", "NHNW")) -->
-
-```{r, message = FALSE, warning = FALSE}
-## Creating the vectors holding the species names
-species <- c("CW", "SHNW", "NHNW")
-sp_holders <-c("Common wombat", "SHN wombat", "NHN wombat")
-
-## Assigning the right class to each species (for the cranium)
-for (i in 1:length(unique(cranium$Species))) {
-    ## Extracting the class for each species   
-    class <- cranium[cranium$Species == sp_holders[i],]
-    ## Preparing the sp name for giving names to outputs
-    sp_name <- paste(species[i], deparse(substitute(cranium)), "class", sep = "_")
-    ## Assigning the class to the names
-    assign(sp_name, class)
-}
-
-## Assigning the right class to each species (for the mandible)
-for (i in 1:length(unique(mandible$Species))) {  
-    ## Extracting the class for each species   
-    class <- mandible[mandible$Species == sp_holders[i],]
-    ## Preparing the sp name for giving names to outputs
-    sp_name <- paste(species[i], deparse(substitute(mandible)), "class", sep = "_")
-    ## Assigning the class to the names
-    assign(sp_name, class)
-}
-```
 
 ## Checking for shape outliers
 
@@ -245,6 +210,35 @@ AllomMandible=procD.allometry(coords~Csize, data=gdf, method="RegScore")
 
 # 2-Block Partial Least Squares analysis (2BPLS)
 
+## Partition classifiers according to species
+
+<!-- Full_classifier_Table_ is the tables of mandibular or cranial classifiers (e.g. read.csv("../Data/Raw/classifier_cranium_wombat.csv")); spp is a vector of species (e.g. c("CW", "SHNW", "NHNW")) -->
+
+```{r, message = FALSE, warning = FALSE}
+## Creating the vectors holding the species names
+species <- c("CW", "SHNW", "NHNW")
+sp_holders <-c("Common wombat", "SHN wombat", "NHN wombat")
+
+## Assigning the right class to each species (for the cranium)
+for (i in 1:length(unique(cranium$Species))) {
+    ## Extracting the class for each species   
+    class <- cranium[cranium$Species == sp_holders[i],]
+    ## Preparing the sp name for giving names to outputs
+    sp_name <- paste(species[i], deparse(substitute(cranium)), "class", sep = "_")
+    ## Assigning the class to the names
+    assign(sp_name, class)
+}
+
+## Assigning the right class to each species (for the mandible)
+for (i in 1:length(unique(mandible$Species))) {  
+    ## Extracting the class for each species   
+    class <- mandible[mandible$Species == sp_holders[i],]
+    ## Preparing the sp name for giving names to outputs
+    sp_name <- paste(species[i], deparse(substitute(mandible)), "class", sep = "_")
+    ## Assigning the class to the names
+    assign(sp_name, class)
+}
+```
 
 ## Reduce coordinate datasets to only those that have mandibles and crania
 
