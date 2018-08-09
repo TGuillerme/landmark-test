@@ -248,9 +248,14 @@ lm_types_mandible=read.csv("../Data/Raw/landmarktypes_mandible_wombat.csv")
 #change from here between cranium and cranium as needed
 
 PartLevels= unique(lm_types_mandible$x)
-Colours <- c("blue", "orange", "green")
+
+#separate colour vectors are needed because the code assigns the first landmark type it encounters withe the first colour in the vector. 
+
+col_cranium <- c("blue", "orange", "green")
+col_mandible <- c("orange","blue", "green")
 
 Part=list()
+
 ###Subsetting the partition levels
 for(i in 1:length(PartLevels)){
   Part[[i]]<-which (lm_types_mandible[,3] == PartLevels[[i]])
@@ -259,11 +264,11 @@ for(i in 1:length(PartLevels)){
 ###plotting the spheres- if you get only white, increase the radius       
 open3d()
 for (i in 1:length(PartLevels)){
-  spheres3d(mshape_mandible[Part[[i]],1], mshape_mandible[Part[[i]],2], mshape_mandible[Part[[i]],3], col=Colours[i], lit=TRUE,radius = 0.001, asp=F)
+  spheres3d(mshape_mandible[Part[[i]],1], mshape_mandible[Part[[i]],2], mshape_mandible[Part[[i]],3], col=col_mandible[i], lit=TRUE,radius = 0.001, asp=F)
   
 }
 
-shade3d(wombat_mandible_meanwarp)
+shade3d(wombat_mandible_meanwarp, color="grey")
 
 ```
 
