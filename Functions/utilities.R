@@ -764,3 +764,43 @@ plot.pca <- function(ordination, classifier, axis = c(1, 2), ...) {
   points(data, pch = 21,
          bg = gg.color.hue(length(levels(classifier)))[classifier])
 }
+
+
+
+#Heatplot code for hypothetical PC shapes; requires landmarktest to be loaded
+#@params Species_dataset is the dataset in question (e.g.CW$cranium); 
+#@params min_or_max_first ("min", "max")is if you want min referenced to max or vice versa. this is handy if one common lm displacement pattern happens to be associated with opposite signed PC scores.
+
+heatplot.PCs<-function (species_dataset,minfirst, PC_axis,...){
+  
+  ## Procrustes variation ranges for PCA; axis determines which ordination axis to use
+  variation <- variation.range(species_dataset$procrustes, return.ID = TRUE, axis=PC_axis, ordination=species_dataset$ordination)
+  
+  # identifies specimens at opposite ends of the PC spectrum
+  specimens_min_max <- variation$min.max
+  
+  #determines range of variation between PC extremes
+  procrustes_var <- variation$range[,1]
+  
+  #runs PCA for min/max plotting
+  PCA=plotTangentSpace(species_dataset$procrustes$coords, verbose=FALSE)
+  
+  gridPar = gridPar(pt.bg = "white", pt.size = 0.5)
+  
+  #converting pc shape ID of PCA into column numbers so the PC number can be chosen (e.g. PC6min is PCA$pc.shapes[[11]])
+  
+  pc_IDs <- c(PC_axis*2-1, PC_axis*2)
+  
+  if(minfirst==TRUE){
+    open3d()
+    plotRefToTarget.heat(PCA$pc.shapes[[pc_IDs[1]]],
+                         PCA$pc.shapes[[pc_IDs[2]]],
+                         col = heat.colors, pt.size = 0.7, col.val = procrustes_var,
+                         plotRefToTarget.args = list(mag = 1),...)}
+  else {
+    open3d()
+    plotRefToTarget.heat(PCA$pc.shapes[[pc_IDs[2]]],
+                         PCA$pc.shapes[[pc_IDs[1]]],
+                         col = heat.colors, pt.size = 0.7, col.val = procrustes_var,
+                         plotRefToTarget.args = list(mag = 1), ...)}
+}
