@@ -16,10 +16,10 @@ Some fancy plots for the maximum landmark variation.
 
 ```{r, message = FALSE, warning = FALSE}
 ## Loading the libraries (and installing if necessary)
-if(!require(devtools)) install.packages("devtools")
-if(!require(geomorph)) install.packages("geomorph")
-if(!require(dispRity)) install.packages("dispRity")
-if(!require(landmarktest)) install_github("TGuillerme/landmark-test")
+if(!require(devtools)) install.packages("devtools"); library(devtools)
+if(!require(geomorph)) install.packages("geomorph"); library(geomorph)
+if(!require(dispRity)) install.packages("dispRity"); library(dispRity)
+if(!require(landmarktest)) install_github("TGuillerme/landmark-test"); library(landmarktest)
 set.seed(42)
 ```
 
@@ -133,9 +133,9 @@ PCA=plotTangentSpace(species_dataset$procrustes$coords, verbose=FALSE)
 
 
 heatplot.PCs(AllWombats$cranium, minfirst=FALSE, 1 )
-heatplot.PCs(HN$cranium, minfirst=TRUE  )
-heatplot.PCs(CW$cranium, minfirst=TRUE)
-heatplot.PCs(SHNW$cranium, minfirst=TRUE)
+heatplot.PCs(HN$cranium, minfirst=TRUE ,1 )
+heatplot.PCs(CW$cranium, minfirst=TRUE,1)
+heatplot.PCs(SHNW$cranium, minfirst=TRUE,1)
 heatplot.PCs(NHNW$cranium, minfirst=TRUE,1)
 
 
