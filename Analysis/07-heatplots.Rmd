@@ -19,7 +19,7 @@ Some fancy plots for the maximum landmark variation.
 if(!require(devtools)) install.packages("devtools"); library(devtools)
 if(!require(geomorph)) install.packages("geomorph"); library(geomorph)
 if(!require(dispRity)) install.packages("dispRity"); library(dispRity)
-if(!require(landmarktest)) install_github("TGuillerme/landmark-test"); library(landmarktest)
+if(!require(landvR)) install_github("TGuillerme/landvR") ; library(landvR)
 set.seed(42)
 ```
 
@@ -57,10 +57,9 @@ procrustes_var <- variation$range[,1]
 ```{r, eval = FALSE}
 gridPar = gridPar(pt.bg = "white", pt.size = 0.5)
 open3d()
-plotRefToTarget.heat(cranium$procruste$coords[, , specimens_min_max[2]],
+procrustes.var.plot(cranium$procruste$coords[, , specimens_min_max[2]],
                      cranium$procruste$coords[, , specimens_min_max[1]],
-                     col = heat.colors, pt.size = 0.3, col.val = procrustes_var,
-                     plotRefToTarget.args = list(mag = 1))
+                     col = heat.colors, pt.size = 0.3, col.val = procrustes_var)
 ```
 
 

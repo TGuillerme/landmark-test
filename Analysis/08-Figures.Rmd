@@ -14,10 +14,10 @@ output:
 ```{r, message = FALSE, warning = FALSE}
 ## Loading the libraries (and installing if necessary)
 
-if(!require(devtools)) install.packages("devtools"); library (devtools)
-if(!require(geomorph)) install.packages("geomorph"); library (geomorph)
-if(!require(landmarktest)) install_github("TGuillerme/landmark-test")
-if (!require(stringr)) install.packages("stringr"); library (stringr)
+if(!require(devtools)) install.packages("devtools"); library(devtools)
+if(!require(geomorph)) install.packages("geomorph"); library(geomorph)
+if(!require(landvR)) install_github("TGuillerme/landvR") ; library(landvR)
+if(!require(stringr)) install.packages("stringr"); library(stringr)
 
 library(ggplot2)
 

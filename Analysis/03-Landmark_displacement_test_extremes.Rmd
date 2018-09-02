@@ -16,7 +16,7 @@ if(!require(knitr)) install.packages("knitr")
 if(!require(xtable)) install.packages("knitr")
 if(!require(geomorph)) install.packages("geomorph")
 if(!require(dispRity)) install_github("TGuillerme/dispRity")
-if(!require(landmarktest)) install_github("TGuillerme/landmark-test")
+if(!require(landvR)) install_github("TGuillerme/landvR")
 source("../Functions/utilities.R")
 set.seed(42)
 ```

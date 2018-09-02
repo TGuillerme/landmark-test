@@ -793,14 +793,12 @@ heatplot.PCs<-function (species_dataset,minfirst, PC_axis,...){
   
   if(minfirst==TRUE){
     open3d()
-    plotRefToTarget.heat(PCA$pc.shapes[[pc_IDs[1]]],
+    procrustes.var.plot(PCA$pc.shapes[[pc_IDs[1]]],
                          PCA$pc.shapes[[pc_IDs[2]]],
-                         col = heat.colors, pt.size = 0.7, col.val = procrustes_var,
-                         plotRefToTarget.args = list(mag = 1),...)}
+                         col = heat.colors, pt.size = 0.7, col.val = procrustes_var,...)}
   else {
     open3d()
-    plotRefToTarget.heat(PCA$pc.shapes[[pc_IDs[2]]],
+    procrustes.var.plot(PCA$pc.shapes[[pc_IDs[2]]],
                          PCA$pc.shapes[[pc_IDs[1]]],
-                         col = heat.colors, pt.size = 0.7, col.val = procrustes_var,
-                         plotRefToTarget.args = list(mag = 1), ...)}
+                         col = heat.colors, pt.size = 0.7, col.val = procrustes_var, ...)}
 }
