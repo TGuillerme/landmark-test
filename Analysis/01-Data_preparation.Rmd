@@ -24,7 +24,6 @@ Data type | Data set | Species | File format
 classifier|  cranium|wombat|.csv
 landmarkdata | cranium  | wombat | .csv
 landmarkgroups | mandible | wombat |.csv
-curveslide|cranium|wombat|.csv
 
 
 ## Partitions

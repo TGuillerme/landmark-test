@@ -44,7 +44,7 @@ source("../Functions/utilities.R")
 
 ```
 
-The "maximum" and "minimum" specimen:
+The "maximum" and "minimum" specimen, for example within Southern HN wombats:
 
 ```{r}
 ## Procrustes variation ranges
@@ -63,7 +63,7 @@ procrustes.var.plot(cranium$procruste$coords[, , specimens_min_max[2]],
 ```
 
 
-#Doing this using hypothetical PC min/max landmarks. 
+#Doing this using hypothetical PC min/max landmarks for the figures in the manuscript. See utilities file for details. 
 
 ```{r, eval = FALSE}
 

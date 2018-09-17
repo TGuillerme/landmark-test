@@ -1,5 +1,5 @@
 ---
-title: "Main analyses"
+title: "Standard analyses"
 author: "Vera Weisbecker"
 bibliography: references.bib
 date: "`r Sys.Date()`"
@@ -15,6 +15,7 @@ if(!require(knitr)) install.packages("knitr"); library(knitr)
 if(!require(xtable)) install.packages("xtable"); library(xtable)
 if(!require(geomorph)) install.packages("geomorph"); library(geomorph)
 if(!require(dispRity)) install.packages("dispRity");library(dispRity)
+if(!require(testthat)) install.packages("testthat");library(testthat)
 source("../Functions/utilities.R")
 set.seed(42)
 
