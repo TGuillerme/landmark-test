@@ -46,7 +46,7 @@ for(part in 1:length(unique(all_gpa_cran$landmarkgroups[,2]))) {
             all_gpa_mand$landmarkgroups[,2] == unique(all_gpa_mand$landmarkgroups[,2])[part])
 }
 
-## Thee GPA for the cranium and mandible for the Lasiorhinus
+## The GPA for the cranium and mandible for the Lasiorhinus
 load(paste0(path, "wombat_lasiorhinus", ".Rda"))
 las_gpa_cran <- land_data[["cranium"]]
 las_gpa_mand <- land_data[["mandible"]]
