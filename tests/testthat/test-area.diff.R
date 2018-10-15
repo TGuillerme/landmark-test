@@ -1,1 +1,0 @@
-context("area.diff")
