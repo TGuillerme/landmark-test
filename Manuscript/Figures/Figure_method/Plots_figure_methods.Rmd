@@ -1,22 +1,73 @@
+---
+title: "Testing the variation in landmark position"
+author: "Thomas Guillerme"
+bibliography: references.bib
+date: "`r Sys.Date()`"
+output:
+  html_document:
+  pdf_document:
+    fig_width: 8
+    fig_height: 4
+---
+
+Loading the packages and the data
+
+```{r}
 ## Loading the libraries (and installing if necessary)
 if(!require(devtools)) install.packages("devtools")
 if(!require(knitr)) install.packages("knitr")
 if(!require(geomorph)) install.packages("geomorph")
-if(!require(dispRity)) install.packages("dispRity");library(dispRity)
-if(!require(landmarktest)) install_github("TGuillerme/landmark-test");library(landmarktest)
+if(!require(dispRity)) install.packages("dispRity")
+if(!require(landvR)) install_github("TGuillerme/landvR")
 source("../../../Functions/utilities.R")
 set.seed(42)
-
 
 ## Loading a dataset
 load("../../../Data/Processed/wombat_ursinus.Rda")
 
 ## Selecting a partition
 cranium <- land_data$cranium
+```
 
+# Step 1: using the PCA to propose a hypothesis
+
+First we can ordinate the data and check the PCA.
+
+```{r, fig.height = 8, width.height = 8}
+## Plot the PCA
+ordination_space <- plotTangentSpace(land_data$cranium$procrustes$coords)
+```
+
+We can then check the variation along the hypothetical PC1 min and PC1 max variation:
+
+```{r}
+## Coordinate differences between the PC1 max and min
+ordination_var <- coordinates.difference(ordination_space$pc.shapes$PC1min,
+                                         ordination_space$pc.shapes$PC1max,
+                                         type = "spherical")
+```
+
+And plot this difference to make the hypothesis of where do the variation occur the most.
+
+```{r, fig.height = 8, width.height = 8}
+## Plotting the coordinate differences between the PC max and min
+procrustes.var.plot(ordination_space$pc.shapes$PC1min,
+                    ordination_space$pc.shapes$PC1max,
+                    col = heat.colors, col.val = ordination_var[[1]][, "radius"], magnitude = 1.2)
+```
+
+# Step 2: testing this difference in the Procrustes space
+
+Measuring the variation in the Procrustes space
+
+```{r}
 ## Procrustes variation ranges
 procrustes_var <- variation.range(cranium$procrustes, return.ID = TRUE)
+```
 
+Applying the test in the zygomatic partition:
+
+```{r}
 ## Partitions
 partitions <- list()
 for(part in unique(cranium$landmarkgroups[,2])) {
@@ -34,6 +85,11 @@ random_area <- rand.test(procrustes_var$range[, "radius"], random_part, test = a
 random_overlap <- rand.test(procrustes_var$range[, "radius"], random_part, test = bhatt.coeff,
                             test.parameter = TRUE)
 
+```
+
+And then plot the effective distribution comparisons from the test (plot functions are detailed in the uncompiled Rmd file)
+
+```{r, echo = FALSE}
 ## Plotting the area difference
 plot.area <- function(distribution, X, reference, col) {
     par(bty = "n")
@@ -78,10 +134,11 @@ plot.overlap  <- function(distribution, X, reference, col){
     lines(x, y2, type = "l", lwd = 2, col = col[2])
 }
 
+```
 
+Getting the results (export directly as pdf)
 
-
-
+```{r}
 ## Plot the results
 pdf(file = "results_area.pdf")
 par(bty = "n")
@@ -91,8 +148,11 @@ pdf(file = "results_overlap.pdf")
 par(bty = "n")
 plot(random_overlap, main = "results overlap")
 dev.off()
+```
 
+And plotting what the test is actually doing (export directly as pdf)
 
+```{r}
 ## Setting the parameters for plotting the test data
 
 ## The data
@@ -104,7 +164,6 @@ random_draws <- replicate(4, sample(1:length(distribution), length(observed_draw
 
 ## The colours parameters
 colours <- c("purple", "green", "grey") #obs, reference, difference
-
 
 ## Observed difference
 ## Overlap
@@ -129,3 +188,4 @@ for(one_plot in 2:4) {
     plot.area(distribution, random_draws[[one_plot]], reference = random_draws[[1]], col = colours)
     dev.off()
 }
+```
