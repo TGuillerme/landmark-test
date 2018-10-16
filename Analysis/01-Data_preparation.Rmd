@@ -99,11 +99,17 @@ for(chain in chains) {
             landmarks <- landmarks[-nhnw_b34,]
         }
         
+        ## Remove the patches
+        landmarks_no_patches <- landmarks[, -c(grep("patch", colnames(landmarks)))]
+
         ## Make into a 3D array
         landmarks <- geomorph::arrayspecs(landmarks, k = 3, p = ncol(landmarks)/3)
+        landmarks_no_patches <- geomorph::arrayspecs(landmarks_no_patches, k = 3,
+                                                     p = ncol(landmarks_no_patches)/3)
         
         ## Running the Procrustes superimposition
         land_data[[dataset]][[2]] <- geomorph::gpagen(landmarks)
+        land_data[[dataset]][[4]] <- geomorph::gpagen(landmarks_no_patches)
 
         ## Convert the array in 2D
         array_2d <- geomorph::two.d.array(land_data[[dataset]][[2]]$coords)
@@ -122,7 +128,8 @@ for(chain in chains) {
                                               tol = tolerance)
 
         ## Name the elements
-        names(land_data[[dataset]]) <- c("landmarkgroups", "procrustes", "ordination")
+        names(land_data[[dataset]]) <- c("landmarkgroups", "procrustes", "ordination",
+                                         "procrustes_no_patches")
     }
 
     ## Check if Processed folder exists
@@ -176,7 +183,7 @@ for(sp in 1:length(species)) {
         }
 
         ## Read the landmarks
-        landmarks  <- t(read.csv(paste0("../Data/Raw/landmarkdata_", dataset, "_", chain, ".csv"),
+        landmarks <- t(read.csv(paste0("../Data/Raw/landmarkdata_", dataset, "_", chain, ".csv"),
                                  header = TRUE, row.names = 1))
 
         ## Remove the juvenile NHNW_B34's mandible
@@ -186,8 +193,13 @@ for(sp in 1:length(species)) {
             wombat_sp <- wombat_sp[-nhnw_b34,]
         }
 
+        ## Remove the patches
+        landmarks_no_patches <- landmarks[, -c(grep("patch", colnames(landmarks)))]
+
         ## Make into a 3D array
         landmarks <- geomorph::arrayspecs(landmarks, k = 3, p = ncol(landmarks)/3)
+        landmarks_no_patches <- geomorph::arrayspecs(landmarks_no_patches, k = 3,
+                                                     p = ncol(landmarks_no_patches)/3)
 
         ## Selecting the subset of species (if sp == 4, select both krefftii and latifrons)
         if(sp != 4) {
@@ -196,9 +208,11 @@ for(sp in 1:length(species)) {
             which_sp <- c(2,3)
         }
         landmarks <- landmarks[, , which(wombat_sp$Species %in% species[which_sp])]
+        landmarks_no_patches <- landmarks_no_patches[, , which(wombat_sp$Species %in% species[which_sp])]
 
         ## Running the Procrustes superimposition
         land_data[[dataset]][[2]] <- geomorph::gpagen(landmarks)
+        land_data[[dataset]][[4]] <- geomorph::gpagen(landmarks_no_patches)
 
         ## Convert the array in 2D
         array_2d <- geomorph::two.d.array(land_data[[dataset]][[2]]$coords)
@@ -217,7 +231,8 @@ for(sp in 1:length(species)) {
                                               tol = tolerance)
 
         ## Name the elements
-        names(land_data[[dataset]]) <- c("landmarkgroups", "procrustes", "ordination")
+        names(land_data[[dataset]]) <- c("landmarkgroups", "procrustes", "ordination",
+                                         "procrustes_no_patches")
     }
 
     save(land_data, file = paste0("../Data/Processed/", chain, "_", species[sp], ".Rda"))
