@@ -207,6 +207,77 @@ gdf=geomorph.data.frame(coords=AllWombats$mandible$procrustes$coords, Csize=AllW
 AllomMandible=procD.allometry(coords~Csize, data=gdf, method="RegScore")
 ```
 
+## Allometry analysis without the patches
+
+We can also run the allometry analysis on the data without the patches
+
+
+```{r, message = FALSE, warning = FALSE, result = 'hide'}
+## Placeholder for the results
+allom_output_no_patch <- list()
+
+## Running the allometry tests
+for (i in 1:length(all_data)){
+    for (k in 1:length(all_data[[1]])){
+        ## Result placeholder
+        allom_output_no_patch[i][[k]] <- list()
+        
+        ## Procrustes allometry test (wrapper around the procD.allometry function)
+        allom_output_no_patch[[i]][[k]] <- handle.procD.formula(coords ~ Csize,
+                                                       all_data[[i]][[k]]$procrustes_no_patches,
+                                                       procD.fun = procD.allometry, iter = 1000,
+                                                       print.progress = FALSE)
+    }
+}
+
+## Naming the results
+names(allom_output_no_patch) <- names(all_data)
+
+## Naming the partitions
+for(i in 1:length(all_data)) {
+    names(allom_output_no_patch[[i]]) <- names(all_data[[i]])
+}
+```
+
+And we can display them as follows:
+
+```{r, echo = FALSE}
+kable(allom_output_no_patch[[1]][[1]]$aov.table, digits = 3,
+    caption = "Procrustes ANOVA for size (allometry) for the northern hairy nose wombat's cranium (no patches).")
+kable(allom_output_no_patch[[1]][[2]]$aov.table, digits = 3,
+   caption = "Procrustes ANOVA for size (allometry) for the northern hairy nose wombat's mandible (no patches).")
+kable(allom_output_no_patch[[2]][[1]]$aov.table, digits = 3,
+    caption = "Procrustes ANOVA for size (allometry) for the southern hairy nose wombat's cranium (no patches).")
+kable(allom_output_no_patch[[2]][[2]]$aov.table, digits = 3,
+   caption = "Procrustes ANOVA for size (allometry) for the southern hairy nose wombat's mandible (no patches).")
+kable(allom_output_no_patch[[3]][[1]]$aov.table, digits = 3,
+              caption = "Procrustes ANOVA for size (allometry) for the common wombat's cranium (no patches).")
+kable(allom_output_no_patch[[3]][[2]]$aov.table, digits = 3,
+              caption = "Procrustes ANOVA for size (allometry) for the common wombat's mandible (no patches).")
+```
+
+#Allometry between species (without the patches)
+
+```{r}
+#Cranium
+
+##turn into gdf frame 
+gdf=geomorph.data.frame(coords=AllWombats$cranium$procrustes_no_patches$coords,
+                        Csize=AllWombats$cranium$procrustes_no_patches$Csize)
+
+##run analysis
+AllomCranium=procD.allometry(coords~Csize, data=gdf, method="RegScore")
+
+#Mandible
+
+##turn into gdf frame 
+gdf=geomorph.data.frame(coords=AllWombats$mandible$procrustes_no_patches$coords,
+                        Csize=AllWombats$mandible$procrustes_no_patches$Csize)
+
+##run analysis
+AllomMandible=procD.allometry(coords~Csize, data=gdf, method="RegScore")
+```
+
 
 # 2-Block Partial Least Squares analysis (2BPLS)
 
@@ -254,7 +325,6 @@ all_classifiers <- list(
 
 ## Checking whether the cranial and mandibular coordinates datasets match
 matched_coords <- reduce.check(all_data, all_classifiers)
-expect_true(all(unlist(matched_coords[[2]])))
 ```
 
 ## Run 2BPLS
@@ -351,9 +421,6 @@ for (i in 1:length(all_data)){
   ## Add the dataset name (cranium/mandible)
   names(merged_pls[[i]]) <- names(all_data[[1]])
 }
-
-
-
 ```
 
 # Run the linear models of PLS scores with PC1 scores and centroid size
