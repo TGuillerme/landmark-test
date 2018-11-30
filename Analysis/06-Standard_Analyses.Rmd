@@ -134,6 +134,44 @@ plotOutliers(SHNW$mandible$procrustes$coords)
 ## No outliers!
 ```
 
+# disparity comparison betweeen wombat species
+
+```{r, message = FALSE, warning = FALSE}
+## Create gdfs with species for the data frames
+cranium_gdf  <- geomorph.data.frame(coords = AllWombats$cranium$procrustes$coords,
+                                    Csize = AllWombats$cranium$procrustes$Csize,
+                                    species = as.factor(cranium$Species))
+mandible_gdf <- geomorph.data.frame(coords = AllWombats$mandible$procrustes$coords,
+                                    Csize = AllWombats$mandible$procrustes$Csize,
+                                    species = as.factor(mandible$Species))
+
+## Running the analyses on the gdf objects (Disparity within groups compared to that group's mean)
+cranium_disparity <- morphol.disparity(coords ~ species, groups = ~species, iter = 1000, seed = 42,
+                                       data = cranium_gdf, print.progress = FALSE)
+
+## Disparity within groups compared to that group's mean
+mandible_disparity <- morphol.disparity(coords ~ species, groups = ~species, iter = 1000, seed = 42,
+                                        data = mandible_gdf, print.progress = FALSE)
+```
+
+And we can display the results as follows:
+
+```{r, echo = FALSE}
+## Cranium disparity values
+kable(data.frame("Procrustes variance" = cranium_disparity[[1]]), digits = 5, caption = "Cranium disparity (procrustes variance) per groups.")
+## Cranium disparity differences
+kable(cranium_disparity[[2]], digits = 5, caption = "Cranium pairwise absolute differences between variances between groups.")
+## Cranium disparity differences p
+kable(cranium_disparity[[3]], digits = 5, caption = "Cranium pairwise absolute differences between variances between groups (p-values).")
+
+## Mandible disparity values
+kable(data.frame("Procrustes variance" = mandible_disparity[[1]]), digits = 5, caption = "Mandible disparity (procrustes variance) per groups.")
+## Mandible disparity differences
+kable(mandible_disparity[[2]], digits = 5, caption = "Mandible pairwise absolute differences between variances between groups.")
+## Mandible disparity differences p
+kable(mandible_disparity[[3]], digits = 5, caption = "Mandible pairwise absolute differences between variances between groups (p-values).")
+```
+
 
 
 
