@@ -1,0 +1,85 @@
+---
+title: "Extreme specimens"
+author: "Thomas Guillerme"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    fig_width: 12
+    fig_height: 6
+---
+
+
+```{r, message = FALSE, warning = FALSE}
+## Loading the libraries (and installing if necessary)
+if(!require(devtools)) install.packages("devtools")
+if(!require(geomorph)) install.packages("geomorph")
+if(!require(landvR)) install_github("TGuillerme/landvR")
+source("../Functions/utilities.R")
+set.seed(42)
+```
+
+## Vombatus ursinus
+
+```{r}
+## Loading the data
+load("../Data/Processed/wombat_ursinus.Rda")
+
+## The procrustes data
+procrustes_cranium <- land_data$cranium$procrustes
+procrustes_mandible <- land_data$mandible$procrustes
+
+## The range selection (based on spherical coordinates radius)
+range_cranium <- variation.range(procrustes_cranium, return.ID = TRUE)
+range_mandible <- variation.range(procrustes_mandible, return.ID = TRUE)
+
+## The min/max specimens
+dimnames(procrustes_cranium$coords)[[3]][range_cranium$min.max]
+dimnames(procrustes_mandible$coords)[[3]][range_mandible$min.max]
+```
+
+For _Vombatus usrsinus_ the min/max specimens based on the cranium are the specimens `r dimnames(procrustes_cranium$coords)[[3]][range_cranium$min.max]`.
+For the mandible they are `r dimnames(procrustes_mandible$coords)[[3]][range_mandible$min.max]`.
+
+## Lasiorhinus latifrons
+
+```{r}
+## Loading the data
+load("../Data/Processed/wombat_latifrons.Rda")
+
+## The procrustes data
+procrustes_cranium <- land_data$cranium$procrustes
+procrustes_mandible <- land_data$mandible$procrustes
+
+## The range selection (based on spherical coordinates radius)
+range_cranium <- variation.range(procrustes_cranium, return.ID = TRUE)
+range_mandible <- variation.range(procrustes_mandible, return.ID = TRUE)
+
+## The min/max specimens
+dimnames(procrustes_cranium$coords)[[3]][range_cranium$min.max]
+dimnames(procrustes_mandible$coords)[[3]][range_mandible$min.max]
+```
+
+For _Lasiorhinus latifrons_ the min/max specimens based on the cranium are the specimens `r dimnames(procrustes_cranium$coords)[[3]][range_cranium$min.max]`.
+For the mandible they are `r dimnames(procrustes_mandible$coords)[[3]][range_mandible$min.max]`.
+
+## Lasiorhinus kreftii
+
+```{r}
+## Loading the data
+load("../Data/Processed/wombat_krefftii.Rda")
+
+## The procrustes data
+procrustes_cranium <- land_data$cranium$procrustes
+procrustes_mandible <- land_data$mandible$procrustes
+
+## The range selection (based on spherical coordinates radius)
+range_cranium <- variation.range(procrustes_cranium, return.ID = TRUE)
+range_mandible <- variation.range(procrustes_mandible, return.ID = TRUE)
+
+## The min/max specimens
+dimnames(procrustes_cranium$coords)[[3]][range_cranium$min.max]
+dimnames(procrustes_mandible$coords)[[3]][range_mandible$min.max]
+```
+
+For _Lasiorhinus kreftii_ the min/max specimens based on the cranium are the specimens `r dimnames(procrustes_cranium$coords)[[3]][range_cranium$min.max]`.
+For the mandible they are `r dimnames(procrustes_mandible$coords)[[3]][range_mandible$min.max]`.
