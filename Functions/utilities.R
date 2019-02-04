@@ -2,9 +2,12 @@
 # @param dataset the type of dataset (cranium or mandible)
 # @param path the path where the processed data is
 # @param combine.land whether to combine the landmarks (only two partitions)
+# @param CI the confidence intervals
+# @param use.PC.range whether to use the variation range algorithm or pick the max/min on the PC1 for the differences. 
+# @param use.PC.range whether to use the procrustes variation between the two hypothetical specimens on PC1.
 
 ## Test pipeline
-pipeline.test <- function(species, dataset, path, verbose = FALSE, rarefaction, combine.land = FALSE, CI){
+pipeline.test <- function(species, dataset, path, verbose = FALSE, rarefaction, combine.land = FALSE, CI, use.PC.range = FALSE, use.PC.hypo = FALSE){
     ## Loading a dataset
     if(verbose) message("Load data...")
     load(paste0(path, species, ".Rda"))
@@ -17,7 +20,32 @@ pipeline.test <- function(species, dataset, path, verbose = FALSE, rarefaction, 
 
     ## Procrustes variation ranges
     if(verbose) message("Calculate range...")
-    procrustes_var <- variation.range(data$procrustes, type = "spherical", what = "radius", CI = CI)
+    
+    if(!use.PC.range && !use.PC.hypo){
+        procrustes_var <- variation.range(data$procrustes, type = "spherical", what = "radius", CI = CI)
+    } else {
+        if(use.PC.range) {
+            ## Select the min-max on the PC1
+            axis <- 1
+            ordination <- data$ordination$x
+            if(CI == 1) {
+                max <- which(ordination[,axis] == max(ordination[,axis]))
+                min <- which(ordination[,axis] == min(ordination[,axis]))
+            } else {
+                max <- which(ordination[,axis] == max(ordination[,axis][which(ordination[,axis] <= quantile(ordination[,axis], probs =   CI/100))]))
+                min <- which(ordination[,axis] == min(ordination[,axis][which(ordination[,axis] >= quantile(ordination[,axis], probs = 1-CI/100))]))
+            }
+            procrustes_var <- coordinates.difference(data$procrustes$coords[,,unname(max)], data$procrustes$coords[,,unname(min)], type = "spherical")[[1]]
+        }
+        if(use.PC.hypo) {
+            ## Select the range two hypothetical specimen
+            get_spec <- plotTangentSpace(data$procrustes$coords, axis1 = 1, axis2 = 2)
+
+            ## Get the coordinates differences
+            procrustes_var <- coordinates.difference(get_spec$pc.shapes$PC1max, get_spec$pc.shapes$PC1min, type = "spherical")[[1]]
+        }
+    }
+
     if(verbose) message("Done.\n")
 
     ## landmarks partitions
@@ -390,7 +418,9 @@ reduce.check<-function(AllData, AllClassifiers){
 #@param partitions.order: optional, reordering the partition names
 #@param partitions: optional, the name of the landmark partitions columns
 #@param species.names: the names of species to display
-summarise.results <- function(CI, rarefaction, print.token = FALSE, rounding = 4, path = "../Data/Results/", species = c("Wombat", "Wombat_lasiorhinus", "Wombat_krefftii", "Wombat_latifrons", "Wombat_ursinus"), datasets = c("cranium", "mandible"), partitions.order = c(1, 3, 2, 6, 4, 5), partitions, species.names) {
+#@param result.type: the type of results to summarise (variation.range, pc1.extremes, pc1.hypothetical)
+
+summarise.results <- function(CI, rarefaction, print.token = FALSE, rounding = 4, path = "../Data/Results/", species = c("Wombat", "Wombat_lasiorhinus", "Wombat_krefftii", "Wombat_latifrons", "Wombat_ursinus"), datasets = c("cranium", "mandible"), partitions.order = c(1, 3, 2, 6, 4, 5), partitions, species.names, result.type = "variation.range") {
 
     ## Printing significance tokens
     get.token <- function(p) {
@@ -483,11 +513,22 @@ summarise.results <- function(CI, rarefaction, print.token = FALSE, rounding = 4
     
             for(ds in 1:length(datasets)) {
     
+                ## Get the type of results to load
+                if(result.type == "variation.range") {
+                    result_type <- ""
+                }
+                if(result.type == "pc1.extremes") {
+                    result_type <- "_PC1"
+                }
+                if(result.type == "pc1.hypothetical") {
+                    result_type <- "_PChypo"
+                }
+
                 ## Extract the results
                 if(rarefaction) {
-                    load(paste0(path, species[sp], "_", datasets[ds], "rarefied_CI", CI, ".Rda"))
+                    load(paste0(path, species[sp], "_", datasets[ds], "rarefied_CI", CI, result_type, ".Rda"))
                 } else {
-                    load(paste0(path, species[sp], "_", datasets[ds], "_CI", CI, ".Rda"))
+                    load(paste0(path, species[sp], "_", datasets[ds], "_CI", CI, result_type, ".Rda"))
                 }
     
                 ## Summarise the results
