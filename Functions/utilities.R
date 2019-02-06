@@ -32,17 +32,20 @@ pipeline.test <- function(species, dataset, path, verbose = FALSE, rarefaction, 
                 max <- which(ordination[,axis] == max(ordination[,axis]))
                 min <- which(ordination[,axis] == min(ordination[,axis]))
             } else {
-                max <- which(ordination[,axis] == max(ordination[,axis][which(ordination[,axis] <= quantile(ordination[,axis], probs =   CI/100))]))
-                min <- which(ordination[,axis] == min(ordination[,axis][which(ordination[,axis] >= quantile(ordination[,axis], probs = 1-CI/100))]))
+
+                CI_percent <- CI * 100  
+                cis <- sort(c(50-CI_percent/2, 50+CI_percent/2)/100)
+                quantile_max <- cis[2]
+                quantile_min <- cis[1]
+
+                max <- which(ordination[,axis] == max(ordination[,axis][which(ordination[,axis] <= quantile(ordination[,axis], probs = quantile_max))]))
+                min <- which(ordination[,axis] == min(ordination[,axis][which(ordination[,axis] >= quantile(ordination[,axis], probs = quantile_min))]))
             }
             procrustes_var <- coordinates.difference(data$procrustes$coords[,,unname(max)], data$procrustes$coords[,,unname(min)], type = "spherical")[[1]]
         }
         if(use.PC.hypo) {
             ## Select the range two hypothetical specimen
-            get_spec <- plotTangentSpace(data$procrustes$coords, axis1 = 1, axis2 = 2)
-
-            ## Get the coordinates differences
-            procrustes_var <- coordinates.difference(get_spec$pc.shapes$PC1max, get_spec$pc.shapes$PC1min, type = "spherical")[[1]]
+            procrustes_var <- variation.range(data$procrustes, type = "spherical", what = "radius", CI = CI, ordination = data$ordination, axis = 1)
         }
     }
 
@@ -467,12 +470,22 @@ summarise.results <- function(CI, rarefaction, print.token = FALSE, rounding = 4
         }
 
         ## Loading the means results (observed)
-        if(rarefaction == FALSE) {
-            load(paste0(path, "Group_cranium_means.Rda"))
-            load(paste0(path, "Group_mandible_means.Rda"))
+        if(result.type == "variation.range"){
+            if(rarefaction == FALSE) {
+                load(paste0(path, "Group_cranium_means.Rda"))
+                load(paste0(path, "Group_mandible_means.Rda"))
+            } else {
+                load(paste0(path, "Group_craniumrarefied_means.Rda"))
+                load(paste0(path, "Group_mandiblerarefied_means.Rda"))
+            }
         } else {
-            load(paste0(path, "Group_craniumrarefied_means.Rda"))
-            load(paste0(path, "Group_mandiblerarefied_means.Rda"))
+            if(rarefaction == FALSE) {
+                load(paste0(path, "Group_cranium_means_hypo.Rda"))
+                load(paste0(path, "Group_mandible_means_hypo.Rda"))
+            } else {
+                load(paste0(path, "Group_craniumrarefied_means_hypo.Rda"))
+                load(paste0(path, "Group_mandiblerarefied_means_hypo.Rda"))
+            }            
         }
 
         ## Getting the pairwise results
