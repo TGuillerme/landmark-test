@@ -174,7 +174,7 @@ plot.test.results(data = complete_results_obs, rarefaction = complete_results_ra
 ```{r, echo = FALSE}
 pdf(file = "../Manuscript/Figures/landmark_test_results_full.pdf", width = 12, height = 8)
 plot.test.results(data = complete_results_obs, rarefaction = complete_results_rar, p.value = 0.001,
-                  no.rar = c(2,5), xlabs = xlabs, ylabs = ylabs, digits = 3, left.pad = 18, ylab.cex = 1.1)
+                  no.rar = c(2,5), xlabs = xlabs, ylabs = ylabs, digits = 3, left.pad = 17, ylab.cex = 1.1)
 dev.off()
 ```
 
