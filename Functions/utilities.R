@@ -653,7 +653,7 @@ xtable.results <- function(results, partitions.names, test.names, path, file.nam
 #@param digits: the digits to display
 #@param left.pad: the space on the left for the text on the left
 
-plot.test.results <- function(data, rarefaction, p.value = 0.001, no.rar, ignore.non.signif = TRUE, partitions = c(expression(bold("Cranium")), expression(bold("Mandible"))), cols = c("grey", "magenta", "green"), ylabs, xlabs, digits, left.pad = 4) {
+plot.test.results <- function(data, rarefaction, p.value = 0.001, no.rar, ignore.non.signif = TRUE, partitions = c(expression(bold("Cranium")), expression(bold("Mandible"))), cols = c("grey", "magenta", "green"), ylabs, xlabs, digits, left.pad = 4, ylab.cex = 1) {
 
     ## Making the x and y labels (if needed)
     if(missing(ylabs)) {
@@ -684,7 +684,7 @@ plot.test.results <- function(data, rarefaction, p.value = 0.001, no.rar, ignore
     image(t(image_matrix[nrow(image_matrix):1,]), col = cols, xaxt = "n", yaxt = "n")
 
     ## Adding the y labels
-    axis(2, at = seq(from = 0, to = 1, length.out = nrow(image_matrix)), las = 2, label = rev(ylabs), tick = FALSE)
+    axis(2, at = seq(from = 0, to = 1, length.out = nrow(image_matrix)), las = 2, label = rev(ylabs), tick = FALSE, cex.axis = ylab.cex)
 
     ## Add the x labels
     if(length(grep("\\n", xlabs) > 0)) {
