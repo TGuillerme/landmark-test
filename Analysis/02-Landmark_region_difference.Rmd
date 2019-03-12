@@ -4,7 +4,7 @@ author: "Thomas Guillerme"
 bibliography: references.bib
 date: "`r Sys.Date()`"
 output:
-  pdf_document:
+  html_document:
     fig_width: 8
     fig_height: 4
 ---
@@ -14,7 +14,7 @@ Here we detail the applied "landmark partition test" testing whether the maximum
 This test is a sort of permutation test testing $H_{0}: \Theta_{0} = \Theta$ (the tested sample is equal to the whole population) with a two-sided alternative $H_{1}: \Theta_{0} \neq \Theta$  (the tested sample is _not_ equal to the whole population).
 If $H_{0}$ can be rejected it means that the statistic measured from the set of landmarks (see below) is different than the overall statistic from the population of landmarks (in other words: the landmark set is different than the all the landmarks combined).
 
-We measured two statistic, the overall difference in landmark size (area difference - see below) and the probability of size overlap between two landmarks sets (Bhattacharyya Coefficient - see below).
+We measured two statistic, the overall difference in landmark size (displacement difference - see below) and the probability of size overlap between two landmarks sets (Bhattacharyya Coefficient - see below).
 These two statistics were measured between the two most extreme specimens selected on the range of variation between the specimens landmarks coordinates (see below).
 We tested the differences for three cranium partitions (the zygomatic arch, the tip of the snout and the rest of the skull) and three mandible ones (the tip of the mandible, the back of the mandible and the rest of the mandible) for each species (_Vombatus ursinus_, _Lasiorhinus krefftii_ and _Lasiorhinus latifrons_), for the _Lasiorhinus_ genus combined and for the three species combined.
 To account for type I error due to multiple testing and for the number of replicates involved in the landmark partition tests, we adjusted the _p_-values using a Bonferonni-Holm [@holm1979simple] correction and lowered our _p_-value rejection threshold to 0.01 (see below).
@@ -48,13 +48,13 @@ However, since we are not interest in _direction_ of difference, these two selec
 
 As mentioned above, we will use two different statistics between to compare the partitions to the rest of the cranium/mandible: (1) the overall difference in landmark size between the "maximum" and "minimum" cranium/mandible (this statistic is a proxy for length difference between landmarks ranges); (2) the probability of overlap between the size differences (between the "maximum" and "minimum") in the partition and the rest of the cranium/mandible (this statistic is a proxy for measuring whether both partitions comes from the same distribution).
 
-### Overall difference in landmark size (area difference) {#areadiff}
+### Overall difference in landmark size (displacement difference) {#areadiff}
 
-To measure the overall differences in the length of the radii, we can calculate the area difference as follows:
+To measure the overall differences in the length of the radii, we can calculate the displacement difference as follows:
 
-##### Area difference
+##### Displacement difference
 
-$\Delta_{area} = \int_{0}^{n-1} (f_{x} - f_{y})d(x,y)$
+$\Delta_{displacement} = \int_{0}^{n-1} (f_{x} - f_{y})d(x,y)$
 
 Where _n_ is minimum number of comparable landmarks and $f_{x}$ and $f_{y}$ are ranked functions (i.e. $f_{0} \geq f_{1} \geq f_{2} ...$) for the landmarks in the partition and all the landmarks respectively.
 If one of the functions $f_{x}$ or $f_{y}$ have _m_ elements (with $m > n$) $f^{*}_{z}$, a rarefied estimated of the function with _m_ elements is used instead.
@@ -71,7 +71,7 @@ $p=\left(\frac{0.9\times \sigma_{m} }{1.34n}\right)^{-1/5}$
 
 With $\sigma_{m}$ being the minimum of the standard deviation and the interquartile range of the distribution.
 This allows the rarefaction algorithm to be fast but "fair" and reduces the number of re-sampling the when the distribution is more homogeneous [@silverman1986density].
-If the area difference is positive, the landmark's variation in the partition is bigger than the overall landmark's variation, if the difference is negative, the variation is smaller.
+If the displacement difference is positive, the landmark's variation in the partition is bigger than the overall landmark's variation, if the difference is negative, the variation is smaller.
 
 ## Probability of overlap between size differences (Bhattacharyya Coefficient)
 
@@ -94,7 +94,7 @@ Values in between these two threshold just show the probability of overlap betwe
 ## Random permutation test
 
 To test whether the landmarks' variation (i.e. the radii between the "maximum" and "minimum" cranium/mandible) one partition is different than the rest of the landmark's variation, we used a kind of permutation test (based on a modification from `ade4::as.randtest` [@thioulouse1997ade]).
-This is a pretty intuitive yet powerful test aiming to calculate whether the observed difference in statistic (either the area difference or the probability of overlap) is different than the same statistic drawn randomly from the same population (here, the distribution of all the landmark's variation).
+This is a pretty intuitive yet powerful test aiming to calculate whether the observed difference in statistic (either the displacement difference or the probability of overlap) is different than the same statistic drawn randomly from the same population (here, the distribution of all the landmark's variation).
 First we measured the statistic between the landmark partition of interest and all the other landmarks (including the ones from the partition).
 Second, we generated 1000 statistics by randomly sampling the same number of landmarks as in the partition in the whole distributions and compared them again to the full distribution.
 This resulted in 1000 null comparisons (i.e. assuming the null hypothesis that the statistic in the partition is the same as the statistic in the total distribution).
@@ -253,7 +253,7 @@ kable(make.table(overlaps_95, "bonferroni"), digits = 5, caption = "Overlap prob
 
 ```{r, fig.width = 6, fig.height = 9, echo = FALSE}
 ## Plot the size differences
-make.plots(differences, type = "area difference", add.p = TRUE, correction = "bonferroni")
+make.plots(differences, type = "displacement difference", add.p = TRUE, correction = "bonferroni")
 ```
 
 ```{r, fig.width = 6, fig.height = 9, echo = FALSE}
@@ -265,7 +265,7 @@ make.plots(overlaps, type = "Bhattacharyya Coefficient", add.p = TRUE, correctio
 
 ```{r, fig.width = 6, fig.height = 9, echo = FALSE}
 ## Plot the size differences
-make.plots(differences_95, type = "area difference", add.p = TRUE, correction = "bonferroni")
+make.plots(differences_95, type = "displacement difference", add.p = TRUE, correction = "bonferroni")
 ```
 
 ```{r, fig.width = 6, fig.height = 9, echo = FALSE}
