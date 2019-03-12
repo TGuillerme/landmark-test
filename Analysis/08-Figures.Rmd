@@ -231,40 +231,42 @@ plotspec(mean_specimen_mesh_mandible,mean_coords_mandible, centered = F, asp=T)
 wombat_cranium_meanwarp<-read.ply("../Data/Processed/wombat_cranium_meanwarp.ply")
 wombat_mandible_meanwarp<-read.ply("../Data/Processed/wombat_mandible_meanwarp.ply")
 
-#plotting coloured landmarks on surface mesh for partitions; change to mandible as needed
-
-PartLevels= unique(land_data$mandible$landmarkgroups[,2])
-Colours <- c("blue", "orange", "green")
-
-Part=list()
-###Subsetting the partition levels
-for(i in 1:length(PartLevels)){
-  Part[[i]]<-which (land_data$mandible$landmarkgroups[,2] == PartLevels[[i]])
-} 
-
-###plotting the spheres- if you get only white, increase the radius. Note that we are using       
-open3d()
-for (i in 1:length(PartLevels)){
-  spheres3d(mshape_mandible[Part[[i]],1], mshape_mandible[Part[[i]],2], mshape_mandible[Part[[i]],3], col=Colours[i], lit=TRUE,radius = 0.001, asp=F)
-  
-}
-
-shade3d(wombat_mandible_meanwarp)
-
-
-#plotting coloured landmarks on surface mesh
+#for plotting coloured landmarks on surface mesh
 
 lm_types_cranium=read.csv("../Data/Raw/landmarktypes_cranium_wombat.csv")
 lm_types_mandible=read.csv("../Data/Raw/landmarktypes_mandible_wombat.csv")
-
-#change from here between cranium and cranium as needed
-
-PartLevels= unique(lm_types_mandible$x)
 
 #separate colour vectors are needed because the code assigns the first landmark type it encounters withe the first colour in the vector. 
 
 col_cranium <- c("blue", "orange", "green")
 col_mandible <- c("orange","blue", "green")
+
+#plotting coloured landmarks on surface mesh for partitions; change to mandible as needed
+
+PartLevels= unique(land_data$cranium$landmarkgroups[,2])
+Colours <- c("blue", "orange", "green")
+
+Part=list()
+###Subsetting the partition levels
+for(i in 1:length(PartLevels)){
+  Part[[i]]<-which (land_data$cranium$landmarkgroups[,2] == PartLevels[[i]])
+} 
+
+###plotting the spheres- if you get only white, increase the radius.       
+open3d()
+for (i in 1:length(PartLevels)){
+  spheres3d(mshape_cranium[Part[[i]],1], mshape_cranium[Part[[i]],2], mshape_cranium[Part[[i]],3], col=Colours[i], lit=TRUE,radius = 0.001, asp=F)
+  
+}
+
+shade3d(wombat_cranium_meanwarp, color="grey")
+
+
+
+#change from here between cranium and cranium as needed
+
+PartLevels= unique(lm_types_mandible$x)
+
 
 Part=list()
 
