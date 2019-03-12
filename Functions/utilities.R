@@ -653,7 +653,7 @@ xtable.results <- function(results, partitions.names, test.names, path, file.nam
 #@param digits: the digits to display
 #@param left.pad: the space on the left for the text on the left
 
-plot.test.results <- function(data, rarefaction, p.value = 0.001, no.rar, ignore.non.signif = TRUE, partitions = c(expression(bold("Cranium")), expression(bold("Mandible"))), cols = c("grey", "magenta", "green"), ylabs, xlabs, digits, left.pad = 4, ylab.cex = 1) {
+plot.test.results <- function(data, rarefaction, p.value = 0.001, no.rar, ignore.non.signif = TRUE, partitions = c(expression(bold("Cranium")), expression(bold("Mandible"))), cols = c("grey", "magenta", "green"), ylabs, ylabs2, xlabs, digits, left.pad = 4, ylab.cex = 1, hypothesis, col.hypo) {
 
     ## Making the x and y labels (if needed)
     if(missing(ylabs)) {
@@ -679,12 +679,13 @@ plot.test.results <- function(data, rarefaction, p.value = 0.001, no.rar, ignore
     image_matrix <- matrix(unlist(lapply(blocks, lapply, level.selector, threshold = p.value)), ncol = ncol(data[, -1]), byrow = FALSE)
 
     ## Plot the main image
-    par(mar = c(2, max(nchar(ylabs))/2, 4, 2), mar = c(5, left.pad, 4, 2)) #c(bottom, left, top, right)
+    par(mar = c(2, max(nchar(ylabs))/2, 4, 2), mar = c(5, left.pad, 4, 4)) #c(bottom, left, top, right)
     #image(t(image_matrix[nrow(image_matrix):1,]), col = cols, xaxt = "n", yaxt = "n", ...)
     image(t(image_matrix[nrow(image_matrix):1,]), col = cols, xaxt = "n", yaxt = "n")
 
     ## Adding the y labels
     axis(2, at = seq(from = 0, to = 1, length.out = nrow(image_matrix)), las = 2, label = rev(ylabs), tick = FALSE, cex.axis = ylab.cex)
+    axis(4, at = seq(from = 0.25, to = 0.85, length.out = 3), las = 3, label = rev(ylabs2), tick = FALSE, cex.axis = ylab.cex, padj = 0.2)
 
     ## Add the x labels
     if(length(grep("\\n", xlabs) > 0)) {
@@ -758,8 +759,60 @@ plot.test.results <- function(data, rarefaction, p.value = 0.001, no.rar, ignore
         polygon(x = block_polygon[[1]], y = block_polygon[[2]], lwd = 3)
     }
 
+
+    # ## Adding the hypothesis difference (if not equal)
+    # if(!missing(hypothesis)) {
+    #     ## Get list of hypothesis change
+    #     check.hypothesis <- function(columns, hypothesis) {
+    #         if(hypothesis == 1) {
+    #             ifelse(column > 0, FALSE, TRUE)
+    #         } else {
+    #             ifelse(column < 0, FALSE, TRUE)
+    #         }
+    #     }
+    # }
+
+    ## Adding the hypothesis difference (if not equal)
+    if(!missing(hypothesis)) {
+        ## Get the values
+        matrix_values <- data[seq(from = 1, to = nrow(data), by = 4),-1]
+        image_hypothesis <- matrix(NA, ncol = ncol(matrix_values), nrow = nrow(matrix_values))
+
+        ## Get the hypothesis
+        positives <- which(hypothesis > 0)
+        image_hypothesis[, positives] <- ifelse(matrix_values[, positives] > 0, 0, 1)
+        negatives <- which(hypothesis < 0)
+        image_hypothesis[, negatives] <- ifelse(matrix_values[, negatives] < 0, 0, 1)
+
+        ## Get the image coordinates matrix (remove the ignored - if necessary)
+        if(ignore.non.signif) {
+            image_coords <- image_hypothesis & ifelse(image_matrix == 1, 0, 1)
+        } else {
+            image_coords <- ifelse(image_hypothesis == 1, TRUE, FALSE)
+        }
+        rownames(image_coords) <- rev(seq(from = 0, to = 1, length.out = nrow(image_matrix)))
+        colnames(image_coords) <- seq(from = 0, to = 1, length.out = ncol(image_matrix))
+
+        ## Getting the list of blocks coordinates that are the same between rar and normal
+        image_coords <- get.coords(image_coords)
+
+        ## Adding the polygons
+        for(poly in 1:length(image_coords[[1]])) {
+            block_polygon <- get.polygon.coordinates(image_coords[[1]][poly], image_coords[[2]][poly], image_matrix)
+            polygon(x = block_polygon[[1]], y = block_polygon[[2]], lwd = 3, border = col.hypo)
+        }        
+    }
+
     ## Separator
-    abline(v = 0.5, lty = 2)
+    abline(v = 0.5, lty = 2, lwd = 1.2)
+
+    ## set the number of categories border
+    categories <- c(2,8,14)
+    ## Get the coordinates of the centres of each cell
+    centers <- seq(from = 0, to = 1, length.out = nrow(image_matrix))
+    ## Get the splits between categories (mean of c(categorie, categorie+1))
+    borders <- apply(matrix(c(centers[categories], centers[categories+1]), ncol = length(categories), byrow = TRUE), 2, mean)
+    abline(h=borders, lty = 2, lwd = 1.2)
 }
 
 
