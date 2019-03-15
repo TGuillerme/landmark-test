@@ -80,8 +80,8 @@ gg.color.hue <- function(n) {
 pdf("../Manuscript/Figures/suppfigure2_PCA.pdf", height = 10, width = 12)
 #plot.new()
 par(mfrow = c(2,2))
-plot.pca(land_data$cranium$ordination, classifier_cranium$Species);legend("bottomleft", c("Common", "Southern HN", "Northern HN"), pt.bg=(gg.color.hue(3)),pch=21, bty="n", cex=1.4 )
-plot.pca(land_data$mandible$ordination, classifier_mandible$Species)
+plot.pca(land_data$cranium$ordination, classifier_cranium$Species);legend("bottomleft", c("Common", "Southern HN", "Northern HN"), pt.bg=(gg.color.hue(3)),pch=21, bty="n", cex=1.2 ); legend ("top", "All Species - Cranium", bty="n", cex=1.2)
+plot.pca(land_data$mandible$ordination, classifier_mandible$Species); legend ("top", "All Species - Mandible", bty="n", cex=1.2)
 
 
 ## Loading the data for the within-species PCA plots
@@ -90,8 +90,8 @@ classifier_cranium_Lasio= subset(classifier_cranium, classifier_cranium$Species 
 classifier_mandible_Lasio= subset(classifier_mandible, classifier_mandible$Species != "Common wombat" )
 
 
-plot.pca(HN$cranium$ordination, classifier_cranium_Lasio$Species)
-plot.pca(HN$mandible$ordination, classifier_mandible_Lasio$Species)
+plot.pca(HN$cranium$ordination, classifier_cranium_Lasio$Species);  legend ("top", "Hairy-nosed - Cranium", bty="n", cex=1.2)
+plot.pca(HN$mandible$ordination, classifier_mandible_Lasio$Species);  legend ("top", "Hairy-nosed - Mandible", bty="n", cex=1.2)
 
 dev.off()
 
