@@ -357,13 +357,13 @@ PCA.vectors<-function(x, minfirst=TRUE){
 }
 
 
-#procD code (for procD.allometry and procD.lm) analysis
+#procD code (for procD.lm and procD.lm) analysis
 
 #@param formula: a formula object (e.g. coords ~ Csize)
 #@param procrustes: the procrustes object (e.g. land_data$cranium$procrustes)
-#@param procD.fun: the procD function (e.g. procD.allometry)
+#@param procD.fun: the procD function (e.g. procD.lm)
 #@param ...: any optional arguments to be passed to procD.fun (e.g. logsz = FALSE, iter = 1, etc...)
-handle.procD.formula <- function(formula, procrustes, procD.fun = procD.allometry, ...) {
+handle.procD.formula <- function(formula, procrustes, procD.fun = procD.lm, ...) {
   
   geomorph_data_frame <- geomorph.data.frame(procrustes)
   
@@ -376,7 +376,7 @@ handle.procD.formula <- function(formula, procrustes, procD.fun = procD.allometr
 
 allom.shape<-function (procrustes_coordinate_file_with_centroid_size){
   
-  Allometry <- handle.procD.formula(formula=coords~ Csize, procrustes=procrustes_coordinate_file_with_centroid_size, procD.fun = procD.allometry, logsz = FALSE, iter = 1000)
+  Allometry <- handle.procD.formula(formula=coords~ Csize, procrustes=procrustes_coordinate_file_with_centroid_size, procD.fun = procD.lm, logsz = FALSE, iter = 1000)
   print(attributes(Allometry))
   return(Allometry)
 }
