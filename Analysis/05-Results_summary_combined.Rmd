@@ -153,26 +153,26 @@ And the finalised fable:
 xlabs <- c("Zygomatic Arch", "Tip of snout", "Remainder", "Masticatory\nmuscle insertions",
            "Symphyseal\narea", "Remainder")
 ylabs <- c(
-            expression(paste( italic("L. krefftii"), ", 100% CI", sep = "")),
+            expression(paste("Northern HN", ", 100% CI", sep = "")),
             expression(paste("95% CI")),
-            expression(paste( italic("L. latifrons"), ", 100% CI", sep = "")),
+            expression(paste("Southern HN", ", 100% CI", sep = "")),
             expression(paste("95% CI")),
-            expression(paste( italic("V. ursinus"), ", 100% CI", sep = "")),
+            expression(paste("Common", ", 100% CI", sep = "")),
             expression(paste("95% CI")),
-            expression(paste( italic("L. krefftii"), ", 100% CI", sep = "")),
+            expression(paste("Northern HN", ", 100% CI", sep = "")),
             expression(paste("95% CI")),
-            expression(paste( italic("L. latifrons"), ", 100% CI", sep = "")),
+            expression(paste("Southern HN", ", 100% CI", sep = "")),
             expression(paste("95% CI")),
-            expression(paste( italic("V. ursinus"), ", 100% CI", sep = "")),
+            expression(paste("Common", ", 100% CI", sep = "")),
             expression(paste("95% CI")),
-            expression(paste( italic("L. krefftii"), ", 100% CI", sep = "")),
+            expression(paste("Northern HN", ", 100% CI", sep = "")),
             expression(paste("95% CI")),
-            expression(paste( italic("L. latifrons"), ", 100% CI", sep = "")),
+            expression(paste("Southern HN", ", 100% CI", sep = "")),
             expression(paste("95% CI")),
-            expression(paste( italic("V. ursinus"), ", 100% CI", sep = "")),
+            expression(paste("Common", ", 100% CI", sep = "")),
             expression(paste("95% CI")),
-            expression(paste("Genus means (GPA)")),
-            expression(paste(italic("Lasiorhinus"), "means (GPA)"))
+            expression(paste("All wombat means (GPA)")),
+            expression(paste("Hairy nose means (GPA)"))
             )  
 ylabs2 <- c("hypothetical\nPC1 projection", "PC1\nextremes", "GPA\nextremes")
 
