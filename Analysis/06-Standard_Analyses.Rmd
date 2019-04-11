@@ -465,30 +465,30 @@ for (i in 1:length(all_data)){
 
 ```{r, message = FALSE, warning = FALSE}
 ## Placeholder lists
-pca_pls_lm <- c_size_pls_lm <- list()
+pca_pls_cor <- c_size_pls_cor <- list()
  
-##correlating the pls scores with PC1 scores and centroid sizes for each species and mandible/cranium
+##corelating the pls scores with PC1 scores and centroid sizes for each species and mandible/cranium
 for (i in 1:length(merged_pls)){
     ## Placeholders
-    pca_pls_lm[[i]] <- c_size_pls_lm[[i]] <- list()
+    pca_pls_cor[[i]] <- c_size_pls_cor[[i]] <- list()
     
     ##this runs the lm analyses for [1] PC scores and [2] Csize
     for (k in 1: length(merged_pls[[1]])){
-        pca_pls_lm[[i]][[k]] <- list()
+        pca_pls_cor[[i]][[k]] <- list()
         ##
-        pca_pls_lm[[i]][[k]][[1]] <- summary(lm(
-                                          merged_pls[[i]][[k]]$PLS_Scores ~ merged_pls[[i]][[k]]$PC1
-                                            ))
+        pca_pls_cor[[i]][[k]][[1]] <- cor.test(
+                                          merged_pls[[i]][[k]]$PLS_Scores , merged_pls[[i]][[k]]$PC1
+                                            )
         ##
-        pca_pls_lm[[i]][[k]][[2]] <- summary(lm(
-                                        merged_pls[[i]][[k]]$PLS_Scores ~ merged_pls[[i]][[k]]$Csize
-                                            ))
+        pca_pls_cor[[i]][[k]][[2]] <- cor.test(
+                                        merged_pls[[i]][[k]]$PLS_Scores , merged_pls[[i]][[k]]$Csize
+                                            )
        
     }
     ## Renaming the list elements
-    names(pca_pls_lm)[[i]] <- names(merged_pls)[[i]]
-    names(pca_pls_lm[[i]]) <- names(merged_pls[[1]])
-    names(pca_pls_lm[[i]][[k]]) <- c("pls_pca", "PLS_Csize")
+    names(pca_pls_cor)[[i]] <- names(merged_pls)[[i]]
+    names(pca_pls_cor[[i]]) <- names(merged_pls[[1]])
+    names(pca_pls_cor[[i]][[k]]) <- c("pls_pca", "PLS_Csize")
 }
 
 ```
@@ -506,7 +506,7 @@ SHNW_PLS_PC2<-merge(SHNW_cranial_scores,SHNWPC2,by="row.names", all.x=TRUE )
 colnames(SHNW_PLS_PC2)=c("Species","PLS_Scores", "PC2")
 
 #run analysis
-summary(lm(SHNW_PLS_PC2$PLS_Scores~ SHNW_PLS_PC2$PC2))
+cor.test(SHNW_PLS_PC2$PLS_Scores, SHNW_PLS_PC2$PC2)
 
 ```
 
