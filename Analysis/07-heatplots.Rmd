@@ -66,22 +66,28 @@ procrustes.var.plot(cranium$procrustes$coords[, , specimens_min_max[2]],
 #Doing this using hypothetical PC min/max landmarks for the figures in the manuscript. See utilities file for details. 
 
 ```{r, eval = FALSE}
-
-
+## Craniums
+## All wombats
 heatplot.PCs(AllWombats$cranium, minfirst=FALSE, 1 )
+## Lasihorhinus
 heatplot.PCs(HN$cranium, minfirst=TRUE ,1 )
+## Vombatus
 heatplot.PCs(CW$cranium, minfirst=TRUE,1)
+## Lasihorhinus latifrons
 heatplot.PCs(SHNW$cranium, minfirst=TRUE,1)
+## Lasihorhinus krefftii
 heatplot.PCs(NHNW$cranium, minfirst=TRUE,1)
 
-
+## Mandibles
+## All wombats
 heatplot.PCs(AllWombats$mandible, minfirst=FALSE, 1)
+## Lasihorhinus
 heatplot.PCs(HN$mandible, minfirst=TRUE, 1 )
+## Vombatus
 heatplot.PCs(CW$mandible, minfirst=FALSE,1)
+## Lasihorhinus latifrons
 heatplot.PCs(SHNW$mandible, minfirst=TRUE,1)
+## Lasihorhinus krefftii
 heatplot.PCs(NHNW$mandible, minfirst=TRUE, 1)
-
-
-
 ```
 
