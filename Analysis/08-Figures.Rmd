@@ -180,7 +180,7 @@ plot.partitions(land_data$cranium, PointSize = 0.001)
 
 #Visualize landmark types or landmark partitions superimposed on a surface using a ply file; more involved as it requires the use of raw data
 
-```{r}
+```{r, eval = FALSE}
 
 #Create a ply file of the mean shape by warping the mean specimen in the PCA to the mean shape; for this, non-procrustes superimposed coordinates are required. The mean shapes are used here because they are easy to register with the landmarks.
 
@@ -281,6 +281,7 @@ shade3d(wombat_mandible_meanwarp, color="grey")
 ```
 
 #Supplementary Figure 3 - multivariate allometry
+
 ```{r}
 gdf=geomorph.data.frame(coords=land_data$cranium$procrustes$coords, Csize=land_data$cranium$procrustes$Csize)
 AllomCranium=procD.allometry(coords~Csize, data=gdf, method="RegScore")
