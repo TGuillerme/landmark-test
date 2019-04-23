@@ -283,12 +283,12 @@ shade3d(wombat_mandible_meanwarp, color="grey")
 #Supplementary Figure 3 - multivariate allometry
 
 ```{r}
-gdf=geomorph.data.frame(coords=land_data$cranium$procrustes$coords, Csize=land_data$cranium$procrustes$Csize)
-AllomCranium=procD.allometry(coords~Csize, data=gdf, method="RegScore")
+cranium_gdf=geomorph.data.frame(coords=land_data$cranium$procrustes$coords, Csize=land_data$cranium$procrustes$Csize)
+AllomCranium=procD.lm(coords~Csize, data=cranium_gdf, method="RegScore", logsz=)
 
 
-gdf=geomorph.data.frame(coords=land_data$mandible$procrustes$coords, Csize=land_data$mandible$procrustes$Csize)
-AllomMandible=procD.allometry(coords~Csize, data=gdf, method="RegScore")
+mandible_gdf=geomorph.data.frame(coords=land_data$mandible$procrustes$coords, Csize=land_data$mandible$procrustes$Csize)
+AllomMandible=procD.lm(coords~Csize, data=mandible_gdf, method="RegScore")
 
 
 ## Allometry plots
@@ -300,8 +300,8 @@ gg.color.hue <- function(n) {
 
 pdf("../Manuscript/Figures/Allom_Suppfigure.pdf", height=6, width=12)
 par(mfrow = c(1,2)) 
-plot(AllomCranium$Reg.proj~AllomCranium$size,bg=gg.color.hue(length(levels(cranium$Species)))[cranium$Species], pch=21, cex=1.5, xlab="Cranium Centroid size", ylab="Regression score")
-plot(AllomMandible$Reg.proj~AllomMandible$size,bg=gg.color.hue(length(levels(mandible$Species)))[mandible$Species], pch=21, cex=1.5, xlab="Mandible Centroid size", ylab="Regression score")
+plotAllometry(AllomCranium, size=cranium_gdf$Csize, method="RegScore", col = gg.color.hue (length(levels(cranium$Species))) [cranium$Species], pch=19, cex=1.5, logsz = FALSE);legend ("topleft", "Cranium", bty="n", cex=1.2);legend("bottomright", c("Common", "Southern HN", "Northern HN"), pt.bg=(gg.color.hue(3)),pch=21, bty="n", cex=1.2 )
+plotAllometry(AllomMandible, size=mandible_gdf$Csize, method="RegScore", col = gg.color.hue (length(levels(mandible$Species))) [mandible$Species], pch=19, cex=1.5, logsz = FALSE);legend ("topleft", "Mandible", bty="n", cex=1.2);legend("bottomright", c("Common", "Southern HN", "Northern HN"), pt.bg=(gg.color.hue(3)),pch=21, bty="n", cex=1.2 )
 
 dev.off()
 
