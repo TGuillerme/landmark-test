@@ -307,13 +307,13 @@ kable(coord_sex_lm[[2]][[2]]$aov.table, digits = 3,
     caption = "Procrustes linear model for coordinates as a function of sex and centroid size for the common wombat's mandible.")
 
 ## centroid size ~ sex 
-kable(coord_sex_lm[[1]][[1]]$aov.table, digits = 3,
+kable(csize_sex_lm[[1]][[1]]$aov.table, digits = 3,
     caption = "Procrustes linear model for centroid size as a function of sex for the southern hairy nose wombat's cranium.")
-kable(coord_sex_lm[[1]][[2]]$aov.table, digits = 3,
+kable(csize_sex_lm[[1]][[2]]$aov.table, digits = 3,
     caption = "Procrustes linear model for centroid size as a function of sex for the southern hairy nose wombat's mandible.")
-kable(coord_sex_lm[[2]][[1]]$aov.table, digits = 3,
+kable(csize_sex_lm[[2]][[1]]$aov.table, digits = 3,
     caption = "Procrustes linear model for centroid size as a function of sex for the common wombat's cranium.")
-kable(coord_sex_lm[[2]][[2]]$aov.table, digits = 3,
+kable(csize_sex_lm[[2]][[2]]$aov.table, digits = 3,
     caption = "Procrustes linear model for centroid size as a function of sex for the common wombat's mandible.")
 ```
 
