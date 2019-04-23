@@ -172,7 +172,150 @@ kable(mandible_disparity[[2]], digits = 5, caption = "Mandible pairwise absolute
 kable(mandible_disparity[[3]], digits = 5, caption = "Mandible pairwise absolute differences between variances between groups (p-values).")
 ```
 
+#Are wombats sexually dimorphic?
 
+
+## Make the sex subsets
+
+The following analysis don't contain the northern hairy nose wombats because there is no variation in location and no sex assignment in the dataset.
+
+```{r, message = FALSE, warning = FALSE}
+## Making the classifiers list
+all_data <- list("SHNW" = SHNW, "CW" = CW)
+all_classifiers <- list("SHNW" = list("cranium" = SHNW_cranium_class,
+                                      "mandible" = SHNW_mandible_class),
+                          "CW" = list("cranium" = CW_cranium_class,
+                                      "mandible" = CW_mandible_class)
+                        )
+```
+
+Creating the sex subsets and the centroid size per sex subsets:
+
+```{r}
+## Results placeholder
+coords_sex_output <- c_size_sex_output <- list()
+
+## Getting the coordinates for specimens with Geolocation
+for (i in 1:length(all_data)){
+    ## Result placeholder
+    list() ->
+        coords_sex_output[[i]] ->
+        c_size_sex_output[[i]]
+
+    ## Getting the coordinates for each classifier
+    for (k in 1:length(all_classifiers[[i]])){
+        
+        ## Sex coordinates
+        coords_sex_output[[i]][[k]] <- all_data[[i]][[k]]$procrustes$coords[ , ,
+                                       !is.na(all_classifiers[[i]][[k]]$Sex)]
+        ## Sex centroid size
+        c_size_sex_output[[i]][[k]] <- all_data[[i]][[k]]$procrustes$Csize[
+                                       !is.na(all_classifiers[[i]][[k]]$Sex)]
+
+    }
+    ## Naming the element
+    names(all_data[[i]]) ->
+      names(coords_sex_output[[i]]) ->
+      names(c_size_sex_output[[i]])
+}
+
+names(all_data) ->
+  names(coords_sex_output) ->
+  names(c_size_sex_output)  
+```
+
+Creating the coordinates subsets and the centroid size subsets for geolocation and sex:
+
+```{r}
+## Results placeholder
+
+sex_gdfs <- list()
+
+## Creating the geomorph dataframe for both species and datasets
+for (i in 1:length(coords_geo_output)){
+    ## Results placeholder
+    
+    sex_gdfs[[i]] <- list()
+    
+    for (k in 1:length(all_classifiers[[i]])){
+      
+      ## Sex data frame object
+      sex_gdfs[[i]][[k]] <- geomorph.data.frame(
+                          coords = coords_sex_output[[i]][[k]],
+                          Csize = c_size_sex_output[[i]][[k]],
+                          Sex= all_classifiers[[i]][[k]]$Sex[!is.na(all_classifiers[[i]][[k]]$Sex)]
+                          )
+  }
+  ## Naming the elements
+  names(sex_gdfs[[i]]) <- names(all_data[[i]])
+}
+ names(sex_gdfs) <- names(all_data) 
+
+## Making sure the dimension names are correct
+expect_equal(match(dimnames(geo_gdfs$SHNW$cranium$coords)[[3]],names(geo_gdfs$SHNW$cranium$Csize)),
+             seq(1:length(names(geo_gdfs$SHNW$cranium$Csize))))
+```
+
+
+## Running procD.lm analyses
+
+We can run the three following linear models for each species and each datasets:
+
+ * coordinates ~ sex + centroid size
+ * centroid size ~ sex
+
+```{r, message = FALSE, warning = FALSE}
+## Results placeholder
+coord_sex_lm <- csize_sex_lm <- list()
+
+## Running all the linear models
+for (i in 1:length(geo_gdfs)){
+    ## Results placeholder
+   coord_sex_lm[[i]] <- csize_sex_lm[[i]] <- list()
+        
+    for (k in 1:length(geo_gdfs[[2]])){
+        
+        ## Running the coordinates ~ sex + centroid size models
+        coord_sex_lm[[i]][[k]] <- procD.lm(coords ~ Sex + Csize, print.progress = FALSE,
+                                           data = sex_gdfs[[i]][[k]], iter = 1000)
+        ## Running the centroid size ~ sex models
+        csize_sex_lm[[i]][[k]] <- procD.lm(Csize ~ Sex, print.progress = FALSE,
+                                           data = sex_gdfs[[i]][[k]], iter = 1000)
+    }
+    ## Renaming the models
+    
+        names(coord_sex_lm[[i]]) ->
+        names(csize_sex_lm[[i]])
+  }
+
+ names(coord_sex_lm) <- names(csize_sex_lm) 
+```
+
+
+And we can display them as follows:
+
+```{r, echo = FALSE}
+
+## coordinates ~ sex + centroid size
+kable(coord_sex_lm[[1]][[1]]$aov.table, digits = 3,
+    caption = "Procrustes linear model for coordinates as a function of sex and centroid size for the southern hairy nose wombat's cranium.")
+kable(coord_sex_lm[[1]][[2]]$aov.table, digits = 3,
+    caption = "Procrustes linear model for coordinates as a function of sex and centroid size for the southern hairy nose wombat's mandible.")
+kable(coord_sex_lm[[2]][[1]]$aov.table, digits = 3,
+    caption = "Procrustes linear model for coordinates as a function of sex and centroid size for the common wombat's cranium.")
+kable(coord_sex_lm[[2]][[2]]$aov.table, digits = 3,
+    caption = "Procrustes linear model for coordinates as a function of sex and centroid size for the common wombat's mandible.")
+
+## centroid size ~ sex 
+kable(coord_sex_lm[[1]][[1]]$aov.table, digits = 3,
+    caption = "Procrustes linear model for centroid size as a function of sex for the southern hairy nose wombat's cranium.")
+kable(coord_sex_lm[[1]][[2]]$aov.table, digits = 3,
+    caption = "Procrustes linear model for centroid size as a function of sex for the southern hairy nose wombat's mandible.")
+kable(coord_sex_lm[[2]][[1]]$aov.table, digits = 3,
+    caption = "Procrustes linear model for centroid size as a function of sex for the common wombat's cranium.")
+kable(coord_sex_lm[[2]][[2]]$aov.table, digits = 3,
+    caption = "Procrustes linear model for centroid size as a function of sex for the common wombat's mandible.")
+```
 
 
 # Allometry Analyses
