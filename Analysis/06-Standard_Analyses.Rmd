@@ -194,7 +194,7 @@ for (i in 1:length(all_data)){
         
         ## Procrustes allometry test (wrapper around the procD.allometry function)
         allom_output[[i]][[k]] <- handle.procD.formula(coords ~ Csize, all_data[[i]][[k]]$procrustes,
-                                                       procD.fun = procD.allometry, iter = 1000,
+                                                       procD.fun = procD.lm, iter = 1000,
                                                        print.progress = FALSE)
     }
 }
