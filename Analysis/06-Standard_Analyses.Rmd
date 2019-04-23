@@ -276,7 +276,7 @@ for (i in 1:length(geo_gdfs)){
     for (k in 1:length(geo_gdfs[[2]])){
         
         ## Running the coordinates ~ sex + centroid size models
-        coord_sex_lm[[i]][[k]] <- procD.lm(coords ~ Sex + Csize, print.progress = FALSE,
+        coord_sex_lm[[i]][[k]] <- procD.lm(coords ~ Sex , print.progress = FALSE,
                                            data = sex_gdfs[[i]][[k]], iter = 1000)
         ## Running the centroid size ~ sex models
         csize_sex_lm[[i]][[k]] <- procD.lm(Csize ~ Sex, print.progress = FALSE,
