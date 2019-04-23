@@ -263,7 +263,7 @@ for (i in 1:length(all_data)){
         ## Procrustes allometry test (wrapper around the procD.allometry function)
         allom_output_no_patch[[i]][[k]] <- handle.procD.formula(coords ~ Csize,
                                                        all_data[[i]][[k]]$procrustes_no_patches,
-                                                       procD.fun = procD.allometry, iter = 1000,
+                                                       procD.fun = procD.lm, iter = 1000,
                                                        print.progress = FALSE)
     }
 }
@@ -304,7 +304,7 @@ gdf=geomorph.data.frame(coords=AllWombats$cranium$procrustes_no_patches$coords,
                         Csize=AllWombats$cranium$procrustes_no_patches$Csize)
 
 ##run analysis
-AllomCranium=procD.allometry(coords~Csize, data=gdf, method="RegScore")
+AllomCranium=procD.lm(coords~Csize, data=gdf, method="RegScore")
 
 #Mandible
 
@@ -313,7 +313,7 @@ gdf=geomorph.data.frame(coords=AllWombats$mandible$procrustes_no_patches$coords,
                         Csize=AllWombats$mandible$procrustes_no_patches$Csize)
 
 ##run analysis
-AllomMandible=procD.allometry(coords~Csize, data=gdf, method="RegScore")
+AllomMandible=procD.lm(coords~Csize, data=gdf, method="RegScore")
 ```
 
 
