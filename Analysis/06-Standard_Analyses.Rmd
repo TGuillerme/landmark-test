@@ -251,9 +251,9 @@ for (i in 1:length(coords_geo_output)){
 }
  names(sex_gdfs) <- names(all_data) 
 
-## Making sure the dimension names are correct
-expect_equal(match(dimnames(geo_gdfs$SHNW$cranium$coords)[[3]],names(geo_gdfs$SHNW$cranium$Csize)),
-             seq(1:length(names(geo_gdfs$SHNW$cranium$Csize))))
+## Making sure the dimension names are correct;requires testthat
+#expect_equal(match(dimnames(geo_gdfs$SHNW$cranium$coords)[[3]],names(geo_gdfs$SHNW$cranium$Csize)),
+#             seq(1:length(names(geo_gdfs$SHNW$cranium$Csize))))
 ```
 
 
