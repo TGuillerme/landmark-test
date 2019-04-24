@@ -34,8 +34,37 @@ mandible <- read.csv("../Data/Raw/classifier_mandible_wombat.csv")
 ## Remove juvenile from mandibles
 nhnw_b34 <- which(mandible[,1] == "NHNW_B34")
 mandible <- mandible[-nhnw_b34, ]
+
+
 ```
 
+#Separating the classifier file by species
+
+```{r, message = FALSE, warning = FALSE}
+## Creating the vectors holding the species names
+species <- c("CW", "SHNW", "NHNW")
+sp_holders <-c("Common wombat", "SHN wombat", "NHN wombat")
+
+## Assigning the right class to each species (for the cranium)
+for (i in 1:length(unique(cranium$Species))) {
+    ## Extracting the class for each species   
+    class <- cranium[cranium$Species == sp_holders[i],]
+    ## Preparing the sp name for giving names to outputs
+    sp_name <- paste(species[i], deparse(substitute(cranium)), "class", sep = "_")
+    ## Assigning the class to the names
+    assign(sp_name, class)
+}
+
+## Assigning the right class to each species (for the mandible)
+for (i in 1:length(unique(mandible$Species))) {  
+    ## Extracting the class for each species   
+    class <- mandible[mandible$Species == sp_holders[i],]
+    ## Preparing the sp name for giving names to outputs
+    sp_name <- paste(species[i], deparse(substitute(mandible)), "class", sep = "_")
+    ## Assigning the class to the names
+    assign(sp_name, class)
+}
+```
 # Preparing the data
 
 
@@ -177,7 +206,7 @@ kable(mandible_disparity[[3]], digits = 5, caption = "Mandible pairwise absolute
 
 ## Make the sex subsets
 
-The following analysis don't contain the northern hairy nose wombats because there is no variation in location and no sex assignment in the dataset.
+The following analysis don't contain the northern hairy nose wombats because there is no variation in sex assignment in the dataset.
 
 ```{r, message = FALSE, warning = FALSE}
 ## Making the classifiers list
@@ -232,7 +261,7 @@ Creating the coordinates subsets and the centroid size subsets for geolocation a
 sex_gdfs <- list()
 
 ## Creating the geomorph dataframe for both species and datasets
-for (i in 1:length(coords_geo_output)){
+for (i in 1:length(coords_sex_output)){
     ## Results placeholder
     
     sex_gdfs[[i]] <- list()
@@ -269,11 +298,11 @@ We can run the three following linear models for each species and each datasets:
 coord_sex_lm <- csize_sex_lm <- list()
 
 ## Running all the linear models
-for (i in 1:length(geo_gdfs)){
+for (i in 1:length(sex_gdfs)){
     ## Results placeholder
    coord_sex_lm[[i]] <- csize_sex_lm[[i]] <- list()
         
-    for (k in 1:length(geo_gdfs[[2]])){
+    for (k in 1:length(sex_gdfs[[2]])){
         
         ## Running the coordinates ~ sex + centroid size models
         coord_sex_lm[[i]][[k]] <- procD.lm(coords ~ Sex , print.progress = FALSE,
@@ -466,31 +495,6 @@ AllomMandible=procD.lm(coords~Csize, data=gdf, method="RegScore")
 
 <!-- Full_classifier_Table_ is the tables of mandibular or cranial classifiers (e.g. read.csv("../Data/Raw/classifier_cranium_wombat.csv")); spp is a vector of species (e.g. c("CW", "SHNW", "NHNW")) -->
 
-```{r, message = FALSE, warning = FALSE}
-## Creating the vectors holding the species names
-species <- c("CW", "SHNW", "NHNW")
-sp_holders <-c("Common wombat", "SHN wombat", "NHN wombat")
-
-## Assigning the right class to each species (for the cranium)
-for (i in 1:length(unique(cranium$Species))) {
-    ## Extracting the class for each species   
-    class <- cranium[cranium$Species == sp_holders[i],]
-    ## Preparing the sp name for giving names to outputs
-    sp_name <- paste(species[i], deparse(substitute(cranium)), "class", sep = "_")
-    ## Assigning the class to the names
-    assign(sp_name, class)
-}
-
-## Assigning the right class to each species (for the mandible)
-for (i in 1:length(unique(mandible$Species))) {  
-    ## Extracting the class for each species   
-    class <- mandible[mandible$Species == sp_holders[i],]
-    ## Preparing the sp name for giving names to outputs
-    sp_name <- paste(species[i], deparse(substitute(mandible)), "class", sep = "_")
-    ## Assigning the class to the names
-    assign(sp_name, class)
-}
-```
 
 ## Reduce coordinate datasets to only those that have mandibles and crania
 
