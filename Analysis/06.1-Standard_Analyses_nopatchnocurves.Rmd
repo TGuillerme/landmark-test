@@ -479,7 +479,7 @@ pca_pls_cor <- c_size_pls_cor <- list()
  
 ##corelating the pls scores with PC1 scores and centroid sizes for each species and mandible/cranium
 for (i in 1:length(merged_pls)){
-    ## Placeholders
+    ##Placeholders
     pca_pls_cor[[i]] <- c_size_pls_cor[[i]] <- list()
     
     ##this runs the lm analyses for [1] PC scores and [2] Csize
