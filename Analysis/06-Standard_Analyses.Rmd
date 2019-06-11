@@ -214,8 +214,7 @@ all_data <- list("SHNW" = SHNW, "CW" = CW)
 all_classifiers <- list("SHNW" = list("cranium" = SHNW_cranium_class,
                                       "mandible" = SHNW_mandible_class),
                           "CW" = list("cranium" = CW_cranium_class,
-                                      "mandible" = CW_mandible_class)
-                        )
+                                      "mandible" = CW_mandible_class))
 ```
 
 Creating the sex subsets and the centroid size per sex subsets:
@@ -311,13 +310,11 @@ for (i in 1:length(sex_gdfs)){
         csize_sex_lm[[i]][[k]] <- procD.lm(Csize ~ Sex, print.progress = FALSE,
                                            data = sex_gdfs[[i]][[k]], iter = 1000)
     }
-    ## Renaming the models
-    
-        names(coord_sex_lm[[i]]) ->
-        names(csize_sex_lm[[i]])
+    ## Renaming the models 
+    names(coord_sex_lm[[i]]) -> names(csize_sex_lm[[i]])
   }
 
- names(coord_sex_lm) <- names(csize_sex_lm) 
+names(coord_sex_lm) <- names(csize_sex_lm) 
 ```
 
 
@@ -403,18 +400,20 @@ kable(allom_output[[3]][[2]]$aov.table, digits = 3,
 #Cranium
 
 ##turn into gdf frame 
-gdf=geomorph.data.frame(coords=AllWombats$cranium$procrustes$coords, Csize=AllWombats$cranium$procrustes$Csize)
+gdf <- geomorph.data.frame(coords = AllWombats$cranium$procrustes$coords, 
+                           Csize = AllWombats$cranium$procrustes$Csize)
 
 ##run analysis
-AllomCranium=procD.allometry(coords~Csize, data=gdf, method="RegScore")
+AllomCranium <- procD.lm(coords~Csize, data = gdf, method = "RegScore")
 
 #Mandible
 
 ##turn into gdf frame 
-gdf=geomorph.data.frame(coords=AllWombats$mandible$procrustes$coords, Csize=AllWombats$mandible$procrustes$Csize)
+gdf <- geomorph.data.frame(coords = AllWombats$mandible$procrustes$coords,
+                           Csize = AllWombats$mandible$procrustes$Csize)
 
 ##run analysis
-AllomMandible=procD.allometry(coords~Csize, data=gdf, method="RegScore")
+AllomMandible <- procD.lm(coords~Csize, data = gdf, method = "RegScore")
 ```
 
 ## Allometry analysis without the patches
@@ -472,20 +471,20 @@ kable(allom_output_no_patch[[3]][[2]]$aov.table, digits = 3,
 #Cranium
 
 ##turn into gdf frame 
-gdf=geomorph.data.frame(coords=AllWombats$cranium$procrustes_no_patches$coords,
-                        Csize=AllWombats$cranium$procrustes_no_patches$Csize)
+gd <- geomorph.data.frame(coords = AllWombats$cranium$procrustes_no_patches$coords,
+                          Csize = AllWombats$cranium$procrustes_no_patches$Csize)
 
 ##run analysis
-AllomCranium=procD.lm(coords~Csize, data=gdf, method="RegScore")
+AllomCranium <- procD.lm(coords~Csize, data = gdf, method = "RegScore")
 
 #Mandible
 
 ##turn into gdf frame 
-gdf=geomorph.data.frame(coords=AllWombats$mandible$procrustes_no_patches$coords,
-                        Csize=AllWombats$mandible$procrustes_no_patches$Csize)
+gdf <- geomorph.data.frame(coords = AllWombats$mandible$procrustes_no_patches$coords,
+                           Csize = AllWombats$mandible$procrustes_no_patches$Csize)
 
 ##run analysis
-AllomMandible=procD.lm(coords~Csize, data=gdf, method="RegScore")
+AllomMandible <- procD.lm(coords~Csize, data = gdf, method = "RegScore")
 ```
 
 
