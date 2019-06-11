@@ -35,6 +35,19 @@ mandible <- read.csv("../Data/Raw/classifier_mandible_wombat.csv")
 nhnw_b34 <- which(mandible[,1] == "NHNW_B34")
 mandible <- mandible[-nhnw_b34, ]
 
+##brief check that the landmarks were pulled out correctly - number of landmarks and plotting of landmarks
+  ### fixed landmarks only: 65 fixed landmarks for cranium, 35 fixed landmarks for mandible
+ length(dimnames(mshape(AllWombats$cranium$procrustes_no_patches_no_curves$coords))[[1]]); plot3d(mshape(AllWombats$cranium$procrustes_no_patches_no_curves$coords),asp=FALSE)
+  
+ length( dimnames(mshape(AllWombats$mandible$procrustes_no_patches_no_curves$coords))[[1]])
+ plot3d(mshape(AllWombats$mandible$procrustes_no_patches_no_curves$coords),asp=FALSE)
+  
+   ### fixed landmarks only: 261 curve landmarks for cranium, 142 fixed landmarks for mandible
+  length(dimnames(mshape(AllWombats$cranium$procrustes_no_patches$coords))[[1]])-65; plot3d(mshape(AllWombats$cranium$procrustes_no_patches$coords),asp=FALSE)
+  
+ length( dimnames(mshape(AllWombats$mandible$procrustes_no_patches$coords))[[1]])-35;
+ plot3d(mshape(AllWombats$mandible$procrustes_no_patches$coords),asp=FALSE)
+  
 
 ```
 
@@ -66,7 +79,26 @@ for (i in 1:length(unique(mandible$Species))) {
 }
 ```
 
-# disparity comparison betweeen wombat species
+#How much % variation is explained by PC1?
+
+```{r}
+
+plotTangentSpace(NHNW$cranium$procrustes_no_patches_no_curves$coords)
+plotTangentSpace(NHNW$mandible$procrustes_no_patches_no_curves$coords)
+
+plotTangentSpace(SHNW$cranium$procrustes_no_patches_no_curves$coords)
+plotTangentSpace(SHNW$mandible$procrustes_no_patches_no_curves$coords)
+
+plotTangentSpace(CW$cranium$procrustes_no_patches_no_curves$coords)
+plotTangentSpace(CW$mandible$procrustes_no_patches_no_curves$coords)
+
+
+
+```
+
+
+
+# disparity comparison between wombat species
 
 ```{r, message = FALSE, warning = FALSE}
 ## Create gdfs with species for the data frames
@@ -76,6 +108,7 @@ cranium_gdf  <- geomorph.data.frame(coords = AllWombats$cranium$procrustes_no_pa
 mandible_gdf <- geomorph.data.frame(coords = AllWombats$mandible$procrustes_no_patches_no_curves$coords,
                                     Csize = AllWombats$mandible$procrustes_no_patches_no_curves$Csize,
                                     species = as.factor(mandible$Species))
+
 
 ## Running the analyses on the gdf objects (Disparity within groups compared to that group's mean)
 cranium_disparity <- morphol.disparity(coords ~ species, groups = ~species, iter = 1000, seed = 42,
@@ -155,7 +188,7 @@ names(all_data) ->
   names(c_size_sex_output)  
 ```
 
-Creating the coordinates subsets and the centroid size subsets for geolocation and sex:
+Creating the coordinates subsets and the centroid size subsets for sex:
 
 ```{r}
 ## Results placeholder
@@ -302,20 +335,20 @@ kable(allom_output[[3]][[2]]$aov.table, digits = 3,
 #Cranium
 
 ##turn into gdf frame 
-gdf <- geomorph.data.frame(coords = AllWombats$cranium$procrustes_no_patches_no_curves$coords, 
+gdf_cranium <- geomorph.data.frame(coords = AllWombats$cranium$procrustes_no_patches_no_curves$coords, 
                            Csize = AllWombats$cranium$procrustes_no_patches_no_curves$Csize)
 
 ##run analysis
-AllomCranium <- procD.lm(coords~Csize, data = gdf, method = "RegScore")
+AllomCranium <- procD.lm(coords~Csize, data = gdf_cranium, method = "RegScore")
 
 #Mandible
 
 ##turn into gdf frame 
-gdf <- geomorph.data.frame(coords = AllWombats$mandible$procrustes_no_patches_no_curves$coords,
+gdf_mandible <- geomorph.data.frame(coords = AllWombats$mandible$procrustes_no_patches_no_curves$coords,
                            Csize = AllWombats$mandible$procrustes_no_patches_no_curves$Csize)
 
 ##run analysis
-AllomMandible <- procD.lm(coords~Csize, data = gdf, method = "RegScore")
+AllomMandible <- procD.lm(coords~Csize, data = gdf_mandible, method = "RegScore")
 ```
 
 
@@ -338,8 +371,8 @@ all_classifiers <- list(
                     "CW" = list("cranium" = CW_cranium_class, "mandible" = CW_mandible_class)
                    )
 
-## Checking whether the cranial and mandibular coordinates datasets match
-matched_coords <- reduce.check(all_data, all_classifiers)
+## Checking whether the cranial and mandibular coordinates datasets match; see utilities for function
+matched_coords <- reduce.check(all_data, all_classifiers, procrustes=5)
 ```
 
 ## Run 2BPLS
@@ -348,7 +381,7 @@ Depending on processor speed, this can take a while, so we recommend just loadin
 The results can be run using the following code chunk:
 
 
-```{r, message = FALSE, warning = FALSE, eval = FALSE}
+```{r, message = FALSE, warning = FALSE, eval = TRUE}
 ## 2BPLS for the southern hairy nose wombats
 SHNWTBPLS <- two.b.pls(matched_coords[[1]]$SHNW$cranium ,matched_coords[[1]]$SHNW$mandible,
                        iter = 1000) 
