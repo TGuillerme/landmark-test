@@ -225,7 +225,10 @@ for(sp in 1:length(species)) {
             which_sp <- c(2,3)
         }
         landmarks <- landmarks[, , which(wombat_sp$Species %in% species[which_sp])]
-        landmarks_no_patches <- landmarks_no_patches[, , which(wombat_sp$Species %in% species[which_sp])]
+        landmarks_no_patches <- landmarks_no_patches[, ,
+                                                    which(wombat_sp$Species %in% species[which_sp])]
+        landmarks_no_patches_no_curves <- landmarks_no_patches_no_curves[, ,
+                                                    which(wombat_sp$Species %in% species[which_sp])]
 
         ## Running the Procrustes superimposition
         land_data[[dataset]][[2]] <- geomorph::gpagen(landmarks)
