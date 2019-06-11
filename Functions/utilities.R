@@ -385,7 +385,7 @@ allom.shape<-function (procrustes_coordinate_file_with_centroid_size){
 #Reducing datasets to those with counterparts
 #@params AllData is a list of procrustes objects after gpa (e.g. land_data, in this case the different species); AllClassifiers is a list of classifiers matched with the AllData shape dataset, which includes subsetting information  
   
-reduce.check<-function(AllData, AllClassifiers){
+reduce.check<-function(AllData, AllClassifiers, procrustes = 2){
     
     coords_PLS_output=list()
     check_output=list()
@@ -394,7 +394,7 @@ reduce.check<-function(AllData, AllClassifiers){
       coords_PLS_output[[i]]=list()
       
       for (k in 1:length(AllClassifiers[[i]])){
-        coords_PLS_output[[i]][[k]] <- AllData [[i]][[k]]$procrustes$coords [ , ,as.character(AllClassifiers[[i]][[k]]$TBPLS) != "Nil"]
+        coords_PLS_output[[i]][[k]] <- AllData [[i]][[k]][[procrustes]]$coords [ , ,as.character(AllClassifiers[[i]][[k]]$TBPLS) != "Nil"]
       }
       names(coords_PLS_output[[i]])<-names(AllData[[i]])
     }
