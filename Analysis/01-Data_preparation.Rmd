@@ -102,14 +102,22 @@ for(chain in chains) {
         ## Remove the patches
         landmarks_no_patches <- landmarks[, -c(grep("patch", colnames(landmarks)))]
 
+        ## Remove the patches and curves
+        landmarks_no_patches_no_curves <- landmarks_no_patches[, -c(grep(" CUR ",
+                                                                 colnames(landmarks_no_patches)))]
+
         ## Make into a 3D array
         landmarks <- geomorph::arrayspecs(landmarks, k = 3, p = ncol(landmarks)/3)
         landmarks_no_patches <- geomorph::arrayspecs(landmarks_no_patches, k = 3,
                                                      p = ncol(landmarks_no_patches)/3)
+        landmarks_no_patches_no_curves <- geomorph::arrayspecs(landmarks_no_patches_no_curves,
+                                                     k = 3,
+                                                     p = ncol(landmarks_no_patches_no_curves)/3)
         
         ## Running the Procrustes superimposition
         land_data[[dataset]][[2]] <- geomorph::gpagen(landmarks)
         land_data[[dataset]][[4]] <- geomorph::gpagen(landmarks_no_patches)
+        land_data[[dataset]][[5]] <- geomorph::gpagen(landmarks_no_patches_no_curves)
 
         ## Convert the array in 2D
         array_2d <- geomorph::two.d.array(land_data[[dataset]][[2]]$coords)
@@ -128,8 +136,10 @@ for(chain in chains) {
                                               tol = tolerance)
 
         ## Name the elements
-        names(land_data[[dataset]]) <- c("landmarkgroups", "procrustes", "ordination",
-                                         "procrustes_no_patches")
+        names(land_data[[dataset]]) <- c("landmarkgroups",
+                                         "procrustes", "ordination",
+                                         "procrustes_no_patches",
+                                         "procrustes_no_patches_no_curves")
     }
 
     ## Check if Processed folder exists
@@ -196,10 +206,17 @@ for(sp in 1:length(species)) {
         ## Remove the patches
         landmarks_no_patches <- landmarks[, -c(grep("patch", colnames(landmarks)))]
 
+        ## Remove the patches and curves
+        landmarks_no_patches_no_curves <- landmarks_no_patches[, -c(grep(" CUR ",
+                                                                 colnames(landmarks_no_patches)))]
+
         ## Make into a 3D array
         landmarks <- geomorph::arrayspecs(landmarks, k = 3, p = ncol(landmarks)/3)
         landmarks_no_patches <- geomorph::arrayspecs(landmarks_no_patches, k = 3,
                                                      p = ncol(landmarks_no_patches)/3)
+        landmarks_no_patches_no_curves <- geomorph::arrayspecs(landmarks_no_patches_no_curves,
+                                                     k = 3,
+                                                     p = ncol(landmarks_no_patches_no_curves)/3)
 
         ## Selecting the subset of species (if sp == 4, select both krefftii and latifrons)
         if(sp != 4) {
@@ -213,6 +230,7 @@ for(sp in 1:length(species)) {
         ## Running the Procrustes superimposition
         land_data[[dataset]][[2]] <- geomorph::gpagen(landmarks)
         land_data[[dataset]][[4]] <- geomorph::gpagen(landmarks_no_patches)
+        land_data[[dataset]][[5]] <- geomorph::gpagen(landmarks_no_patches_no_curves)
 
         ## Convert the array in 2D
         array_2d <- geomorph::two.d.array(land_data[[dataset]][[2]]$coords)
@@ -231,8 +249,10 @@ for(sp in 1:length(species)) {
                                               tol = tolerance)
 
         ## Name the elements
-        names(land_data[[dataset]]) <- c("landmarkgroups", "procrustes", "ordination",
-                                         "procrustes_no_patches")
+        names(land_data[[dataset]]) <- c("landmarkgroups",
+                                         "procrustes", "ordination",
+                                         "procrustes_no_patches",
+                                         "procrustes_no_patches_no_curves")
     }
 
     save(land_data, file = paste0("../Data/Processed/", chain, "_", species[sp], ".Rda"))
