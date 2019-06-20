@@ -44,12 +44,12 @@ source("../Functions/utilities.R")
 
 ```
 
-The "maximum" and "minimum" specimen, for example within Southern HN wombats:
+The "maximum" and "minimum" specimen in procrustes space, for example within Common HN wombats:
 
 ```{r}
 ## Procrustes variation ranges
-cranium=SHNW$cranium
-variation <- variation.range(cranium$procrustes, return.ID = TRUE, CI = 0.5)
+cranium=CW$cranium
+variation <- variation.range(cranium$procrustes, return.ID = TRUE)
 specimens_min_max <- variation$min.max
 procrustes_var <- variation$range[,1]
 ```
@@ -59,9 +59,34 @@ gridPar = gridPar(pt.bg = "white", pt.size = 0.5)
 open3d()
 procrustes.var.plot(cranium$procrustes$coords[, , specimens_min_max[2]],
                      cranium$procrustes$coords[, , specimens_min_max[1]],
-                     col = heat.colors, pt.size = 0.3, col.val = procrustes_var)
+                     col = heat.colors, pt.size = 0.8, col.val = procrustes_var)
 ```
 
+Specimens along PC extremes (i.e. not hypothetical specimens)
+```{r}
+
+##  variation ranges
+cranium=CW$cranium
+variation <- variation.range(cranium$procrustes$coords, ordination= "TRUE")
+
+variation.range(proc_super, ordination = TRUE, axis = 1, type = "vector", what = "length")
+
+
+
+specimens_min_max <- variation$min.max
+procrustes_var <- variation$range[,1]
+```
+
+```{r, eval = FALSE}
+gridPar = gridPar(pt.bg = "white", pt.size = 0.5)
+open3d()
+procrustes.var.plot(cranium$procrustes$coords[, , specimens_min_max[2]],
+                     cranium$procrustes$coords[, , specimens_min_max[1]],
+                     col = heat.colors, pt.size = 0.8, col.val = procrustes_var)
+```
+
+
+```
 
 #Doing this using hypothetical PC min/max landmarks for the figures in the manuscript. See utilities file for details. 
 

@@ -37,15 +37,15 @@ mandible <- mandible[-nhnw_b34, ]
 
 ##brief check that the landmarks were pulled out correctly - number of landmarks and plotting of landmarks
   ### fixed landmarks only: 65 fixed landmarks for cranium, 35 fixed landmarks for mandible
- length(dimnames(mshape(AllWombats$cranium$procrustes_no_patches_no_curves$coords))[[1]]); plot3d(mshape(AllWombats$cranium$procrustes_no_patches_no_curves$coords),asp=FALSE)
+ length(dimnames(mshape(AllWombats$cranium$procrustes_no_patches$coords))[[1]]); plot3d(mshape(AllWombats$cranium$procrustes_no_patches$coords),asp=FALSE)
   
- length( dimnames(mshape(AllWombats$mandible$procrustes_no_patches_no_curves$coords))[[1]])
- plot3d(mshape(AllWombats$mandible$procrustes_no_patches_no_curves$coords),asp=FALSE)
+ length( dimnames(mshape(AllWombats$mandible$procrustes_no_patches$coords))[[1]])
+ plot3d(mshape(AllWombats$mandible$procrustes_no_patches$coords),asp=FALSE)
   
-   ### fixed landmarks only: 261 curve landmarks for cranium, 142 fixed landmarks for mandible
-  length(dimnames(mshape(AllWombats$cranium$procrustes_no_patches$coords))[[1]])-65; plot3d(mshape(AllWombats$cranium$procrustes_no_patches$coords),asp=FALSE)
+   ### fixed landmarks and curves only: 261 curve landmarks for cranium, 142 fixed landmarks for mandible
+  length(dimnames(mshape(AllWombats$cranium$procrustes_no_patches_no_curves$coords))[[1]])-65; plot3d(mshape(AllWombats$cranium$procrustes_no_patches$coords),asp=FALSE)
   
- length( dimnames(mshape(AllWombats$mandible$procrustes_no_patches$coords))[[1]])-35;
+ length( dimnames(mshape(AllWombats$mandible$procrustes_no_patches_no_curves$coords))[[1]])-35;
  plot3d(mshape(AllWombats$mandible$procrustes_no_patches$coords),asp=FALSE)
   
 
@@ -83,14 +83,14 @@ for (i in 1:length(unique(mandible$Species))) {
 
 ```{r}
 
-plotTangentSpace(NHNW$cranium$procrustes_no_patches_no_curves$coords)
-plotTangentSpace(NHNW$mandible$procrustes_no_patches_no_curves$coords)
+plotTangentSpace(NHNW$cranium$procrustes_no_patches$coords)
+plotTangentSpace(NHNW$mandible$procrustes_no_patches$coords)
 
-plotTangentSpace(SHNW$cranium$procrustes_no_patches_no_curves$coords)
-plotTangentSpace(SHNW$mandible$procrustes_no_patches_no_curves$coords)
+plotTangentSpace(SHNW$cranium$procrustes_no_patches$coords)
+plotTangentSpace(SHNW$mandible$procrustes_no_patches$coords)
 
-plotTangentSpace(CW$cranium$procrustes_no_patches_no_curves$coords)
-plotTangentSpace(CW$mandible$procrustes_no_patches_no_curves$coords)
+plotTangentSpace(CW$cranium$procrustes_no_patches$coords)
+plotTangentSpace(CW$mandible$procrustes_no_patches$coords)
 
 
 
@@ -102,11 +102,11 @@ plotTangentSpace(CW$mandible$procrustes_no_patches_no_curves$coords)
 
 ```{r, message = FALSE, warning = FALSE}
 ## Create gdfs with species for the data frames
-cranium_gdf  <- geomorph.data.frame(coords = AllWombats$cranium$procrustes_no_patches_no_curves$coords,
-                                    Csize = AllWombats$cranium$procrustes_no_patches_no_curves$Csize,
+cranium_gdf  <- geomorph.data.frame(coords = AllWombats$cranium$procrustes_no_patches$coords,
+                                    Csize = AllWombats$cranium$procrustes_no_patches$Csize,
                                     species = as.factor(cranium$Species))
-mandible_gdf <- geomorph.data.frame(coords = AllWombats$mandible$procrustes_no_patches_no_curves$coords,
-                                    Csize = AllWombats$mandible$procrustes_no_patches_no_curves$Csize,
+mandible_gdf <- geomorph.data.frame(coords = AllWombats$mandible$procrustes_no_patches$coords,
+                                    Csize = AllWombats$mandible$procrustes_no_patches$Csize,
                                     species = as.factor(mandible$Species))
 
 
@@ -159,21 +159,21 @@ Creating the sex subsets and the centroid size per sex subsets:
 ## Results placeholder
 coords_sex_output <- c_size_sex_output <- list()
 
-## Getting the coordinates for specimens with Geolocation
+## Getting the coordinates for specimens with Sex
 for (i in 1:length(all_data)){
     ## Result placeholder
     list() ->
         coords_sex_output[[i]] ->
         c_size_sex_output[[i]]
 
-    ##Â Getting the coordinates for each classifier
+    ##Â Getting the coordinates for each classifier
     for (k in 1:length(all_classifiers[[i]])){
         
         ## Sex coordinates
-        coords_sex_output[[i]][[k]] <- all_data[[i]][[k]]$procrustes_no_patches_no_curves$coords[,,
+        coords_sex_output[[i]][[k]] <- all_data[[i]][[k]]$procrustes_no_patches$coords[,,
                                        !is.na(all_classifiers[[i]][[k]]$Sex)]
         ## Sex centroid size
-        c_size_sex_output[[i]][[k]] <- all_data[[i]][[k]]$procrustes_no_patches_no_curves$Csize[
+        c_size_sex_output[[i]][[k]] <- all_data[[i]][[k]]$procrustes_no_patches$Csize[
                                        !is.na(all_classifiers[[i]][[k]]$Sex)]
 
     }
@@ -297,7 +297,7 @@ for (i in 1:length(all_data)){
 
         ## Procrustes allometry test (wrapper around the procD.allometry function)
         allom_output[[i]][[k]] <- handle.procD.formula(coords ~ Csize,
-                                                 all_data[[i]][[k]]$procrustes_no_patches_no_curves,
+                                                 all_data[[i]][[k]]$procrustes_no_patches,
                                                  procD.fun = procD.lm, iter = 1000,
                                                  print.progress = FALSE)
     }
@@ -335,8 +335,8 @@ kable(allom_output[[3]][[2]]$aov.table, digits = 3,
 #Cranium
 
 ##turn into gdf frame 
-gdf_cranium <- geomorph.data.frame(coords = AllWombats$cranium$procrustes_no_patches_no_curves$coords, 
-                           Csize = AllWombats$cranium$procrustes_no_patches_no_curves$Csize)
+gdf_cranium <- geomorph.data.frame(coords = AllWombats$cranium$procrustes_no_patches$coords, 
+                           Csize = AllWombats$cranium$procrustes_no_patches$Csize)
 
 ##run analysis
 AllomCranium <- procD.lm(coords~Csize, data = gdf_cranium, method = "RegScore")
@@ -344,8 +344,8 @@ AllomCranium <- procD.lm(coords~Csize, data = gdf_cranium, method = "RegScore")
 #Mandible
 
 ##turn into gdf frame 
-gdf_mandible <- geomorph.data.frame(coords = AllWombats$mandible$procrustes_no_patches_no_curves$coords,
-                           Csize = AllWombats$mandible$procrustes_no_patches_no_curves$Csize)
+gdf_mandible <- geomorph.data.frame(coords = AllWombats$mandible$procrustes_no_patches$coords,
+                           Csize = AllWombats$mandible$procrustes_no_patches$Csize)
 
 ##run analysis
 AllomMandible <- procD.lm(coords~Csize, data = gdf_mandible, method = "RegScore")
@@ -372,7 +372,7 @@ all_classifiers <- list(
                    )
 
 ## Checking whether the cranial and mandibular coordinates datasets match; see utilities for function
-matched_coords <- reduce.check(all_data, all_classifiers, procrustes=5)
+matched_coords <- reduce.check(all_data, all_classifiers, procrustes=4)
 ```
 
 ## Run 2BPLS
@@ -443,7 +443,7 @@ for (i in 1:length(all_data)){
     pc_scores[[i]][[k]] <- as.data.frame(all_data[[i]][[k]]$ordination$x[,1])
 
     ## Get the centroid sizes
-    centroid_size[[i]][[k]] <- as.data.frame(all_data[[i]][[k]]$procrustes_no_patches_no_curves$Csize)  
+    centroid_size[[i]][[k]] <- as.data.frame(all_data[[i]][[k]]$procrustes_no_patches$Csize)  
     
     ## Combine the pls data
     pls_pca[[i]][[k]] <- merge(TBPLS_scores[[i]][[k]], pc_scores[[i]][[k]],
