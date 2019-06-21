@@ -62,12 +62,13 @@ procrustes.var.plot(cranium$procrustes$coords[, , specimens_min_max[2]],
                      col = heat.colors, pt.size = 0.8, col.val = procrustes_var)
 ```
 
-Specimens along PC extremes (i.e. not hypothetical specimens, as per warning messaage)
-```{r}
+Specimens along PC extremes (i.e. not hypothetical specimens, as per warning message)
 
+```{r}
 ##  variation ranges
 cranium=CW$cranium
 variation <- variation.range(cranium$procrustes, return.ID = TRUE, axis=1, ordination=cranium$ordination )
+variation_hyp <- variation.range(cranium$procrustes, axis=1, ordination=cranium$ordination )
 
 specimens_min_max <- variation$min.max
 procrustes_var <- variation$range[,1]
@@ -78,11 +79,61 @@ gridPar = gridPar(pt.bg = "white", pt.size = 0.5)
 open3d()
 procrustes.var.plot(cranium$procrustes$coords[, , specimens_min_max[2]],
                      cranium$procrustes$coords[, , specimens_min_max[1]],
-                     col = heat.colors, pt.size = 0.8, col.val = procrustes_var)
+                     col = heat.colors, pt.size = 0.8, col.val =  variation$range[,1])
 ```
 
 
+```{r}
+## Comparing the coordinates of both hypothetical and extreme specimens.
+species_dataset <- AllWombats$cranium
+
+## Getting the true specimens that are closest to the hypothetical ones
+variation <- variation.range(species_dataset$procrustes, return.ID = TRUE, axis = 1,
+                             ordination = species_dataset$ordination)
+true_specimens <- variation$min.max
+
+## Getting the hypothetical specimens (as output by plotTangentSpace)
+hypothetical_spec <- plotTangentSpace(species_dataset$procrustes$coords, verbose = FALSE)
+
+## Isolating the pairs of specimens
+hypothetical_spec_min <- hypothetical_spec$pc.shapes[[1]]
+hypothetical_spec_max <- hypothetical_spec$pc.shapes[[2]]
+true_specimens_min <- species_dataset$procrustes$coords[, , true_specimens[1]]
+true_specimens_max <- species_dataset$procrustes$coords[, , true_specimens[2]]
+
+## Comparing the max and mins (they are supposed to be different!)
+all(hypothetical_spec_min == hypothetical_spec_max) # FALSE (they are different)
+all(true_specimens_min == true_specimens_max) # FALSE
+
+## Comparing the true and the hypothetical (the are supposed to be different)
+all(hypothetical_spec_min == true_specimens_min) # FALSE
+all(hypothetical_spec_max == true_specimens_max) # FALSE
+
+## Are any of the coordinates the same?
+any(hypothetical_spec_min == true_specimens_min) # FALSE
+any(hypothetical_spec_max == true_specimens_max) # FALSE
+
+## Is it a rounding problem (how many are similar per rounding)
+## This function returns the percentage of coordinates that are matching
+compare.rounding <- function(digits, x, y) {
+   rounding_equals <- length(which(round(x, digits) == round(y, digits)))
+   return(rounding_equals/length(x)*100)
+}
+differences_min <- sapply(c(1:7), compare.rounding, hypothetical_spec_min, true_specimens_min)
+differences_max <- sapply(c(1:7), compare.rounding, hypothetical_spec_max, true_specimens_max)
+
+## Plotting these results
+plot(NULL, xlab = "Precision (digits)", ylab = "Percentage of coordinates matching",
+           ylim = c(0,100), xlim = c(1,7))
+legend("topright", lty = 1, col = c("purple", "pink"),
+       legend = c("hypothetical vs. max proj. (min)", "hypothetical vs. max proj. (max)"))
+lines(differences_min, col = "purple")
+lines(differences_max, col = "pink")
+
 ```
+
+
+<!-- ``` -->
 
 #Doing this using hypothetical PC min/max landmarks for the figures in the manuscript. See utilities file for details. Also be aware that the warning message that the returned specimen does not correspond to the PCmin/max specimen but the nearest observed one is INCORRECT in this case becasue we are using the hypothetical configurations as specimens.
 
