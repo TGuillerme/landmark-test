@@ -48,8 +48,8 @@ The "maximum" and "minimum" specimen in procrustes space
 
 ```{r}
 ## Procrustes variation ranges
-cranium=SHNW$cranium
-variation <- variation.range(cranium$procrustes, return.ID = TRUE)
+target=CW$cranium
+variation <- variation.range(target$procrustes, return.ID = TRUE)
 specimens_min_max <- variation$min.max
 procrustes_var <- variation$range[,1]
 ```
@@ -57,83 +57,42 @@ procrustes_var <- variation$range[,1]
 ```{r, eval = FALSE}
 gridPar = gridPar(pt.bg = "white", pt.size = 0.5)
 open3d()
-procrustes.var.plot(cranium$procrustes$coords[, , specimens_min_max[2]],
-                     cranium$procrustes$coords[, , specimens_min_max[1]],
-                     col = heat.colors, pt.size = 0.8, col.val = procrustes_var)
+procrustes.var.plot(target$procrustes$coords[, , specimens_min_max[1]],
+                     target$procrustes$coords[, , specimens_min_max[2]],
+                     col = heat.colors, pt.size = 0.8, col.val = procrustes_var, main = "GPA var")
 ```
 
 Specimens along PC extremes (i.e. not hypothetical specimens, as per warning message)
 
 ```{r}
 ##  variation ranges
-cranium=CW$cranium
-variation <- variation.range(cranium$procrustes, return.ID = TRUE, axis=1, ordination=cranium$ordination )
-variation_hyp <- variation.range(cranium$procrustes, axis=1, ordination=cranium$ordination )
+target=CW$cranium
+#HIgest and lowest Pc1 score - specimen closest to PC1 extremes
+variation_real <- variation.range(target$procrustes, axis=1, ordination=target$ordination, return.ID = TRUE)
 
-specimens_min_max <- variation$min.max
-procrustes_var <- variation$range[,1]
+minmax <- variation_real$min.max
+
+#measuring the difference between the two sepcimens selected in variation.real
+variation <- coordinates.difference(target$procrustes$coords[,,minmax[1]], target$procrustes$coords[,,minmax[2]], type = "spherical")
+
+open3d()
+#Use "variation" to colour the plot exactly according to vector length
+procrustes.var.plot(target$procrustes$coords[, , minmax[2]],
+                     target$procrustes$coords[, , minmax[1]],
+                     col = heat.colors, pt.size = 0.8, col.val = variation[[1]][,1],
+                      main="Min-max specimens closes to PC1 extremes")
+
 ```
 
 ```{r, eval = FALSE}
 gridPar = gridPar(pt.bg = "white", pt.size = 0.5)
 open3d()
-procrustes.var.plot(cranium$procrustes$coords[, , specimens_min_max[2]],
-                     cranium$procrustes$coords[, , specimens_min_max[1]],
-                     col = heat.colors, pt.size = 0.8, col.val =  variation$range[,1])
+procrustes.var.plot(target$procrustes$coords[, , specimens_min_max[2]],
+                     target$procrustes$coords[, , specimens_min_max[1]],
+                     col = heat.colors, pt.size = 0.8, col.val =  variation$range[,1],
+                      main="procrustes.var.plot based actual specimens")
 ```
 
-
-```{r}
-## Comparing the coordinates of both hypothetical and extreme specimens.
-species_dataset <- AllWombats$cranium
-
-## Getting the true specimens that are closest to the hypothetical ones
-variation <- variation.range(species_dataset$procrustes, return.ID = TRUE, axis = 1,
-                             ordination = species_dataset$ordination)
-true_specimens <- variation$min.max
-
-## Getting the hypothetical specimens (as output by plotTangentSpace)
-hypothetical_spec <- plotTangentSpace(species_dataset$procrustes$coords, verbose = FALSE)
-
-## Isolating the pairs of specimens
-hypothetical_spec_min <- hypothetical_spec$pc.shapes[[1]]
-hypothetical_spec_max <- hypothetical_spec$pc.shapes[[2]]
-true_specimens_min <- species_dataset$procrustes$coords[, , true_specimens[1]]
-true_specimens_max <- species_dataset$procrustes$coords[, , true_specimens[2]]
-
-## Comparing the max and mins (they are supposed to be different!)
-all(hypothetical_spec_min == hypothetical_spec_max) # FALSE (they are different)
-all(true_specimens_min == true_specimens_max) # FALSE
-
-## Comparing the true and the hypothetical (the are supposed to be different)
-all(hypothetical_spec_min == true_specimens_min) # FALSE
-all(hypothetical_spec_max == true_specimens_max) # FALSE
-
-## Are any of the coordinates the same?
-any(hypothetical_spec_min == true_specimens_min) # FALSE
-any(hypothetical_spec_max == true_specimens_max) # FALSE
-
-## Is it a rounding problem (how many are similar per rounding)
-## This function returns the percentage of coordinates that are matching
-compare.rounding <- function(digits, x, y) {
-   rounding_equals <- length(which(round(x, digits) == round(y, digits)))
-   return(rounding_equals/length(x)*100)
-}
-differences_min <- sapply(c(1:7), compare.rounding, hypothetical_spec_min, true_specimens_min)
-differences_max <- sapply(c(1:7), compare.rounding, hypothetical_spec_max, true_specimens_max)
-
-## Plotting these results
-plot(NULL, xlab = "Precision (digits)", ylab = "Percentage of coordinates matching",
-           ylim = c(0,100), xlim = c(1,7))
-legend("topright", lty = 1, col = c("purple", "pink"),
-       legend = c("hypothetical vs. max proj. (min)", "hypothetical vs. max proj. (max)"))
-lines(differences_min, col = "purple")
-lines(differences_max, col = "pink")
-
-```
-
-
-<!-- ``` -->
 
 #Doing this using hypothetical PC min/max landmarks for the figures in the manuscript. See utilities file for details. Also be aware that the warning message that the returned specimen does not correspond to the PCmin/max specimen but the nearest observed one is INCORRECT in this case becasue we are using the hypothetical configurations as specimens.
 
@@ -144,7 +103,7 @@ heatplot.PCs(AllWombats$cranium, minfirst=FALSE, 1 )
 ## Lasiorhinus
 heatplot.PCs(HN$cranium, minfirst=TRUE ,1 )
 ## Vombatus
-heatplot.PCs(CW$cranium, minfirst=FALSE,1)
+heatplot.PCs(CW$cranium, minfirst=FALSE,1, main="hypothetical CW PC1")
 ## Lasihorhinus latifrons
 heatplot.PCs(SHNW$cranium, minfirst=TRUE,1)
 ## Lasihorhinus krefftii
@@ -161,5 +120,36 @@ heatplot.PCs(CW$mandible, minfirst=FALSE,1)
 heatplot.PCs(SHNW$mandible, minfirst=TRUE,1)
 ## Lasihorhinus krefftii
 heatplot.PCs(NHNW$mandible, minfirst=TRUE, 1)
+```
+
+#In case there are any doubts that the heatplot and "regular" PlotTangentSpace/plotRefToTArget show the same, below is a comparison
+```{r}
+
+gridpar=gridPar(pt.size=0.3)
+
+#Run conventional PlotRefToTarget
+CWGeomorph=plotTangentSpace(CW$cranium$procrustes$coords)
+
+#Find min/max specimen
+which(CWGeomorph$pc.scores[,1] ==  max(CWGeomorph$pc.scores[,1]))#CW_M22233, number 3
+which(CWGeomorph$pc.scores[,1] ==  min(CWGeomorph$pc.scores[,1]))#CW_M22233, number 14
+
+#also no. 3 and 14 in the coordinates
+dimnames(CW$cranium$procrustes$coords)[[3]]
+
+#Plot hypothetical configurations 
+open3d()
+plotRefToTarget(CWGeomorph$pc.shapes$PC1max, CWGeomorph$pc.shapes$PC1min, method="vector",gridPar=gridpar, main="min/max hypothetical specimens on PC1 as determined through PlotTangentSpace")
+
+#Plot actual specimens - they are different!
+
+open3d()
+plotRefToTarget( CW$cranium$procrustes$coords[,,3], CW$cranium$procrustes$coords[,,14], method="vector", gridPar=gridpar, main="min/max actual specimens of CW PC1 as determined through plotTangentSpace")
+
+
+#hypothetical PCs "the old fashioned way" are comparable to the heat plots and running the above code also means that 
+open3d()
+heatplot.PCs(CW$cranium, minfirst=FALSE,1)
+
 ```
 

@@ -1,4 +1,4 @@
-# @param species the species name
+﻿# @param species the species name
 # @param dataset the type of dataset (cranium or mandible)
 # @param path the path where the processed data is
 # @param combine.land whether to combine the landmarks (only two partitions)
@@ -882,9 +882,6 @@ heatplot.PCs<-function (species_dataset,minfirst, PC_axis,...){
   
   ## Procrustes variation ranges for PCA; axis determines which ordination axis to use
   variation <- variation.range(species_dataset$procrustes, return.ID = TRUE, axis=PC_axis, ordination=species_dataset$ordination)
-  
-  # identifies specimens at opposite ends of the PC spectrum
-  specimens_min_max <- variation$min.max
   
   #determines range of variation between PC extremes
   procrustes_var <- variation$range[,1]
