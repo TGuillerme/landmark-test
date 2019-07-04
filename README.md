@@ -76,24 +76,24 @@ This script is available [here in Rmd](https://github.com/TGuillerme/landmark-te
 
 ## 05 - Results summary
 
-This script produces the figures @@@ and @@@ in the manuscript and the tables @@@ in the supplementary materials.
+This script produces the figure 4 in the manuscript and the tables in the supplementary materials.
 This script is available [here in Rmd](https://github.com/TGuillerme/landmark-test/blob/master/Analysis/05-Results_summary.Rmd) or [here in html](https://rawgit.com/TGuillerme/landmark-test/master/Analysis/05-Results_summary.html).
 
 ## 06 - Main analyses
 
 This script contains the Procrustes distances analysis and covers the allometry analysis, the linear models and the partial least squares analysis.
-It was used to produce the results in figures @@@ and tables @@@ in the manuscript.
+It was used to produce tables 1 and 2 in the manuscript.
 This script is available [here in Rmd](https://github.com/TGuillerme/landmark-test/blob/master/Analysis/06-Main_Analyses.Rmd).
 
 ## 07 Heatplots
 
-This script contains the code for producing the landmark variation heaplots (figures @@@ and tables @@@).
+This script contains the code for producing the landmark variation heaplots (figures 2 and 3).
 The script is based on a modified version of the function `geomorph::plotRefToTarget`.
 This script is available [here in Rmd](https://github.com/TGuillerme/landmark-test/blob/master/Analysis/07-heatplots.Rmd).
 
 ## 08 Figures
 
-Finally, this script was used to produce the figures @@@ in the manuscript and can be found [here in Rmd](https://github.com/TGuillerme/landmark-test/blob/master/Analysis/08-Figures.Rmd).
+Finally, this script was used to produce the figures 1 in the manuscript and can be found [here in Rmd](https://github.com/TGuillerme/landmark-test/blob/master/Analysis/08-Figures.Rmd).
 
 # Checkpoint for reproducibility
 To rerun all the code with packages as they existed on CRAN at time of our analyses we recommend using the `checkpoint` package, and running this code prior to the analysis:
