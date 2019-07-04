@@ -1,7 +1,7 @@
 # landmark-test
 <!-- Authors: [Vera Weisbecker](v.weisbecker@uq.edu.au), [Thomas Guillerme](mailto:guillert@tcd.ie)... -->
 
-This repository contains all the code and data used in the manuscript [Link to final published pdf will be here]().
+This repository contains all the code and data used in the manuscript: *Individual variation of the masticatory system dominates 3D skull shape in the herbivory-adapted marsupial wombats.* ([link to the preprint](https://www.biorxiv.org/content/10.1101/692632v1)).
 
 <!-- To cite the paper:  -->
 <!-- > @@@ -->
