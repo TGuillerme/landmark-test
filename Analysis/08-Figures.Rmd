@@ -44,7 +44,9 @@ rawdata_mandible_wombat <- read.csv ("../Data/Raw/landmarkdata_mandible_wombat.c
 nhnw_b34 <- which(colnames(rawdata_mandible_wombat) == "NHNW_B34")
 rawdata_mandible_wombat <- rawdata_mandible_wombat[,-nhnw_b34]
 
+# load allometry residuals
 
+load("../Data/Processed/Allometry_residuals.rda")
 
 #read classifiers
 cranium <- read.csv("../Data/Raw/classifier_cranium_wombat.csv")
@@ -59,7 +61,7 @@ mandible <- mandible[-nhnw_b34, ]
 ```
 
 
-# PCA plot for Figure 1 and supplementary Figure 4
+# PCA plot for Figure 1 
 
 ```{r, message = FALSE, warning = FALSE}
 
@@ -74,18 +76,18 @@ gg.color.hue <- function(n) {
     hcl(h = hues, l = 65, c = 100)[1:n]
 }
 
-## PCA plots - supplementary fig. 2
+## PCA plots - Figure 1
 
 
-pdf("../Manuscript/Figures/suppfigure2_PCA.pdf", height = 10, width = 12)
-#plot.new()
+pdf("../Manuscript/Figures/Figure1_PCA.pdf", height = 10, width = 12)
 par(mfrow = c(2,2))
-plot.pca(land_data$cranium$ordination, classifier_cranium$Species);legend("bottomleft", c("Common", "Southern HN", "Northern HN"), pt.bg=(gg.color.hue(3)),pch=21, bty="n", cex=1.2 ); legend ("top", "All Species - Cranium", bty="n", cex=1.2)
+plot.pca(land_data$cranium$ordination, classifier_cranium$Species);legend("bottomleft", c("Common", "Southern HN", "Northern HN"), pt.bg=(gg.color.hue(3)),pch=21, bty="n", cex=1.2, y.intersp = 0.7 ); legend ("top", "All Species - Cranium", bty="n", cex=1.2)
 plot.pca(land_data$mandible$ordination, classifier_mandible$Species); legend ("top", "All Species - Mandible", bty="n", cex=1.2)
 
 
 ## Loading the data for the within-species PCA plots
-load("../Data/Processed/wombat_latifrons.Rda")
+load("../Data/Processed/wombat_lasiorhinus.Rda")
+
 classifier_cranium_Lasio= subset(classifier_cranium, classifier_cranium$Species != "Common wombat" )
 classifier_mandible_Lasio= subset(classifier_mandible, classifier_mandible$Species != "Common wombat" )
 
@@ -97,6 +99,77 @@ dev.off()
 
 
 ```
+
+
+#the same plot with allometry residuals (residuals of the regression of shape against centroid size)
+
+```{r, message = FALSE, warning = FALSE}
+
+load("../Data/Processed/Allometry_residuals.rda")
+
+
+#make ordination as required for plot.pca (in utilities)
+array_2d_cran <- geomorph::two.d.array(Allom_plus_consensus_cran)
+
+ordination_cran <- prcomp(array_2d_cran, center = TRUE, scale. = FALSE, retx = TRUE,
+                                              tol = NULL)
+# Mandible, all species
+
+array_2d_mand <- geomorph::two.d.array(Allom_plus_consensus_mand)
+
+ordination_mand <- prcomp(array_2d_mand, center = TRUE, scale. = FALSE, retx = TRUE,
+                                              tol = NULL)
+
+#Cranium, Lasiorhinus
+array_2d_cran_las <- geomorph::two.d.array(Allom_plus_consensus_cran_Lasio)
+
+ordination_cran_las <- prcomp(array_2d_cran_las, center = TRUE, scale. = FALSE, retx = TRUE,
+                                              tol = NULL)
+# Mandible, Lasiorhinus
+
+array_2d_mand_las <- geomorph::two.d.array(Allom_plus_consensus_mand_Lasio)
+
+ordination_mand_las <- prcomp(array_2d_mand_las, center = TRUE, scale. = FALSE, retx = TRUE,
+                                              tol = NULL)
+
+
+
+classifier_cranium <- cranium
+classifier_mandible <- mandible
+
+##loading hues
+gg.color.hue <- function(n) {
+    hues = seq(15, 375, length = n + 1)
+    hcl(h = hues, l = 65, c = 100)[1:n]
+}
+
+## PCA plots - supplementary fig. 2
+
+
+pdf("../Manuscript/Figures/SuppX_Residual_PCA.pdf", height = 10, width = 12)
+#plot.new()
+par(mfrow = c(2,2))
+plot.pca(ordination_cran, classifier_cranium$Species);legend("bottomleft", c("Common", "Southern HN", "Northern HN"), pt.bg=(gg.color.hue(3)),pch=21, bty="n", cex=1.2 ); legend ("top", "All Species - Cranium", bty="n", cex=1.2)
+
+plot.pca(ordination_mand, classifier_mandible$Species); legend ("top", "All Species - Mandible", bty="n", cex=1.2)
+
+
+## Loading the data for the within-species PCA plots
+load("../Data/Processed/wombat_latifrons.Rda")
+classifier_cranium_Lasio= subset(classifier_cranium, classifier_cranium$Species != "Common wombat" )
+classifier_mandible_Lasio= subset(classifier_mandible, classifier_mandible$Species != "Common wombat" )
+
+
+plot.pca(ordination_cran_las, classifier_cranium_Lasio$Species);  legend ("top", "Hairy-nosed - Cranium", bty="n", cex=1.2)
+plot.pca(ordination_mand_las, classifier_mandible_Lasio$Species);  legend ("top", "Hairy-nosed - Mandible", bty="n", cex=1.2 )
+
+dev.off()
+
+
+```
+
+
+
 
 
 # Pull out landmark designations. These need to be raw data because the landmark names are in the raw data

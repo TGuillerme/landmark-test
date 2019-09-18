@@ -21,6 +21,8 @@ set.seed(42)
 ## Loading and renaming the land_data objects
 load("../Data/Processed/wombat.Rda")
 AllWombats <- land_data
+load("../Data/Processed/wombat_lasiorhinus.Rda")
+Lasio <- land_data
 load("../Data/Processed/wombat_krefftii.Rda")
 NHNW <- land_data
 load("../Data/Processed/wombat_latifrons.Rda")
@@ -412,7 +414,7 @@ allom_cranium <-arrayspecs(AllomCranium$residuals,dim(gdf_cranium$coords)[[1]],3
 cranium_consensus <- AllWombats$cranium$procrustes$consensus
 
 #Add the consensus shape (from the GPA) to residuals if you want to understand the landmark variation in the residuals; this does not affect the analyses though and is just "cosmetic"
-Allom_plus_consensus <- allom_cranium + array(cranium_consensus, dim(allom_cranium))
+Allom_plus_consensus_cran <- allom_cranium + array(cranium_consensus, dim(allom_cranium))
 
 
 
@@ -429,7 +431,48 @@ allom_mandible <-arrayspecs(AllomMandible$residuals,dim(gdf_mandible$coords)[[1]
 
 mandible_consensus <- AllWombats$mandible$procrustes$consensus
 
-Allom_plus_consensus <- allom_mandible + array(mandible_consensus, dim(allom_mandible))
+Allom_plus_consensus_mand <- allom_mandible + array(mandible_consensus, dim(allom_mandible))
+
+
+#The same for just the Northerns/Southerns for later presentation
+
+#Cranium
+
+##turn into gdf frame 
+gdf_cranium <- geomorph.data.frame(coords = Lasio$cranium$procrustes$coords, 
+                           Csize = Lasio$cranium$procrustes$Csize)
+##run analysis
+AllomCranium <- procD.lm(coords~Csize, data = gdf, method = "RegScore")
+
+#Create dataset of residuals of allometry for generating shape space without size
+
+allom_cranium <-arrayspecs(AllomCranium$residuals,dim(gdf_cranium$coords)[[1]],3)
+
+cranium_consensus <- Lasio$cranium$procrustes$consensus
+
+#Add the consensus shape (from the GPA) to residuals if you want to understand the landmark variation in the residuals; this does not affect the analyses though and is just "cosmetic"
+Allom_plus_consensus_cran_Lasio <- allom_cranium + array(cranium_consensus, dim(allom_cranium))
+
+
+
+#Mandible
+
+##turn into gdf frame 
+gdf_mandible <- geomorph.data.frame(coords = Lasio$mandible$procrustes$coords,
+                           Csize = Lasio$mandible$procrustes$Csize)
+
+##run analysis
+AllomMandible <- procD.lm(coords~Csize, data = gdf_mandible, method = "RegScore")
+
+allom_mandible <-arrayspecs(AllomMandible$residuals,dim(gdf_mandible$coords)[[1]],3)
+
+mandible_consensus <- Lasio$mandible$procrustes$consensus
+
+Allom_plus_consensus_mand_Lasio <- allom_mandible + array(mandible_consensus, dim(allom_mandible))
+
+
+
+save(Allom_plus_consensus_cran,Allom_plus_consensus_mand, Allom_plus_consensus_cran_Lasio,Allom_plus_consensus_mand_Lasio,file = "../Data/Processed/Allometry_residuals.rda")
 
 ```
 
