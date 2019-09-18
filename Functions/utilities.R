@@ -840,8 +840,10 @@ plot.pca <- function(ordination, classifier, axis = c(1, 2), ...) {
 
   ## The plot
   plot(NULL, xlim = plot_lim, ylim = plot_lim,
-       xlab = paste0("PC", axis[1], " (", load[1], "%)"),
-       ylab = paste0("PC", axis[2], " (", load[2], "%)"),
+       xlab = paste0("PC", axis[1], " (", round(load[1], 0), "%)"),
+       ylab = paste0("PC", axis[2], " (", round(load[2], 0), "%)"),
+       cex.lab = 1.5,
+       
        ...)
 
   ## The convex hull
