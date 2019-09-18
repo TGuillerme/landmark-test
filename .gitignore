@@ -19,3 +19,4 @@ Manuscript/Figures/*.pdf
 ## Ignore ply and surface files
 *.ply
 *.stl
+Manuscript/PCA_differences.docx
