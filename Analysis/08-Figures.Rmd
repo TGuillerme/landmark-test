@@ -82,8 +82,8 @@ gg.color.hue <- function(n) {
 
 pdf("../Manuscript/Figures/Figure1_PCA.pdf", height = 10, width = 12)
 par(mfrow = c(2,2))
-plot.pca(land_data$cranium$ordination, classifier_cranium$Species, cex.axis=1.2  );legend("bottomleft", c("Common", "Southern HN", "Northern HN"), pt.bg=(gg.color.hue(3)),pch=21, bty="n", cex=1.2, y.intersp = 0.7 ); legend ("top", "All Species - Cranium", bty="n", cex=1.5)
-plot.pca(land_data$mandible$ordination, classifier_mandible$Species,cex.axis=1.2 ); legend ("top", "All Species - Mandible", bty="n", cex=1.2)
+plot.pca(land_data$cranium$ordination, classifier_cranium$Species, cex.axis=1.2  );legend("bottomleft", c("Common", "Southern HN", "Northern HN"), pt.bg=(gg.color.hue(3)),pch=21, bty="n", cex=1.2); legend ("top", "All Species - Cranium", bty="n", cex=1.5)
+plot.pca(land_data$mandible$ordination, classifier_mandible$Species,cex.axis=1.2 ); legend ("top", "All Species - Mandible", bty="n", cex=1.5)
 
 
 ## Loading the data for the within-species PCA plots
@@ -93,8 +93,8 @@ classifier_cranium_Lasio= subset(classifier_cranium, classifier_cranium$Species 
 classifier_mandible_Lasio= subset(classifier_mandible, classifier_mandible$Species != "Common wombat" )
 
 
-plot.pca(HN$cranium$ordination, classifier_cranium_Lasio$Species, cex.axis=1.2 );  legend ("top", "Hairy-nosed - Cranium", bty="n", cex=1.2)
-plot.pca(HN$mandible$ordination, classifier_mandible_Lasio$Species, cex.axis=1.2 );  legend ("top", "Hairy-nosed - Mandible", bty="n", cex=1.5)
+plot.pca(HN$cranium$ordination, classifier_cranium_Lasio$Species, cex.axis=1.5 );  legend ("top", "Hairy-nosed - Cranium", bty="n", cex=1.5)
+plot.pca(HN$mandible$ordination, classifier_mandible_Lasio$Species, cex.axis=1.5 );  legend ("top", "Hairy-nosed - Mandible", bty="n", cex=1.5)
 
 dev.off()
 
@@ -150,9 +150,9 @@ gg.color.hue <- function(n) {
 pdf("../Manuscript/Figures/SuppX_Residual_PCA.pdf", height = 10, width = 12)
 #plot.new()
 par(mfrow = c(2,2))
-plot.pca(ordination_cran, classifier_cranium$Species, cex.axis=1.2 );legend("bottomleft", c("Common", "Southern HN", "Northern HN"), pt.bg=(gg.color.hue(3)),pch=21, bty="n", cex=1.2 ); legend ("top", "All Species - Cranium", bty="n", cex=1.2)
+plot.pca(ordination_cran, classifier_cranium$Species, cex.axis=1.2 );legend("bottomleft", c("Common", "Southern HN", "Northern HN"), pt.bg=(gg.color.hue(3)),pch=21, bty="n", cex=1.2 ); legend ("top", "All Species - Cranium", bty="n", cex=1.5)
 
-plot.pca(ordination_mand, classifier_mandible$Species, cex.axis=1.2); legend ("top", "All Species - Mandible", bty="n", cex=1.2)
+plot.pca(ordination_mand, classifier_mandible$Species, cex.axis=1.2); legend ("top", "All Species - Mandible", bty="n", cex=1.5)
 
 
 ## Loading the data for the within-species PCA plots
@@ -161,8 +161,8 @@ classifier_cranium_Lasio= subset(classifier_cranium, classifier_cranium$Species 
 classifier_mandible_Lasio= subset(classifier_mandible, classifier_mandible$Species != "Common wombat" )
 
 
-plot.pca(ordination_cran_las, classifier_cranium_Lasio$Species, cex.axis=1.2);  legend ("top", "Hairy-nosed - Cranium", bty="n", cex=1.2)
-plot.pca(ordination_mand_las, classifier_mandible_Lasio$Species, cex.axis=1.2);  legend ("top", "Hairy-nosed - Mandible", bty="n", cex=1.2 )
+plot.pca(ordination_cran_las, classifier_cranium_Lasio$Species, cex.axis=1.2);  legend ("top", "Hairy-nosed - Cranium", bty="n", cex=1.5)
+plot.pca(ordination_mand_las, classifier_mandible_Lasio$Species, cex.axis=1.2);  legend ("top", "Hairy-nosed - Mandible", bty="n", cex=1.5 )
 
 dev.off()
 

@@ -842,7 +842,7 @@ plot.pca <- function(ordination, classifier, axis = c(1, 2), ...) {
   plot(NULL, xlim = plot_lim, ylim = plot_lim,
        xlab = paste0("PC", axis[1], " (", round(load[1], 0), "%)"),
        ylab = paste0("PC", axis[2], " (", round(load[2], 0), "%)"),
-       cex.lab = 1.5,
+       cex.lab = 1.3,
        
        ...)
 
