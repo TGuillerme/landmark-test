@@ -1,4 +1,4 @@
-﻿# @param species the species name
+# @param species the species name
 # @param dataset the type of dataset (cranium or mandible)
 # @param path the path where the processed data is
 # @param combine.land whether to combine the landmarks (only two partitions)
@@ -103,7 +103,7 @@ pipeline.test <- function(species, dataset, path, verbose = FALSE, rarefaction, 
 }
 
 
-## Summary pipeline
+##Summary pipeline
 pipeline.plots <- function(results, export = FALSE){
 
     ## Plot the size differences
@@ -180,7 +180,7 @@ make.table <- function(results, correction, partition.args) {
         p_name <- "p value"
     }
 
-    ## Adding the partitions names
+    ##Adding the partitions names
     if(!is.null(partition.args$partitions)) {
         summary_table <- data.frame(summary_table)
         summary_table[,1] <- partition.args$partitions
@@ -221,7 +221,7 @@ make.xtable <- function(results, correction, partition.args, digits = 3, caption
         }
     }
 
-    ## Bold cells function
+    ##Bold cells function
     bold.cells <- function(x) gsub('BOLD(.*)', paste0('\\\\textbf{\\1', '}'), x)
 
     ## convert into xtable format
@@ -247,7 +247,7 @@ make.plots <- function(results, type, add.p = FALSE, correction, rarefaction = F
     ## Number of plots
     n_plots <- length(results)
 
-    ## Plotting parameters
+    ##Plotting parameters
     if(!missing(path)) {
         pdf(file = path)
     } else {
@@ -283,7 +283,7 @@ make.plots <- function(results, type, add.p = FALSE, correction, rarefaction = F
 
         ## p_value
         if(add.p) {
-            ## Get the coordinates for the text
+            ##Get the coordinates for the text
             text_pos <- ifelse(table_res[one_plot, "Observed"] < table_res[one_plot, "Random mean"], "topleft", "topright")
             ## Add the text
             legend(text_pos, paste(colnames(table_res)[6], round(table_res[one_plot, 6], 5), sep = "\n")  , bty = "n")
@@ -518,7 +518,7 @@ summarise.results <- function(CI, rarefaction, print.token = FALSE, rounding = 4
 
     } else {
 
-        ## Make the empty table
+        ##Make the empty table
         results_table <- data.frame(matrix(NA, ncol = length(species)*4, nrow = 6+1))
     
         ## Loop through the datasets
@@ -702,7 +702,7 @@ plot.test.results <- function(data, rarefaction, p.value = 0.001, no.rar, ignore
     rownames(value_to_plot) <- rev(seq(from = 0, to = 1, length.out = nrow(value_to_plot)))
     colnames(value_to_plot) <- seq(from = 0, to = 1, length.out = ncol(value_to_plot))
 
-    ## Getting the list of blocks coordinates from a named TRUE/FALSE matrix
+    ##Getting the list of blocks coordinates from a named TRUE/FALSE matrix
     get.coords <- function(list_coords) {
         list_blocks_x <- as.numeric(t(apply(list_coords, 1, function(x) names(x))))
         list_blocks_y <- as.numeric(apply(list_coords, 2, function(x) names(x)))
@@ -733,12 +733,12 @@ plot.test.results <- function(data, rarefaction, p.value = 0.001, no.rar, ignore
         rar_coords[,no.rar] <- FALSE
     }
 
-    ## Getting the list of blocks coordinates that are the same between rar and normal
+    ##Getting the list of blocks coordinates that are the same between rar and normal
     rar_coords <- get.coords(rar_coords)
 
     ## Getting the polygon coordinates
     get.polygon.coordinates <- function(block_x, block_y, image_matrix, lwd) {
-        ## Get the size of the pixels
+        ##Get the size of the pixels
         x_size <- diff(seq(from = 0, to = 1, length.out = ncol(image_matrix)))[1]
         y_size <- diff(seq(from = 0, to = 1, length.out = nrow(image_matrix)))[1]
 
@@ -793,7 +793,7 @@ plot.test.results <- function(data, rarefaction, p.value = 0.001, no.rar, ignore
         rownames(image_coords) <- rev(seq(from = 0, to = 1, length.out = nrow(image_matrix)))
         colnames(image_coords) <- seq(from = 0, to = 1, length.out = ncol(image_matrix))
 
-        ## Getting the list of blocks coordinates that are the same between rar and normal
+        ##Getting the list of blocks coordinates that are the same between rar and normal
         image_coords <- get.coords(image_coords)
 
         ## Adding the polygons
@@ -832,7 +832,7 @@ plot.pca <- function(ordination, classifier, axis = c(1, 2), ...) {
   ## The data
   data <- ordination$x[,axis]
 
-  ## The plot limits
+  ##The plot limits
   plot_lim <- range(as.vector(c(data)))
 
   ## The loadings
@@ -849,10 +849,10 @@ plot.pca <- function(ordination, classifier, axis = c(1, 2), ...) {
     ## Placeholder
     chull_list <- list()
 
-    ## Splitting the data per classifiers
+    ##Splitting the data per classifiers
     data_class <- mapply(cbind, split(data[,1], classifier), split(data[,2], classifier))
 
-    ## Getting the convex hull positions per classifiers
+    ##Getting the convex hull positions per classifiers
     chull_pos <- lapply(data_class, chull)
 
     ## Getting the chull coordinates per classifier
