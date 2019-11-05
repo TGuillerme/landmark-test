@@ -1,18 +1,9 @@
 # landmark-test
 Authors: [Vera Weisbecker](v.weisbecker@uq.edu.au), [Thomas Guillerme](mailto:guillert@tcd.ie), [Cruise Speck](), [Emma Sherratt](), [Hyab Mehari Abraha](), [Alana C. Sharp](), [Claire E. Terhune](), [Simon Collins](), [Steve Johnston](), [Olga Panagiotopoulou]()
 
-This repository contains all the code and data used in the manuscript: *Individual variation of the masticatory system dominates 3D skull shape in the herbivory-adapted marsupial wombats.* ([link to the preprint](https://www.biorxiv.org/content/10.1101/692632v1)).
+This repository contains all the code and data used in the manuscript:
 
-<!-- To cite the paper:  -->
-<!-- > @@@ -->
-
-<!-- To cite this repo:  -->
-<!-- > @@@ -->
-
-# Data
-
-<!-- All the data used in the manuscript is archive on [Figshare](https://figshare.com/s/7a8fde8eaa39a3d3cf56). -->
-
+Weisbecker, V., Guillerme, T., Speck, C. et al. Individual variation of the masticatory system dominates 3D skull shape in the herbivory-adapted marsupial wombats. Front Zool 16, 41 (2019) [doi:10.1186/s12983-019-0338-5](https://frontiersinzoology.biomedcentral.com/articles/10.1186/s12983-019-0338-5)
 
 # Analyses
 
