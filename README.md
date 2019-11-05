@@ -5,6 +5,8 @@ This repository contains all the code and data used in the manuscript:
 
 Weisbecker, V., Guillerme, T., Speck, C. et al. Individual variation of the masticatory system dominates 3D skull shape in the herbivory-adapted marsupial wombats. Front Zool 16, 41 (2019) [doi:10.1186/s12983-019-0338-5](https://frontiersinzoology.biomedcentral.com/articles/10.1186/s12983-019-0338-5)
 
+This repo is based on code from the [`landvR` package](https://github.com/TGuillerme/landvR).
+
 # Analyses
 
 The tables and figures present in the manuscript are all reproducible through the following scripts:
